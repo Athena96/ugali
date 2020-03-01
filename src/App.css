@@ -1,5 +1,5 @@
 .App {
-  text-align: center;
+  text-align: left;
 }
 
 .App-logo {
@@ -35,4 +35,58 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+#title {
+  text-align: center;
+  font-family: arial, sans-serif;
+}
+
+/* #transactions {
+  text-align: center;
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  border: 3px solid #ddd;
+  width: 100%;
+} */
+
+#transactions td, #transactions th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#transactions tr:nth-child(even){background-color: #f2f2f2;}
+#transactions tr:hover {background-color: #ddd;}
+#transactions th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: center;
+  background-color: #FFAC31;
+  color: white;
+}
+
+.button {
+  background-color: #31465F;
+  border: none;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 8px;
+  font-size: 16px;
+  margin: 4px 2px;
+}
+
+.Link {
+  background-color: #31465F;
+  border: none;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 8px;
+  font-size: 16px;
+  margin: 4px 2px;
 }

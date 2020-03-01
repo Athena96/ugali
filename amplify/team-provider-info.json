@@ -1,0 +1,20 @@
+{
+    "ugalienv": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-ugali-ugalienv-95004-authRole",
+            "UnauthRoleArn": "arn:aws:iam::173916683421:role/amplify-ugali-ugalienv-95004-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::173916683421:role/amplify-ugali-ugalienv-95004-authRole",
+            "Region": "us-west-2",
+            "DeploymentBucketName": "amplify-ugali-ugalienv-95004-deployment",
+            "UnauthRoleName": "amplify-ugali-ugalienv-95004-unauthRole",
+            "StackName": "amplify-ugali-ugalienv-95004",
+            "StackId": "arn:aws:cloudformation:us-west-2:173916683421:stack/amplify-ugali-ugalienv-95004/173d6780-5be5-11ea-a09d-06c82e60cd18",
+            "AmplifyAppId": "d2i7grpxbxqdu4"
+        },
+        "categories": {
+            "auth": {
+                "ugali9cbd228b": {}
+            }
+        }
+    }
+}
