@@ -1,5 +1,6 @@
 // React
-import React, { useEffect } from 'react';
+import React, { Component } from 'react';
+
 import { BrowserRouter, Route, Link, Switch } from 'react-router-dom';
 
 // Amplify
@@ -7,8 +8,8 @@ import { withAuthenticator } from 'aws-amplify-react';
 import API from '@aws-amplify/api';
 import PubSub from '@aws-amplify/pubsub';
 import awsconfig from './aws-exports';
-import { Hub } from 'aws-amplify';
 import Amplify from 'aws-amplify';
+import { Auth } from 'aws-amplify';
 
 // Components
 import AddTransaction from "./AddTransaction";
@@ -19,45 +20,63 @@ import './App.css';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
-// new
 Amplify.configure(awsconfig);
 
+class App extends Component {
 
-function App() {
+  constructor(props) {
+    super(props);
+    this.state = { user: "" };
+  }
 
-  useEffect(() => {
+  async signOut() {
+    try {
+      await Auth.signOut()
+      this.props.rerender()
 
-    Hub.listen('auth', (data) => {
-      const { payload } = data
-      console.log('A new auth event has happened: ', data)
-       if (payload.event === 'signIn') {
-         console.log('a user has signed in!' + payload.data.attributes.email);
-       }
-       if (payload.event === 'signOut') {
-         console.log('a user has signed out!')
-       }
-    })
-  }, []);
+      // this.props.navigation.navigate('Auth')
+    } catch (err) {
+      console.log('error signing out...', err)
+    }
+  }
 
-  return (
-    <div>
-    <div>
+  componentDidMount() {
+    Auth.currentAuthenticatedUser().then(user => {
+      let email = user.attributes.email;
+      this.setState({user: email});
+    }).catch((err) => {
+        window.alert("Encountered error fetching your username: \n",err);
+    });
+  }
 
-    <BrowserRouter>
-      <div>
-        <Link className="Link" to="/transactions">Transactions</Link>
-        <Link className="Link" to="/addTransaction">Add Transaction</Link>
-        <Switch>
-          <Route path="/addTransaction" component={AddTransaction} />
-          <Route path="/transactions" component={Transactions} />
-          <Route path="/" component={Transactions} />
-        </Switch>
+  render() {
+    return (
+      <div className="links">
+        
+        <div align="right">
+          <h2 align="right">{ "Hello  " + this.state.user}
+          <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button></h2>
+        </div>
+      
+        <hr/>
+
+      <BrowserRouter>
+        <div>
+          <Link className="Link" to="/transactions"><b>Transactions</b></Link>
+          <Link className="Link" to="/addTransaction"><b>Add Transaction</b></Link>
+          <Switch>
+            <Route path="/addTransaction" component={AddTransaction} />
+            <Route path="/transactions" component={Transactions} />
+            <Route path="/" component={Transactions} />
+          </Switch>
+        </div>
+      </BrowserRouter>
       </div>
-    </BrowserRouter>
+    );
+  }
 
-    </div>
-    </div>
-  );
 }
-
-export default withAuthenticator(App, true);
+export default props =>  {
+  const AppComponent = withAuthenticator(App)
+  return <AppComponent {...props} />
+}

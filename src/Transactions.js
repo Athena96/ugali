@@ -1,5 +1,5 @@
 // React
-import React, { useEffect, useReducer } from 'react';
+import React, { Component } from 'react';
 
 // Amplify
 import API, { graphqlOperation } from '@aws-amplify/api';
@@ -10,54 +10,39 @@ import { Auth } from 'aws-amplify';
 // graphql
 import { listTransactions } from './graphql/queries';
 
-// Components
-import App from "./App.js";
-
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
 
 // Constants
 const TXN_LIMIT = 100;
 
-const QUERY = 'QUERY';
 
-// State
-const initialState = {
-    transactions: []
-};
+class Transactions extends Component {
+    constructor(props) {
+        console.log("constructor");
 
-// todo stop using this confusing reducer stuff, use "setState()" instead
-const reducer = (state, action) => {
-    switch (action.type) {
-        case QUERY:
-            console.log(App.glob);
-            console.log("QUERY, ", action);
-            return { ...state, transactions: action.transactions};
-        default:
-            return state;
+        super(props);
+        this.state = { transactions: [] };
+        this.handleChange = this.handleChange.bind(this); // handles state change
+        this.componentDidMount = this.componentDidMount.bind(this); 
     }
-}
 
-function Transactions() {
-
-    const [state, dispatch] = useReducer(reducer, initialState);
-
-    function renderTableHeader() {
+    renderTableHeader() {
         let header = ['title', 'amount', 'date', 'category', 'type', 'payment_method', 'description'];
         return header.map((key, index) => {
             return <th key={index}>{key.toUpperCase()}</th>
         })
     }
 
-    function renderTableData() {
-        return state.transactions.map((transaction, index) => {
+    renderTableData() {
+        return this.state.transactions.map((transaction, index) => {
             const { id, title, amount, category, date, type, payment_method, description} = transaction
             return (
                 <tr key={id}>
                     <td>{title}</td>
                     <td>{amount}</td>
-                    <td>{category}</td>
                     <td>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</td>
+                    <td>{category}</td>
                     <td>{type === 2 ? "Expense" : "Income"}</td>
                     <td>{payment_method}</td>
                     <td>{description}</td>
@@ -66,47 +51,58 @@ function Transactions() {
         })
     }
 
-    useEffect(() => {
+    componentDidMount() {
 
-        async function getData() {
-
-            let user = await Auth.currentAuthenticatedUser();
+        Auth.currentAuthenticatedUser().then(user => {
             let email = user.attributes.email;
+
             console.log("Fetching transactions for: " + email);
-            const transactionData = await API.graphql(graphqlOperation(listTransactions, { limit: TXN_LIMIT, filter: { user: { eq: email } } }));
+            API.graphql(graphqlOperation(listTransactions, { limit: TXN_LIMIT, filter: { user: { eq: email } } })).then(data => {
 
-            var sortedTxns = transactionData.data.listTransactions.items;
-            sortedTxns.sort((t1, t2) => {
-                var d1 = new Date(t1.date);
-                var d2 = new Date(t2.date);
-                if (d1 < d2)
-                    return 1;
-                if (d1 > d2)
-                    return -1;
-                return 0;
-            });
-            console.log(sortedTxns);
+                console.log(data);
+                var sortedTxns = data.data.listTransactions.items;
+                sortedTxns.sort((t1, t2) => {
+                    var d1 = new Date(t1.date);
+                    var d2 = new Date(t2.date);
+                    if (d1 < d2)
+                        return 1;
+                    if (d1 > d2)
+                        return -1;
+                    return 0;
+                });
+                console.log(sortedTxns);
+                this.setState({ transactions: sortedTxns });
+            }).catch((err) => {
+                window.alert("Encountered error fetching your transactions: \n",err);
+            })
+            
+        }).catch((err) => {
+            window.alert("Encountered error fetching your username: \n",err);
+        });
+        
+    }
 
-            dispatch({ type: QUERY, transactions: sortedTxns });
-        }
-        getData();
+    handleChange(event) {
+        var target = event.target;
+        var value = target.value;
+        var name = target.name;
+        this.setState({
+            [name]: value
+        });
+    }
 
-    }, []);
-
-    return (
-        <div className="App">
-            <br />
+    render() {
+        return (
             <div>
-                <table id='transactions'>
+                <table id='transactions' style={{ height: '100%', width: '100%' }}>
                     <tbody>
-                        <tr>{renderTableHeader()}</tr>
-                        {renderTableData()}
+                        <tr>{this.renderTableHeader()}</tr>
+                        {this.renderTableData()}
                     </tbody>
                 </table>
             </div>
-        </div>
-    );
+        );
+    }
 }
-
 
 export default Transactions;

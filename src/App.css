@@ -42,18 +42,19 @@
   font-family: arial, sans-serif;
 }
 
-/* #transactions {
-  text-align: center;
-  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
-  border: 3px solid #ddd;
-  width: 100%;
-} */
+.links {
+  padding: 10px;
+}
+
+#transactions {
+  padding-top: 15px;
+}
 
 #transactions td, #transactions th {
   border: 1px solid #ddd;
   padding: 8px;
 }
+
 
 #transactions tr:nth-child(even){background-color: #f2f2f2;}
 #transactions tr:hover {background-color: #ddd;}
@@ -69,20 +70,35 @@
   background-color: #31465F;
   border: none;
   color: white;
-  padding: 20px;
+  padding: 10px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 13px;
   margin: 4px 2px;
 }
+
+
+.signOut {
+  background-color: rgb(89, 93, 97);
+  border: none;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 8px;
+  font-size: 13px;
+  margin: 4px 20px;
+}
+
 
 .Link {
   background-color: #31465F;
   border: none;
   color: white;
-  padding: 20px;
+  padding: 15px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
