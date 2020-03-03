@@ -106,3 +106,10 @@
   font-size: 16px;
   margin: 4px 2px;
 }
+
+.addTransactionBackground {
+  background-color: #FFAC31;
+  border-radius: 8px;
+  padding: 10px;
+
+}

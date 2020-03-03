@@ -162,10 +162,10 @@ class AddTransaction extends Component {
 
   render() {
     return (
-      <div>
+      <div className="addTransactionBackground">
       <form onSubmit={this.handleSubmit}>
         <label>
-          Title:
+          Title:<br />
           <input
             name="title"
             type="text"
@@ -173,7 +173,7 @@ class AddTransaction extends Component {
             onChange={this.handleChange} />
         </label><br />
         <label>
-          Amount:
+          Amount:<br />
           <input
             name="amount"
             type="text"
@@ -181,7 +181,7 @@ class AddTransaction extends Component {
             onChange={this.handleChange} />
         </label><br />
         <label>
-          Category:
+          Category:<br />
           <input
             name="category"
             type="text"
@@ -189,7 +189,7 @@ class AddTransaction extends Component {
             onChange={this.handleChange} />
         </label><br />
         <label>
-          Date:
+          Date:<br />
           <input
             name="date"
             type="date"
@@ -197,7 +197,7 @@ class AddTransaction extends Component {
             onChange={this.handleChange} />
         </label><br />
         <label>
-          Description:
+          Description:<br />
           <textarea
             name="description"
             type="text"
@@ -205,7 +205,7 @@ class AddTransaction extends Component {
             onChange={this.handleChange} />
         </label><br />
         <label>
-          Payment Method:
+          Payment Method:<br />
           <input
             name="payment_method"
             type="text"
@@ -213,7 +213,7 @@ class AddTransaction extends Component {
             onChange={this.handleChange} />
         </label><br />
         <label>
-          Is Expense?:
+          Is Expense? (Uncheck if 'Income'):
           <input
             name="type"
             type="checkbox"

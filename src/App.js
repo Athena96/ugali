@@ -62,11 +62,11 @@ class App extends Component {
 
       <BrowserRouter>
         <div>
-          <Link className="Link" to="/transactions"><b>Transactions</b></Link>
-          <Link className="Link" to="/addTransaction"><b>Add Transaction</b></Link>
+          <Link className="Link" to="/transactions/"><b>Transactions</b></Link>
+          <Link className="Link" to="/addTransaction/"><b>Add Transaction</b></Link>
           <Switch>
-            <Route path="/addTransaction" component={AddTransaction} />
-            <Route path="/transactions" component={Transactions} />
+            <Route path="/addTransaction/" component={AddTransaction} />
+            <Route path="/transactions/" component={Transactions} />
             <Route path="/" component={Transactions} />
           </Switch>
         </div>
