@@ -56,8 +56,7 @@ class App extends Component {
 
       <BrowserRouter>
       
-        <div >
-
+        <div>
           <span class="left">
           <Link className="Link" to="/transactions/">Transactions</Link>
           <Link className="Link" to="/addTransaction/">Add Transaction</Link>
@@ -65,9 +64,7 @@ class App extends Component {
           <span class="right">
             <b>{ "Hello  " + this.state.user}</b>
             <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br/>
-
           </span>​
-        
         </div>
 
         <div>
@@ -77,7 +74,9 @@ class App extends Component {
             <Route path="/transactions/" component={Transactions} />
             <Route path="/" component={Transactions} />
           </Switch>
+
         </div>
+
       </BrowserRouter>
       </div>
     );

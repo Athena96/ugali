@@ -23,10 +23,13 @@ class Transactions extends Component {
         console.log("constructor");
 
         super(props);
-        this.state = { transactions: [] };
+        this.state = { transactions: [], year: '', month: '', VISIBLE_TXNS: [] };
         this.handleChange = this.handleChange.bind(this); // handles state change
         this.componentDidMount = this.componentDidMount.bind(this); 
         this.deleteTransaction = this.deleteTransaction.bind(this); 
+        this.filterTransactions = this.filterTransactions.bind(this); 
+        this.updateTransaction = this.updateTransaction.bind(this); 
+
     }
 
     async deleteTransaction(event) {
@@ -51,21 +54,29 @@ class Transactions extends Component {
         }
     }
 
+    updateTransaction(event) {
+        this.props.history.push('/AddTransaction/'+event.target.id)
+    }
+
     renderTransactionData() {
-        return this.state.transactions.map((transaction, index) => {
+        return this.state.VISIBLE_TXNS.map((transaction, index) => {
             const { id, title, amount, category, date, type, payment_method, description} = transaction;
             console.log("ID: ",id);
             var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
             console.log(description);
             if (description === null) {
                 return (
-                    <div>
+                    <div >
                     <div className={classname}>
-                    <span class="left"><font size="4.5">{title}- ${amount}</font></span>
+                    <span class="left"><font size="4.5">{title} - ${amount}</font></span>
                     <span class="right"><font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</font></span>
                     <br/>
                     <p><b>Category:</b> {category}  <b>Payment Method:</b> {payment_method}</p>
-                    <span class="right"><button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button></span>
+                    <span class="right">
+                        <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
+                        <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
+                    </span>
+
                     </div><br/>
                     </div>
                 )
@@ -73,12 +84,16 @@ class Transactions extends Component {
                 return (
                     <div>
                     <div className={classname}>
-                    <span class="left"><font size="4.5">{title}- ${amount}</font></span>
+                    <span class="left"><font size="4.5">{title} - ${amount}</font></span>
                     <span class="right"><font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</font></span>
                     <br/>
                     <p><b>Category:</b> {category}  <b>Payment Method:</b> {payment_method}</p>
                     <p><b>Description:</b><br/>{description}</p>
-                    <span class="right"><button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button></span>
+                    <span class="right">
+                        <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
+                        <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
+                    </span>
+
                     </div><br/>
                     </div>
                 )
@@ -86,6 +101,54 @@ class Transactions extends Component {
             
             
         })
+    }
+
+    renderCategorySummary() {
+        var categoryAgg = {}
+
+        for (var txn of this.state.VISIBLE_TXNS) {
+            if (categoryAgg[txn.category] === undefined) {
+                categoryAgg[txn.category] = 0.0
+            } else {
+                if (txn.type === 2) {
+                    categoryAgg[txn.category] += txn.amount
+                } else {
+                    categoryAgg[txn.category] -= txn.amount
+                }
+            }
+        }
+
+        console.log("categoryAgg: ", categoryAgg);
+        for (var key in categoryAgg) {
+            return (
+            <p>{key}: ${categoryAgg[key]}</p>
+            )
+        }
+
+    }
+
+    renderPaymentMethod() {
+        var categoryAgg = {}
+
+        for (var txn of this.state.VISIBLE_TXNS) {
+            if (categoryAgg[txn.payment_method] === undefined) {
+                categoryAgg[txn.payment_method] = 0.0
+            } else {
+                if (txn.type === 2) {
+                    categoryAgg[txn.payment_method] += txn.amount
+                } else {
+                    categoryAgg[txn.payment_method] -= txn.amount
+                }
+            }
+        }
+
+        console.log("categoryAgg: ", categoryAgg);
+        for (var key in categoryAgg) {
+            return (
+            <p>{key}: ${categoryAgg[key]}</p>
+            )
+        }
+
     }
 
     componentDidMount() {
@@ -109,6 +172,8 @@ class Transactions extends Component {
                 });
                 console.log(sortedTxns);
                 this.setState({ transactions: sortedTxns });
+                this.setState({ VISIBLE_TXNS: sortedTxns });
+
             }).catch((err) => {
                 window.alert("Encountered error fetching your transactions: \n",err);
             })
@@ -119,6 +184,30 @@ class Transactions extends Component {
         
     }
 
+    async filterTransactions(e) {
+        console.log("SUBMIT")
+        if (this.state.year === null || this.state.year === undefined || this.state.year === "" || 
+        this.state.month === null || this.state.month === undefined || this.state.month === "") {
+            window.alert("Must enter year and month (YYYY for year, and MM for month)");
+            return;
+        }
+        var filteredTxns = [];
+
+        for (var txn of this.state.transactions) {
+            console.log(txn.date);
+            console.log(typeof txn.date);
+            var dateParts = txn.date.split("-");
+            var year = dateParts[0];
+            var month = dateParts[1];
+            if (year === this.state.year && month === this.state.month) {
+                filteredTxns.push(txn);
+            }
+        }
+
+        this.setState({VISIBLE_TXNS: filteredTxns})
+        
+    }
+
     handleChange(event) {
         var target = event.target;
         var value = target.value;
@@ -126,13 +215,55 @@ class Transactions extends Component {
         this.setState({
             [name]: value
         });
+        console.log(this.state.year);
+        console.log(this.state.month);
     }
 
     render() {
         return (
-            <div>
-                {this.renderTransactionData()}
+                    
+                <div>
+
+                    <div>
+                        <input
+                        className="roundedOutline"
+                        name="year"
+                        type="text"
+                        value={this.state.year}
+                        onChange={this.handleChange} />
+
+                        <input
+                        className="roundedOutline"
+                        name="month"
+                        type="text"
+                        value={this.state.month}
+                        onChange={this.handleChange} />
+                
+                        <button class="filter" onClick={this.filterTransactions}>filter</button>
+                    </div>
+
+                    <div id="container">
+                    
+                        <div id="leftThing">
+                            <h3>Category Summary</h3>
+                            {this.renderCategorySummary()}
+                        </div>
+
+                        <div id="content">
+                            <h3>Payment Method</h3>
+                            {this.renderPaymentMethod()}
+                        </div>
+
+                        <div id="rightThing">
+                        </div>
+                    </div>
+
+                <div>
+                    {this.renderTransactionData()}
+                </div>
+
             </div>
+
         );
     }
 }

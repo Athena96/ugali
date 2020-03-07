@@ -3,6 +3,8 @@ import React, { Component } from "react";
 import { Auth } from 'aws-amplify';
 import API, { graphqlOperation } from '@aws-amplify/api';
 import { createTransaction } from './graphql/mutations';
+import { getTransaction } from './graphql/queries';
+import { updateTransaction } from './graphql/mutations';
 
 function getDoubleDigitFormat(number) {
   return (number < 10) ? "0"+number : number; 
@@ -35,21 +37,69 @@ class AddTransaction extends Component {
 
   constructor(props) {
     super(props);
+
+    var txnId = null;
+    if (props.history.location.pathname.split('/')[2] !== "") {
+      txnId = props.history.location.pathname.split('/')[2];
+
+    } 
+
     var strDate =  formatDate(new Date());
+      this.state = {
+        title: "",
+        amount: "0.00",
+        category: "",
+        date: strDate,
+        description: "",
+        payment_method: "",
+        type: 2 ,
+        user: "",
+        updateTxnId: txnId
+      };
+    
+    this.componentDidMount = this.componentDidMount.bind(this); 
 
-    this.state = {
-      title: "",
-      amount: "0.00",
-      category: "",
-      date: strDate,
-      description: "",
-      payment_method: "",
-      type: 2 ,
-      user: ""
-    };
-
-    this.handleSubmit = this.handleSubmit.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.renderButton = this.renderButton.bind(this);
+
+    
+  }
+
+  componentDidMount() {
+console.log("componentDidMount");
+    if (this.state.updateTxnId != null) {
+      Auth.currentAuthenticatedUser().then(user => {
+        let email = user.attributes.email;
+  
+        console.log("Fetching transactions for: " + email);
+        API.graphql(graphqlOperation(getTransaction, { id: this.state.updateTxnId })).then(data => {
+          console.log(data);
+          const txn = data.data.getTransaction;
+          console.log(txn.date);
+
+         var dt = txn.date.split('-')[0]+"-"+txn.date.split('-')[1] + "-" + txn.date.split('-')[2].split('T')[0];
+            this.setState({
+              title: txn.title,
+              amount: txn.amount,
+              category: txn.category,
+              date: dt,
+              description: txn.description === null ? "" : txn.description,
+              payment_method: txn.payment_method,
+              type: txn.type,
+              user: txn.user,
+              updateTxnId: this.state.updateTxnId
+            });
+  
+        }).catch((err) => {
+            window.alert("Encountered error fetching your transactions: \n",err);
+        })
+        
+    }).catch((err) => {
+        window.alert("Encountered error fetching your username: \n",err);
+    });
+    }
+    
   }
 
   handleChange(event) {
@@ -65,6 +115,20 @@ class AddTransaction extends Component {
     });
   }
 
+  renderButton() {
+
+    if (this.state.updateTxnId != null) {
+      return(
+        <input class="updateButton" type="submit" value="Update" />
+      )
+    } else {
+      return(
+        <input class="addButton" type="submit" value="Submit" />
+      )
+    }
+    
+  }
+
   resetState() {
     var strDate =  formatDate(new Date());
     this.setState({
@@ -75,7 +139,8 @@ class AddTransaction extends Component {
       description: "",
       payment_method: "",
       type: 2 ,
-      user: ""
+      user: "",
+      updateTxnId: ""
     });
   }
 
@@ -112,7 +177,9 @@ class AddTransaction extends Component {
     var formattedDate = convertDateStrToGraphqlDate(this.state.date);
 
     // extract txn from state.
-    var transaction = {
+    var transaction = {};
+    if (this.state.updateTxnId == null) {
+      transaction = {
         title: this.state.title,
         amount: this.state.amount,
         category: this.state.category,
@@ -122,6 +189,20 @@ class AddTransaction extends Component {
         type: this.state.type,
         user: this.state.user
     }
+    } else {
+      transaction = {
+        id: this.state.updateTxnId,
+        title: this.state.title,
+        amount: this.state.amount,
+        category: this.state.category,
+        date: this.state.date,
+        description: this.state.description,
+        payment_method: this.state.payment_method,
+        type: this.state.type,
+        user: this.state.user
+    }
+    }
+   
     // fill in description
     if (transaction.description === '') {
         transaction.description = null;
@@ -145,9 +226,18 @@ class AddTransaction extends Component {
 
     // submit
     try {
-      const res = await API.graphql(graphqlOperation(createTransaction, { input: transaction }));
-      console.log("SUCCESS! \n",res);
-      window.alert("Successfully added your transaction!");
+
+      if (this.state.updateTxnId == null) {
+        const res = await API.graphql(graphqlOperation(createTransaction, { input: transaction }));
+        console.log("SUCCESS! \n",res);
+        window.alert("Successfully added your transaction!");
+      } else {
+        // UPDATE
+        const res = await API.graphql(graphqlOperation(updateTransaction, { input: transaction }));
+        console.log("SUCCESS! \n",res);
+        window.alert("Successfully updated your transaction!");
+      }
+      
     } catch(err) {
       console.log("FAILURE! \n",err);
       var errorMessages = [];
@@ -235,7 +325,8 @@ class AddTransaction extends Component {
             </label>
             </div>
         <br />
-        <input class="addButton" type="submit" value="Submit" />
+        {this.renderButton()}
+
       </form>
    
       </div>
