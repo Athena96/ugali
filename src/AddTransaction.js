@@ -166,6 +166,7 @@ class AddTransaction extends Component {
         <label>
           Title:<br />
           <input
+            className="rounded"
             name="title"
             type="text"
             value={this.state.title}
@@ -174,6 +175,7 @@ class AddTransaction extends Component {
         <label>
           Amount:<br />
           <input
+            className="rounded"
             name="amount"
             type="text"
             value={this.state.amount}
@@ -182,6 +184,7 @@ class AddTransaction extends Component {
         <label>
           Category:<br />
           <input
+            className="rounded"
             name="category"
             type="text"
             value={this.state.category}
@@ -190,6 +193,7 @@ class AddTransaction extends Component {
         <label>
           Date:<br />
           <input
+          className="rounded"
             name="date"
             type="date"
             value={this.state.date}
@@ -198,6 +202,7 @@ class AddTransaction extends Component {
         <label>
           Description:<br />
           <textarea
+            className="rounded"
             name="description"
             type="text"
             value={this.state.description}
@@ -206,6 +211,7 @@ class AddTransaction extends Component {
         <label>
           Payment Method:<br />
           <input
+            className="rounded"
             name="payment_method"
             type="text"
             value={this.state.payment_method}

@@ -6,6 +6,7 @@ import API, { graphqlOperation } from '@aws-amplify/api';
 import PubSub from '@aws-amplify/pubsub';
 import awsconfig from './aws-exports';
 import { Auth } from 'aws-amplify';
+import { deleteTransaction } from './graphql/mutations';
 
 // graphql
 import { listTransactions } from './graphql/queries';
@@ -25,6 +26,29 @@ class Transactions extends Component {
         this.state = { transactions: [] };
         this.handleChange = this.handleChange.bind(this); // handles state change
         this.componentDidMount = this.componentDidMount.bind(this); 
+        this.deleteTransaction = this.deleteTransaction.bind(this); 
+    }
+
+    async deleteTransaction(event) {
+        try {
+            console.log(event.target.id);
+            var txnId = event.target.id;
+            const res = await API.graphql(graphqlOperation(deleteTransaction, {input: {id: txnId}}))
+            console.log(res);
+            window.alert("Successfully deleted your transaction!");
+            var newTxns = [];
+            for (var txn of this.state.transactions) {
+                if (txn.id !== txnId) {
+                    newTxns.push(txn);
+                }
+            }
+            this.setState({
+                transactions: newTxns
+            });
+        } catch (err) {
+            console.log("FAILURE! \n",err);
+            window.alert(err);
+        }
     }
 
     renderTransactionData() {
@@ -32,17 +56,34 @@ class Transactions extends Component {
             const { id, title, amount, category, date, type, payment_method, description} = transaction;
             console.log("ID: ",id);
             var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
+            console.log(description);
+            if (description === null) {
+                return (
+                    <div>
+                    <div className={classname}>
+                    <span class="left"><font size="4.5">{title}- ${amount}</font></span>
+                    <span class="right"><font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</font></span>
+                    <br/>
+                    <p><b>Category:</b> {category}  <b>Payment Method:</b> {payment_method}</p>
+                    <span class="right"><button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button></span>
+                    </div><br/>
+                    </div>
+                )
+            } else {
+                return (
+                    <div>
+                    <div className={classname}>
+                    <span class="left"><font size="4.5">{title}- ${amount}</font></span>
+                    <span class="right"><font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</font></span>
+                    <br/>
+                    <p><b>Category:</b> {category}  <b>Payment Method:</b> {payment_method}</p>
+                    <p><b>Description:</b><br/>{description}</p>
+                    <span class="right"><button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button></span>
+                    </div><br/>
+                    </div>
+                )
+            }
             
-            return (
-                <div>
-                <div className={classname}>
-                <span class="left"><font size="4.5">{title}- ${amount}</font></span>
-                <span class="right">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</span>​
-                <p><b>Category:</b> {category}  <b>Payment Method:</b> {payment_method}</p>
-                <p><b>Description:</b><br/>{description}</p>
-                </div><br/>
-                </div>
-            )
             
         })
     }
