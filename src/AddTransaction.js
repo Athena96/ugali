@@ -58,9 +58,8 @@ class AddTransaction extends Component {
     var name = target.name;
 
     if (name === "type") {
-      value = value ? 2 : 1;
+      value = parseInt(value);
     } 
-
     this.setState({
       [name]: value
     });
@@ -212,15 +211,25 @@ class AddTransaction extends Component {
             value={this.state.payment_method}
             onChange={this.handleChange} />
         </label><br />
-        <label>
-          Is Expense? (Uncheck if 'Income'):
-          <input
-            name="type"
-            type="checkbox"
-            checked={(this.state.type === 2 ? true : false)}
-            onChange={this.handleChange} />
-        </label><br />
-        <input type="submit" value="Submit" />
+
+          <div className="radio">
+            <label>
+              <input type="radio" name='type' value={2}
+                      checked={this.state.type === 2} 
+                      onChange={this.handleChange} />
+                      Expense
+            </label>
+          </div>
+          <div className="radio">
+            <label>
+              <input type="radio" name='type' value={1}
+                      checked={this.state.type === 1} 
+                      onChange={this.handleChange} />
+              Income
+            </label>
+            </div>
+        <br />
+        <input class="addButton" type="submit" value="Submit" />
       </form>
    
       </div>

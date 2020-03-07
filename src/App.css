@@ -79,7 +79,64 @@
   margin: 4px 2px;
 }
 
+.addButton {
+  background-color: rgb(3, 54, 6);
+  border: none;
+  color: white;
+  padding: 10px;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 8px;
+  font-size: 13px;
+  margin: 4px 2px;
+}
 
+.expenseTxn {
+  background-color: #31465F;
+  border: none;
+  color: white;
+  width: 96%;
+  padding: 10px;
+  text-align: left;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 8px;
+  font-size: 13px;
+  margin: 4px 2px;
+}
+.incomeTxn {
+  background-color: rgb(3, 54, 6);
+  border: none;
+  color: white;
+  width: 96%;
+  padding: 10px;
+  text-align: left;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 8px;
+  font-size: 13px;
+  margin: 4px 2px;
+}
+
+.addTransactionBackground {
+  background-color: rgb(197, 197, 197);
+  border-radius: 8px;
+  padding: 10px;
+  width: 96%;
+  display: inline-block;
+
+  margin: 4px 2px;
+  border-radius: 8px;
+}
+.right{
+  float:right;
+}
+
+.left{
+  float:left;
+}
 .signOut {
   background-color: rgb(89, 93, 97);
   border: none;
@@ -95,9 +152,8 @@
 
 
 .Link {
-  background-color: #31465F;
   border: none;
-  color: white;
+  color: rgb(10, 99, 231);
   padding: 15px;
   text-align: center;
   text-decoration: none;
@@ -107,9 +163,3 @@
   margin: 4px 2px;
 }
 
-.addTransactionBackground {
-  background-color: #FFAC31;
-  border-radius: 8px;
-  padding: 10px;
-
-}

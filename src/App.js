@@ -52,18 +52,26 @@ class App extends Component {
   render() {
     return (
       <div className="links">
-        
-        <div align="right">
-          <h2 align="right">{ "Hello  " + this.state.user}
-          <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button></h2>
-        </div>
       
-        <hr/>
 
       <BrowserRouter>
+      
+        <div >
+
+          <span class="left">
+          <Link className="Link" to="/transactions/">Transactions</Link>
+          <Link className="Link" to="/addTransaction/">Add Transaction</Link>
+          </span>
+          <span class="right">
+            <b>{ "Hello  " + this.state.user}</b>
+            <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br/>
+
+          </span>​
+        
+        </div>
+
         <div>
-          <Link className="Link" to="/transactions/"><b>Transactions</b></Link>
-          <Link className="Link" to="/addTransaction/"><b>Add Transaction</b></Link>
+          
           <Switch>
             <Route path="/addTransaction/" component={AddTransaction} />
             <Route path="/transactions/" component={Transactions} />

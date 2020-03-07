@@ -27,27 +27,23 @@ class Transactions extends Component {
         this.componentDidMount = this.componentDidMount.bind(this); 
     }
 
-    renderTableHeader() {
-        let header = ['title', 'amount', 'date', 'category', 'type', 'payment_method', 'description'];
-        return header.map((key, index) => {
-            return <th key={index}>{key.toUpperCase()}</th>
-        })
-    }
-
-    renderTableData() {
+    renderTransactionData() {
         return this.state.transactions.map((transaction, index) => {
-            const { id, title, amount, category, date, type, payment_method, description} = transaction
+            const { id, title, amount, category, date, type, payment_method, description} = transaction;
+            console.log("ID: ",id);
+            var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
+            
             return (
-                <tr key={id}>
-                    <td>{title}</td>
-                    <td>{amount}</td>
-                    <td>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</td>
-                    <td>{category}</td>
-                    <td>{type === 2 ? "Expense" : "Income"}</td>
-                    <td>{payment_method}</td>
-                    <td>{description}</td>
-                </tr>
+                <div>
+                <div className={classname}>
+                <span class="left"><font size="4.5">{title}- ${amount}</font></span>
+                <span class="right">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</span>​
+                <p><b>Category:</b> {category}  <b>Payment Method:</b> {payment_method}</p>
+                <p><b>Description:</b><br/>{description}</p>
+                </div><br/>
+                </div>
             )
+            
         })
     }
 
@@ -94,12 +90,7 @@ class Transactions extends Component {
     render() {
         return (
             <div>
-                <table id='transactions' style={{ height: '100%', width: '100%' }}>
-                    <tbody>
-                        <tr>{this.renderTableHeader()}</tr>
-                        {this.renderTableData()}
-                    </tbody>
-                </table>
+                {this.renderTransactionData()}
             </div>
         );
     }
