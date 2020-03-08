@@ -67,7 +67,9 @@ class AddTransaction extends Component {
   }
 
   componentDidMount() {
+
 console.log("componentDidMount");
+
     if (this.state.updateTxnId != null) {
       Auth.currentAuthenticatedUser().then(user => {
         let email = user.attributes.email;
@@ -179,6 +181,7 @@ console.log("componentDidMount");
     // extract txn from state.
     var transaction = {};
     if (this.state.updateTxnId == null) {
+      console.log("NEW");
       transaction = {
         title: this.state.title,
         amount: this.state.amount,
@@ -190,6 +193,8 @@ console.log("componentDidMount");
         user: this.state.user
     }
     } else {
+      console.log("UPDATE");
+
       transaction = {
         id: this.state.updateTxnId,
         title: this.state.title,
@@ -222,20 +227,24 @@ console.log("componentDidMount");
     // log the txn to be added
     console.log("Adding Transaction:");
     console.log(transaction);
-    this.resetState();
 
     // submit
     try {
 
       if (this.state.updateTxnId == null) {
+        console.log("ADD TXN...");
         const res = await API.graphql(graphqlOperation(createTransaction, { input: transaction }));
         console.log("SUCCESS! \n",res);
         window.alert("Successfully added your transaction!");
+        this.resetState();
+
       } else {
-        // UPDATE
+        console.log("UPDATE TXN...");
         const res = await API.graphql(graphqlOperation(updateTransaction, { input: transaction }));
         console.log("SUCCESS! \n",res);
         window.alert("Successfully updated your transaction!");
+        this.resetState();
+
       }
       
     } catch(err) {

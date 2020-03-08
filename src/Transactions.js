@@ -30,6 +30,9 @@ class Transactions extends Component {
         this.filterTransactions = this.filterTransactions.bind(this); 
         this.updateTransaction = this.updateTransaction.bind(this); 
 
+        // this.renderCategorySummary = this.renderCategorySummary.bind(this); 
+        // this.renderPaymentMethod = this.renderPaymentMethod.bind(this); 
+
     }
 
     async deleteTransaction(event) {
@@ -105,26 +108,27 @@ class Transactions extends Component {
 
     renderCategorySummary() {
         var categoryAgg = {}
+        console.log("renderCategorySummary: ");
 
         for (var txn of this.state.VISIBLE_TXNS) {
+            console.log("txn: ", txn);
             if (categoryAgg[txn.category] === undefined) {
                 categoryAgg[txn.category] = 0.0
+            } 
+            if (txn.type === 2) {
+                categoryAgg[txn.category] += txn.amount
             } else {
-                if (txn.type === 2) {
-                    categoryAgg[txn.category] += txn.amount
-                } else {
-                    categoryAgg[txn.category] -= txn.amount
-                }
+                categoryAgg[txn.category] -= txn.amount
             }
+            
         }
 
         console.log("categoryAgg: ", categoryAgg);
+        var ret = [];
         for (var key in categoryAgg) {
-            return (
-            <p>{key}: ${categoryAgg[key]}</p>
-            )
+            ret.push(<p>{key}: ${categoryAgg[key]}</p>);
         }
-
+        return ret;
     }
 
     renderPaymentMethod() {
@@ -133,22 +137,20 @@ class Transactions extends Component {
         for (var txn of this.state.VISIBLE_TXNS) {
             if (categoryAgg[txn.payment_method] === undefined) {
                 categoryAgg[txn.payment_method] = 0.0
-            } else {
-                if (txn.type === 2) {
+            }
+            if (txn.type === 2) {
                     categoryAgg[txn.payment_method] += txn.amount
                 } else {
                     categoryAgg[txn.payment_method] -= txn.amount
                 }
-            }
         }
 
         console.log("categoryAgg: ", categoryAgg);
+        var ret = [];
         for (var key in categoryAgg) {
-            return (
-            <p>{key}: ${categoryAgg[key]}</p>
-            )
+            ret.push(<p>{key}: ${categoryAgg[key]}</p>);
         }
-
+        return ret;
     }
 
     componentDidMount() {
@@ -194,8 +196,6 @@ class Transactions extends Component {
         var filteredTxns = [];
 
         for (var txn of this.state.transactions) {
-            console.log(txn.date);
-            console.log(typeof txn.date);
             var dateParts = txn.date.split("-");
             var year = dateParts[0];
             var month = dateParts[1];
@@ -204,7 +204,8 @@ class Transactions extends Component {
             }
         }
 
-        this.setState({VISIBLE_TXNS: filteredTxns})
+        console.log("setting state.");
+        this.setState({VISIBLE_TXNS: filteredTxns});
         
     }
 
