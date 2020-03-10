@@ -171,7 +171,12 @@ class Transactions extends Component {
             let email = user.attributes.email;
 
             console.log("Fetching transactions for: " + email);
-            API.graphql(graphqlOperation(listTransactions, { limit: TXN_LIMIT, filter: { user: { eq: email } } })).then(data => {
+            API.graphql(graphqlOperation(listTransactions, { 
+                limit: TXN_LIMIT, 
+                filter: { 
+                    user: { eq: email } 
+                } 
+            })).then(data => {
 
                 console.log(data);
                 var sortedTxns = data.data.listTransactions.items;
@@ -187,6 +192,10 @@ class Transactions extends Component {
                 console.log(sortedTxns);
                 this.setState({ transactions: sortedTxns });
                 this.setState({ VISIBLE_TXNS: sortedTxns });
+
+                if (data.data.listTransactions.nextToken !== null) {
+                    window.alert("There were some recurring transactions that could not be fetched, so this page is not accurate.");
+                }
 
             }).catch((err) => {
                 window.alert("Encountered error fetching your transactions: \n",err);

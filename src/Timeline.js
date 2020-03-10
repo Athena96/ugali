@@ -13,6 +13,9 @@ import { listTransactions } from './graphql/queries';
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
 
+// Constants
+const TXN_LIMIT = 100;
+
 class Transactions extends Component {
     constructor(props) {
         console.log("constructor");
@@ -60,11 +63,12 @@ class Transactions extends Component {
 
             console.log("Fetching transactions for: " + email);
             API.graphql(graphqlOperation(listTransactions, { 
+                limit: TXN_LIMIT,
                 filter: {
-                     user: { eq: email },
-                     is_recurring: { eq: true } 
-                    } 
-                })).then(data => {
+                    user: { eq: email },
+                    is_recurring: { eq: true } 
+                } 
+            })).then(data => {
 
                 console.log(data);
                 var sortedTxns = data.data.listTransactions.items;
@@ -78,6 +82,10 @@ class Transactions extends Component {
                     return 0;
                 });
                 this.setState({ recurring_txns: sortedTxns });
+
+                if (data.data.listTransactions.nextToken !== null) {
+                    window.alert("There were some recurring transactions that could not be fetched, so your generated timeline is not accurate.");
+                }
 
             }).catch((err) => {
                 window.alert("Encountered error fetching your transactions: \n",err);
