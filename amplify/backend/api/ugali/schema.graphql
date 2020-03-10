@@ -9,4 +9,5 @@ type Transaction @model {
   type: Int
   createdAt: AWSDateTime
   user: String
+  is_recurring: Boolean
 }

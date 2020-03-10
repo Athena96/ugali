@@ -13,6 +13,7 @@ export const getTransaction = `query GetTransaction($id: ID!) {
     type
     createdAt
     user
+    is_recurring
   }
 }
 `;
@@ -33,6 +34,7 @@ export const listTransactions = `query ListTransactions(
       type
       createdAt
       user
+      is_recurring
     }
     nextToken
   }

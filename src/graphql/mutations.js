@@ -16,6 +16,7 @@ export const createTransaction = `mutation CreateTransaction(
     type
     createdAt
     user
+    is_recurring
   }
 }
 `;
@@ -34,6 +35,7 @@ export const updateTransaction = `mutation UpdateTransaction(
     type
     createdAt
     user
+    is_recurring
   }
 }
 `;
@@ -52,6 +54,7 @@ export const deleteTransaction = `mutation DeleteTransaction(
     type
     createdAt
     user
+    is_recurring
   }
 }
 `;

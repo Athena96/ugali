@@ -42,14 +42,24 @@ class Transactions extends Component {
             const res = await API.graphql(graphqlOperation(deleteTransaction, {input: {id: txnId}}))
             console.log(res);
             window.alert("Successfully deleted your transaction!");
+            
             var newTxns = [];
             for (var txn of this.state.transactions) {
                 if (txn.id !== txnId) {
                     newTxns.push(txn);
                 }
             }
+
+            var VISIBLETxns = [];
+            for (var vtxn of this.state.VISIBLE_TXNS) {
+                if (vtxn.id !== txnId) {
+                    VISIBLETxns.push(vtxn);
+                }
+            }
+
             this.setState({
-                transactions: newTxns
+                transactions: newTxns,
+                VISIBLE_TXNS: VISIBLETxns,
             });
         } catch (err) {
             console.log("FAILURE! \n",err);
@@ -63,7 +73,7 @@ class Transactions extends Component {
 
     renderTransactionData() {
         return this.state.VISIBLE_TXNS.map((transaction, index) => {
-            const { id, title, amount, category, date, type, payment_method, description} = transaction;
+            const { id, title, amount, category, date, type, payment_method, description, is_recurring} = transaction;
             console.log("ID: ",id);
             var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
             console.log(description);
@@ -75,6 +85,7 @@ class Transactions extends Component {
                     <span class="right"><font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</font></span>
                     <br/>
                     <p><b>Category:</b> {category}  <b>Payment Method:</b> {payment_method}</p>
+                    <p><b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}</p>
                     <span class="right">
                         <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
                         <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
@@ -91,6 +102,7 @@ class Transactions extends Component {
                     <span class="right"><font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</font></span>
                     <br/>
                     <p><b>Category:</b> {category}  <b>Payment Method:</b> {payment_method}</p>
+                    <p><b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}</p>
                     <p><b>Description:</b><br/>{description}</p>
                     <span class="right">
                         <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>

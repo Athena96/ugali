@@ -14,6 +14,7 @@ import { Auth } from 'aws-amplify';
 // Components
 import AddTransaction from "./AddTransaction";
 import Transactions from './Transactions';
+import Timeline from './Timeline';
 
 // Style
 import './App.css';
@@ -58,6 +59,7 @@ class App extends Component {
       
         <div>
           <span class="left">
+          <Link className="Link" to="/timeline/">Timeline</Link>
           <Link className="Link" to="/transactions/">Transactions</Link>
           <Link className="Link" to="/addTransaction/">Add Transaction</Link>
           </span>
@@ -70,6 +72,7 @@ class App extends Component {
         <div>
           
           <Switch>
+            <Route path="/timeline/" component={Timeline} />
             <Route path="/addTransaction/" component={AddTransaction} />
             <Route path="/transactions/" component={Transactions} />
             <Route path="/" component={Transactions} />

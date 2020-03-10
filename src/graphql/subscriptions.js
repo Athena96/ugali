@@ -13,6 +13,7 @@ export const onCreateTransaction = `subscription OnCreateTransaction {
     type
     createdAt
     user
+    is_recurring
   }
 }
 `;
@@ -28,6 +29,7 @@ export const onUpdateTransaction = `subscription OnUpdateTransaction {
     type
     createdAt
     user
+    is_recurring
   }
 }
 `;
@@ -43,6 +45,7 @@ export const onDeleteTransaction = `subscription OnDeleteTransaction {
     type
     createdAt
     user
+    is_recurring
   }
 }
 `;

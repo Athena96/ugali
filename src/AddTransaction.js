@@ -33,6 +33,9 @@ function convertDateStrToGraphqlDate(dateStr) {
   }
 }
 
+var ORIGINAL_DATE = "";
+
+
 class AddTransaction extends Component {
 
   constructor(props) {
@@ -45,17 +48,18 @@ class AddTransaction extends Component {
     } 
 
     var strDate =  formatDate(new Date());
-      this.state = {
-        title: "",
-        amount: "0.00",
-        category: "",
-        date: strDate,
-        description: "",
-        payment_method: "",
-        type: 2 ,
-        user: "",
-        updateTxnId: txnId
-      };
+    this.state = {
+      title: "",
+      amount: "0.00",
+      category: "",
+      date: strDate,
+      description: "",
+      payment_method: "",
+      type: 2 ,
+      is_recurring: false,
+      user: "",
+      updateTxnId: txnId
+    };
     
     this.componentDidMount = this.componentDidMount.bind(this); 
 
@@ -68,8 +72,6 @@ class AddTransaction extends Component {
 
   componentDidMount() {
 
-console.log("componentDidMount");
-
     if (this.state.updateTxnId != null) {
       Auth.currentAuthenticatedUser().then(user => {
         let email = user.attributes.email;
@@ -80,7 +82,8 @@ console.log("componentDidMount");
           const txn = data.data.getTransaction;
           console.log(txn.date);
 
-         var dt = txn.date.split('-')[0]+"-"+txn.date.split('-')[1] + "-" + txn.date.split('-')[2].split('T')[0];
+            var dt = txn.date.split('-')[0]+"-"+txn.date.split('-')[1] + "-" + txn.date.split('-')[2].split('T')[0];
+            ORIGINAL_DATE = txn.date;
             this.setState({
               title: txn.title,
               amount: txn.amount,
@@ -90,6 +93,7 @@ console.log("componentDidMount");
               payment_method: txn.payment_method,
               type: txn.type,
               user: txn.user,
+              is_recurring: txn.is_recurring,
               updateTxnId: this.state.updateTxnId
             });
   
@@ -108,6 +112,8 @@ console.log("componentDidMount");
     var target = event.target;
     var value = target.type === 'checkbox' ? target.checked : target.value;
     var name = target.name;
+    console.log(value);
+    console.log(name);
 
     if (name === "type") {
       value = parseInt(value);
@@ -140,9 +146,10 @@ console.log("componentDidMount");
       date: strDate,
       description: "",
       payment_method: "",
-      type: 2 ,
+      type: 2,
+      is_recurring: false,
       user: "",
-      updateTxnId: ""
+      updateTxnId: null
     });
   }
 
@@ -190,22 +197,37 @@ console.log("componentDidMount");
         description: this.state.description,
         payment_method: this.state.payment_method,
         type: this.state.type,
+        is_recurring: this.state.is_recurring,
         user: this.state.user
-    }
+      }
+
+      transaction.date = formattedDate;
+
+
     } else {
       console.log("UPDATE");
+      console.log(this.state);
+
+      var d = "";
+      if (ORIGINAL_DATE.split('-')[2].split('T')[0] == this.state.date.split('-')[2]) {
+        d = ORIGINAL_DATE;
+      } else {
+        d = convertDateStrToGraphqlDate(this.state.date);
+
+      }
 
       transaction = {
         id: this.state.updateTxnId,
         title: this.state.title,
         amount: this.state.amount,
         category: this.state.category,
-        date: this.state.date,
+        date: d,
         description: this.state.description,
         payment_method: this.state.payment_method,
         type: this.state.type,
+        is_recurring: this.state.is_recurring,
         user: this.state.user
-    }
+      }
     }
    
     // fill in description
@@ -221,7 +243,6 @@ console.log("componentDidMount");
 
     // update state before submit
     transaction.user = email;
-    transaction.date = formattedDate;
     transaction.amount = numberAmount;
 
     // log the txn to be added
@@ -317,22 +338,32 @@ console.log("componentDidMount");
             onChange={this.handleChange} />
         </label><br />
 
-          <div className="radio">
-            <label>
-              <input type="radio" name='type' value={2}
-                      checked={this.state.type === 2} 
-                      onChange={this.handleChange} />
-                      Expense
-            </label>
-          </div>
-          <div className="radio">
-            <label>
-              <input type="radio" name='type' value={1}
-                      checked={this.state.type === 1} 
-                      onChange={this.handleChange} />
-              Income
-            </label>
-            </div>
+        <div className="radio">
+          <label>
+            <input type="radio" name='type' value={2}
+                    checked={this.state.type === 2} 
+                    onChange={this.handleChange} />
+                    Expense
+          </label>
+        </div>
+        <div className="radio">
+          <label>
+            <input type="radio" name='type' value={1}
+                    checked={this.state.type === 1} 
+                    onChange={this.handleChange} />
+            Income
+          </label>
+        </div>
+            
+        <label>
+          Is Recurring Transaction:
+          <input
+            name="is_recurring"
+            type="checkbox"
+            checked={this.state.is_recurring}
+            onChange={this.handleChange} />
+        </label><br />
+
         <br />
         {this.renderButton()}
 
