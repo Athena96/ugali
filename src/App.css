@@ -259,3 +259,13 @@
 #rightThing {
   width: 25%;
 }
+
+.bar {
+  float: left;
+  padding: 6px 8px 6px 16px;
+}
+
+.barbooks {
+  float: left;
+  padding: 6px 8px 6px 16px;
+}

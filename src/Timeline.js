@@ -148,16 +148,11 @@ class Transactions extends Component {
             }
         }
         
-       
-
-        // console.log("variable_exp_amount: ", localStorage.getItem("variable_exp_amount"));
-        // console.log("variable_exp_name: ", localStorage.getItem("variable_exp_name"));
-        // console.log("variable_exp_name: ", localStorage.getItem("me"));
-
         var balanceRows = [];
-        const DAY_TO_CALCULATE = 31; // 180d = ~6 months
+        const DAY_TO_CALCULATE = 31*6;
 
         var start = new Date();
+        start.setDate(start.getDate() - 1);
         var end = new Date();
         end.setDate(start.getDate() + DAY_TO_CALCULATE);
 
@@ -168,7 +163,7 @@ class Transactions extends Component {
             balanceRows[idx] = {
                 id: idx,
                 balanceDate: new Date(currentDay),
-                balance: (idx === 0) ? parseFloat(this.state.starting_balance) : balanceRows[idx-1].balance,
+                balance: (idx === 0) ? parseFloat(this.state.starting_balance).toFixed(2) : parseFloat(balanceRows[idx-1].balance).toFixed(2),
                 income: "",
                 incomeDesc: "",
                 expense: "",
@@ -211,6 +206,7 @@ class Transactions extends Component {
                 balanceRows[idx].balance += totalIncome;
                 balanceRows[idx].balance -= totalExpense;
 
+                balanceRows[idx].balance = parseFloat(balanceRows[idx].balance).toFixed(2);
                 // update income
                 var incomeStr = ""
                 var incomeDescStr = ""
