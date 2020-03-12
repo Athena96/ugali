@@ -24,15 +24,11 @@ class Transactions extends Component {
 
         super(props);
         this.state = { transactions: [], year: '', month: '', VISIBLE_TXNS: [] };
-        this.handleChange = this.handleChange.bind(this); // handles state change
+        this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.deleteTransaction = this.deleteTransaction.bind(this);
         this.filterTransactions = this.filterTransactions.bind(this);
         this.updateTransaction = this.updateTransaction.bind(this);
-
-        // this.renderCategorySummary = this.renderCategorySummary.bind(this); 
-        // this.renderPaymentMethod = this.renderPaymentMethod.bind(this); 
-
     }
 
     async deleteTransaction(event) {
@@ -74,9 +70,9 @@ class Transactions extends Component {
     renderTransactionData() {
         return this.state.VISIBLE_TXNS.map((transaction, index) => {
             const { id, title, amount, category, date, type, payment_method, description, is_recurring } = transaction;
-            console.log("ID: ", id);
             var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
-            console.log(description);
+            
+            // verified that descripted comes as null from DDB when there is no description.
             if (description === null) {
                 return (
                     <div >
@@ -120,10 +116,16 @@ class Transactions extends Component {
 
     componentDidMount() {
 
+        if (localStorage.getItem("year") != null) {
+            this.setState({year: localStorage.getItem("year") });
+        }
+        if (localStorage.getItem("month") != null) {
+            this.setState({month: localStorage.getItem("month") });
+        }
+
         Auth.currentAuthenticatedUser().then(user => {
             let email = user.attributes.email;
 
-            console.log("Fetching transactions for: " + email);
             API.graphql(graphqlOperation(listTransactions, { 
                 limit: TXN_LIMIT, 
                 filter: { 
@@ -150,6 +152,8 @@ class Transactions extends Component {
                     window.alert("There were some recurring transactions that could not be fetched, so this page is not accurate.");
                 }
 
+                this.filterTransactions();
+
             }).catch((err) => {
                 window.alert("Encountered error fetching your transactions: \n", err);
             })
@@ -162,8 +166,7 @@ class Transactions extends Component {
 
     async filterTransactions(e) {
         console.log("SUBMIT")
-        if (this.state.year === null || this.state.year === undefined || this.state.year === "" ||
-            this.state.month === null || this.state.month === undefined || this.state.month === "") {
+        if (this.state.year === "" || this.state.month === "") {
             window.alert("Must enter year and month (YYYY for year, and MM for month)");
             return;
         }
@@ -233,53 +236,65 @@ class Transactions extends Component {
         return ret;
     }
 
-    renderTableData() {
+    renderCategoryTableData() {
         var categoryAgg = {}
-        console.log("renderCategorySummary: ");
-
         for (var txn of this.state.VISIBLE_TXNS) {
-            console.log("txn: ", txn);
             if (categoryAgg[txn.category] === undefined) {
                 categoryAgg[txn.category] = 0.0
             }
-            if (txn.type === 2) {
-                categoryAgg[txn.category] += txn.amount
-            } else {
-                categoryAgg[txn.category] -= txn.amount
-            }
-
+            categoryAgg[txn.category] += txn.amount;            
         }
 
-        return Object.keys(categoryAgg).map((key, index) => {
+        // convert to array
+        var categoryArray = [];
+        for (var k of Object.keys(categoryAgg)) {
+            categoryArray.push({category: k, amount: categoryAgg[k]});
+        }
+
+        // sort
+        var sortedCategoryArray = categoryArray.sort((a,b) => {
+            return (a.amount > b.amount) ? -1 : 1;
+        });
+
+        return sortedCategoryArray.map((catVal, index) => {
             return (
-                <tr key={key}>
-                    <td>{key}</td>
-                    <td>${parseFloat(categoryAgg[key]).toFixed(2)}</td>
+                <tr key={index}>
+                    <td>{catVal.category}</td>
+                    <td>${parseFloat(catVal.amount).toFixed(2)}</td>
                 </tr>
             )
         })
     }
 
     renderPaymentMethodTableData() {
-        var categoryAgg = {}
-        console.log("renderCategorySummary: ");
-
+        var paymentMethodAgg = {}
         for (var txn of this.state.VISIBLE_TXNS) {
-            if (categoryAgg[txn.payment_method] === undefined) {
-                categoryAgg[txn.payment_method] = 0.0
+            if (paymentMethodAgg[txn.payment_method] === undefined) {
+                paymentMethodAgg[txn.payment_method] = 0.0
             }
             if (txn.type === 2) {
-                categoryAgg[txn.payment_method] += txn.amount
+                paymentMethodAgg[txn.payment_method] += txn.amount
             } else {
-                categoryAgg[txn.payment_method] -= txn.amount
+                paymentMethodAgg[txn.payment_method] -= txn.amount
             }
         }
 
-        return Object.keys(categoryAgg).map((key, index) => {
+        // convert to array
+        var paymentMethodArray = [];
+        for (var k of Object.keys(paymentMethodAgg)) {
+            paymentMethodArray.push({paymentMethod: k, amount: paymentMethodAgg[k]});
+        }
+
+        // sort
+        var sortedPaymentMethodArray = paymentMethodArray.sort((a,b) => {
+            return (a.amount > b.amount) ? -1 : 1;
+        });
+
+        return sortedPaymentMethodArray.map((paymentMethodVal, index) => {
             return (
-                <tr key={key}>
-                    <td>{key}</td>
-                    <td>${parseFloat(categoryAgg[key]).toFixed(2)}</td>
+                <tr key={index}>
+                    <td>{paymentMethodVal.paymentMethod}</td>
+                    <td>${parseFloat(paymentMethodVal.amount).toFixed(2)}</td>
                 </tr>
             )
         })
@@ -312,7 +327,7 @@ class Transactions extends Component {
                         <h3>Category Summary</h3>
                             <tbody>
                                 <tr>{this.renderTableHeader()}</tr>
-                                {this.renderTableData()}
+                                {this.renderCategoryTableData()}
                             </tbody>
                         </table>
                     </div>

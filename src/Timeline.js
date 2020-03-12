@@ -18,8 +18,6 @@ const TXN_LIMIT = 100;
 
 class Transactions extends Component {
     constructor(props) {
-        console.log("constructor");
-
         super(props);
         this.state = { balance_rows: [], variable_exp_name: "", variable_exp_amount: "", recurring_txns: [], starting_balance: ""};
         this.handleChange = this.handleChange.bind(this);
@@ -36,17 +34,15 @@ class Transactions extends Component {
     }
 
     renderTableData() {
-        console.log("RENDERING");
         return this.state.balance_rows.map((balance_row, index) => {
             const { id, balanceDate, balance, income, incomeDesc, expense, expenseDesc } = balance_row;
             var year = balanceDate.getFullYear();
             var month = balanceDate.getMonth() + 1;
             var day = balanceDate.getDate();
-            console.log(balance_row);
             return (
                 <tr key={id}>
                     <td>{year + "-" + month + "-" + day}</td>
-                    <td>${balance}</td>
+                    <td>${parseFloat(balance).toFixed(2)}</td>
                     <td>{income}</td>
                     <td>{incomeDesc}</td>
                     <td>{expense}</td>
@@ -57,11 +53,20 @@ class Transactions extends Component {
     }
 
     componentDidMount() {
+        // check local storage for saved values, if have some, populate the fields with it.
+        if (localStorage.getItem("variable_exp_name") != null) {
+            this.setState({variable_exp_name: localStorage.getItem("variable_exp_name") });
+        }
+        if (localStorage.getItem("variable_exp_amount") != null) {
+            this.setState({variable_exp_amount: localStorage.getItem("variable_exp_amount") });
+        }
+        if (localStorage.getItem("starting_balance") != null) {
+            this.setState({starting_balance: localStorage.getItem("starting_balance") });
+        }
 
         Auth.currentAuthenticatedUser().then(user => {
             let email = user.attributes.email;
 
-            console.log("Fetching transactions for: " + email);
             API.graphql(graphqlOperation(listTransactions, { 
                 limit: TXN_LIMIT,
                 filter: {
@@ -70,7 +75,6 @@ class Transactions extends Component {
                 } 
             })).then(data => {
 
-                console.log(data);
                 var sortedTxns = data.data.listTransactions.items;
                 sortedTxns.sort((t1, t2) => {
                     var d1 = new Date(t1.date);
@@ -86,7 +90,9 @@ class Transactions extends Component {
                 if (data.data.listTransactions.nextToken !== null) {
                     window.alert("There were some recurring transactions that could not be fetched, so your generated timeline is not accurate.");
                 }
-
+                
+                this.generateTimeline();
+                
             }).catch((err) => {
                 window.alert("Encountered error fetching your transactions: \n",err);
             })
@@ -102,23 +108,8 @@ class Transactions extends Component {
     }
 
     generateTimeline() {
-
-        // if the user didn't input anything, then look in local storage
-            // if its there, then use it and populate the txt fields.
-            // else, alert user to input semthing
-        // else if the user did input something,
-            // if its same as local storage, then continue
-            // else, update the local storage value.
-
-        if (this.state.variable_exp_name === null || this.state.variable_exp_name === undefined || this.state.variable_exp_name === "") {
-            console.log("no input");
-
-            console.log(localStorage.getItem("variable_exp_name"));
-
+        if (this.state.variable_exp_name === "") {
             if (localStorage.getItem("variable_exp_name") != null) {
-                console.log("found value in storage");
-                console.log(localStorage.getItem("variable_exp_name"));
-
                 this.state.variable_exp_name = localStorage.getItem("variable_exp_name");
             } else {
                 window.alert("Must input value for variable spending, name, value and initial balance.");
@@ -130,7 +121,7 @@ class Transactions extends Component {
             }
         }
 
-        if (this.state.variable_exp_amount === null || this.state.variable_exp_amount === undefined || this.state.variable_exp_amount == "") {
+        if (this.state.variable_exp_amount == "") {
             if (localStorage.getItem("variable_exp_amount") != null) {
                 this.state.variable_exp_amount = localStorage.getItem("variable_exp_amount");
             } else {
@@ -143,7 +134,7 @@ class Transactions extends Component {
             }
         }
 
-        if (this.state.starting_balance === null || this.state.starting_balance === undefined || this.state.starting_balance == "") {
+        if (this.state.starting_balance == "") {
             if (localStorage.getItem("starting_balance") != null) {
                 this.state.starting_balance = localStorage.getItem("starting_balance");
             } else {
@@ -171,7 +162,7 @@ class Transactions extends Component {
             balanceRows[idx] = {
                 id: idx,
                 balanceDate: new Date(currentDay),
-                balance: (idx === 0) ? parseFloat(this.state.starting_balance).toFixed(2) : parseFloat(balanceRows[idx-1].balance).toFixed(2),
+                balance: (idx === 0) ? this.state.starting_balance : balanceRows[idx-1].balance,
                 income: "",
                 incomeDesc: "",
                 expense: "",
@@ -194,9 +185,6 @@ class Transactions extends Component {
 
             // if first day of month... add variable spending
             if (currentDay.getDate() === 1) {
-                console.log(currentDay);
-                console.log(currentDay.getDate());
-                console.log(idx);
                 const varSpendingTxn = {
                     title: this.state.variable_exp_name,
                     amount: parseFloat(this.state.variable_exp_amount),
@@ -214,7 +202,6 @@ class Transactions extends Component {
                 balanceRows[idx].balance += totalIncome;
                 balanceRows[idx].balance -= totalExpense;
 
-                balanceRows[idx].balance = parseFloat(balanceRows[idx].balance).toFixed(2);
                 // update income
                 var incomeStr = ""
                 var incomeDescStr = ""
@@ -257,9 +244,6 @@ class Transactions extends Component {
         var target = event.target;
         var value = target.value;
         var name = target.name;
-        console.log(name);
-        console.log(value);
-
         this.setState({
             [name]: value
         });

@@ -7,11 +7,11 @@ import { getTransaction } from './graphql/queries';
 import { updateTransaction } from './graphql/mutations';
 
 function getDoubleDigitFormat(number) {
-  return (number < 10) ? "0"+number : number; 
+  return (number < 10) ? "0" + number : number;
 }
 
 function formatDate(date) {
-  var month = getDoubleDigitFormat(date.getMonth()+1);
+  var month = getDoubleDigitFormat(date.getMonth() + 1);
   var day = getDoubleDigitFormat(date.getDate());
   return date.getFullYear() + '-' + month + '-' + day;
 }
@@ -27,7 +27,7 @@ function convertDateStrToGraphqlDate(dateStr) {
     var hour = getDoubleDigitFormat(currTime.getHours());
     var min = getDoubleDigitFormat(currTime.getMinutes());
     var sec = getDoubleDigitFormat(currTime.getSeconds());
-    var formattedString = year + '-' + month + '-' + day + 'T' + hour + ':' + min + ':' + sec  + '.000Z';
+    var formattedString = year + '-' + month + '-' + day + 'T' + hour + ':' + min + ':' + sec + '.000Z';
     console.log("formattedString: ", formattedString);
     return formattedString;
   }
@@ -45,9 +45,9 @@ class AddTransaction extends Component {
     if (props.history.location.pathname.split('/')[2] !== "") {
       txnId = props.history.location.pathname.split('/')[2];
 
-    } 
+    }
 
-    var strDate =  formatDate(new Date());
+    var strDate = formatDate(new Date());
     this.state = {
       title: "",
       amount: "0.00",
@@ -55,19 +55,19 @@ class AddTransaction extends Component {
       date: strDate,
       description: "",
       payment_method: "",
-      type: 2 ,
+      type: 2,
       is_recurring: false,
       user: "",
       updateTxnId: txnId
     };
-    
-    this.componentDidMount = this.componentDidMount.bind(this); 
+
+    this.componentDidMount = this.componentDidMount.bind(this);
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.renderButton = this.renderButton.bind(this);
 
-    
+
   }
 
   componentDidMount() {
@@ -75,37 +75,39 @@ class AddTransaction extends Component {
     if (this.state.updateTxnId != null) {
       Auth.currentAuthenticatedUser().then(user => {
         let email = user.attributes.email;
-  
-        console.log("Fetching transactions for: " + email);
-        API.graphql(graphqlOperation(getTransaction, { id: this.state.updateTxnId })).then(data => {
-          console.log(data);
-          const txn = data.data.getTransaction;
-          console.log(txn.date);
 
-            var dt = txn.date.split('-')[0]+"-"+txn.date.split('-')[1] + "-" + txn.date.split('-')[2].split('T')[0];
-            ORIGINAL_DATE = txn.date;
-            this.setState({
-              title: txn.title,
-              amount: txn.amount,
-              category: txn.category,
-              date: dt,
-              description: txn.description === null ? "" : txn.description,
-              payment_method: txn.payment_method,
-              type: txn.type,
-              user: txn.user,
-              is_recurring: txn.is_recurring,
-              updateTxnId: this.state.updateTxnId
-            });
-  
+        API.graphql(graphqlOperation(getTransaction, { id: this.state.updateTxnId })).then(data => {
+
+          if (data.data.getTransaction.user !== email) {
+            window.alert("Couldn't find the transaction.");
+            return;
+          }
+          const txn = data.data.getTransaction;
+
+          var dt = txn.date.split('-')[0] + "-" + txn.date.split('-')[1] + "-" + txn.date.split('-')[2].split('T')[0];
+          ORIGINAL_DATE = txn.date;
+          this.setState({
+            title: txn.title,
+            amount: txn.amount,
+            category: txn.category,
+            date: dt,
+            description: txn.description === null ? "" : txn.description,
+            payment_method: txn.payment_method,
+            type: txn.type,
+            user: txn.user,
+            is_recurring: txn.is_recurring,
+            updateTxnId: this.state.updateTxnId
+          });
+
         }).catch((err) => {
-            window.alert("Encountered error fetching your transactions: \n",err);
+          window.alert("Encountered error fetching your transactions: \n", err);
         })
-        
-    }).catch((err) => {
-        window.alert("Encountered error fetching your username: \n",err);
-    });
+
+      }).catch((err) => {
+        window.alert("Encountered error fetching your username: \n", err);
+      });
     }
-    
+
   }
 
   handleChange(event) {
@@ -117,7 +119,7 @@ class AddTransaction extends Component {
 
     if (name === "type") {
       value = parseInt(value);
-    } 
+    }
     this.setState({
       [name]: value
     });
@@ -126,19 +128,19 @@ class AddTransaction extends Component {
   renderButton() {
 
     if (this.state.updateTxnId != null) {
-      return(
+      return (
         <input class="updateButton" type="submit" value="Update" />
       )
     } else {
-      return(
+      return (
         <input class="addButton" type="submit" value="Submit" />
       )
     }
-    
+
   }
 
   resetState() {
-    var strDate =  formatDate(new Date());
+    var strDate = formatDate(new Date());
     this.setState({
       title: "",
       amount: "0.00",
@@ -229,10 +231,10 @@ class AddTransaction extends Component {
         user: this.state.user
       }
     }
-   
+
     // fill in description
     if (transaction.description === '') {
-        transaction.description = null;
+      transaction.description = null;
     }
 
     // update amount
@@ -249,27 +251,35 @@ class AddTransaction extends Component {
     console.log("Adding Transaction:");
     console.log(transaction);
 
+    // remove whitespace
+    transaction.title = transaction.title.trim();
+    transaction.category = transaction.category.trim();
+    if (transaction.description != null) {
+      transaction.description = transaction.description.trim();
+    }
+    transaction.payment_method = transaction.payment_method.trim();
+
     // submit
     try {
 
       if (this.state.updateTxnId == null) {
         console.log("ADD TXN...");
         const res = await API.graphql(graphqlOperation(createTransaction, { input: transaction }));
-        console.log("SUCCESS! \n",res);
+        console.log("SUCCESS! \n", res);
         window.alert("Successfully added your transaction!");
         this.resetState();
 
       } else {
         console.log("UPDATE TXN...");
         const res = await API.graphql(graphqlOperation(updateTransaction, { input: transaction }));
-        console.log("SUCCESS! \n",res);
+        console.log("SUCCESS! \n", res);
         window.alert("Successfully updated your transaction!");
         this.resetState();
 
       }
-      
-    } catch(err) {
-      console.log("FAILURE! \n",err);
+
+    } catch (err) {
+      console.log("FAILURE! \n", err);
       var errorMessages = [];
       for (var error of err.errors) {
         errorMessages.push(error.message);
@@ -282,93 +292,99 @@ class AddTransaction extends Component {
   render() {
     return (
       <div className="addTransactionBackground">
-      <form onSubmit={this.handleSubmit}>
-        <label>
-          Title:<br />
-          <input
-            className="rounded"
-            name="title"
-            type="text"
-            value={this.state.title}
-            onChange={this.handleChange} />
-        </label><br />
-        <label>
-          Amount:<br />
-          <input
-            className="rounded"
-            name="amount"
-            type="text"
-            value={this.state.amount}
-            onChange={this.handleChange} />
-        </label><br />
-        <label>
-          Category:<br />
-          <input
-            className="rounded"
-            name="category"
-            type="text"
-            value={this.state.category}
-            onChange={this.handleChange} />
-        </label><br />
-        <label>
-          Date:<br />
-          <input
-          className="rounded"
-            name="date"
-            type="date"
-            value={this.state.date}
-            onChange={this.handleChange} />
-        </label><br />
-        <label>
-          Description:<br />
-          <textarea
-            className="rounded"
-            name="description"
-            type="text"
-            value={this.state.description}
-            onChange={this.handleChange} />
-        </label><br />
-        <label>
-          Payment Method:<br />
-          <input
-            className="rounded"
-            name="payment_method"
-            type="text"
-            value={this.state.payment_method}
-            onChange={this.handleChange} />
-        </label><br />
-
-        <div className="radio">
+        <form onSubmit={this.handleSubmit}>
           <label>
-            <input type="radio" name='type' value={2}
-                    checked={this.state.type === 2} 
-                    onChange={this.handleChange} />
-                    Expense
-          </label>
-        </div>
-        <div className="radio">
+            Title:<br />
+            <input
+              className="rounded"
+              name="title"
+              type="text"
+              value={this.state.title}
+              onChange={this.handleChange} />
+          </label><br />
           <label>
-            <input type="radio" name='type' value={1}
-                    checked={this.state.type === 1} 
-                    onChange={this.handleChange} />
-            Income
+            Amount:<br />
+            <input
+              className="rounded"
+              name="amount"
+              type="text"
+              value={this.state.amount}
+              onChange={this.handleChange} />
+          </label><br />
+          <label>
+            New Category:
+            <input
+              className="roundedShare"
+              name="category"
+              type="text"
+              value={this.state.category}
+              onChange={this.handleChange} />
           </label>
-        </div>
-            
-        <label>
-          Is Recurring Transaction:
+          <label>
+          Previously Used Categories:
+          <select value={this.state.value} onChange={this.handleChange}>
+            {/* <option value="grapefruit">Grapefruit</option> */}
+          </select><br />
+        </label>
+          <label>
+            Date:<br />
+            <input
+              className="rounded"
+              name="date"
+              type="date"
+              value={this.state.date}
+              onChange={this.handleChange} />
+          </label><br />
+          <label>
+            Description:<br />
+            <textarea
+              className="rounded"
+              name="description"
+              type="text"
+              value={this.state.description}
+              onChange={this.handleChange} />
+          </label><br />
+          <label>
+            Payment Method:<br />
+            <input
+              className="rounded"
+              name="payment_method"
+              type="text"
+              value={this.state.payment_method}
+              onChange={this.handleChange} />
+          </label><br />
+
+          <div className="radio">
+            <label>
+              <input type="radio" name='type' value={2}
+                checked={this.state.type === 2}
+                onChange={this.handleChange} />
+              Expense
+          </label>
+          </div>
+          <div className="radio">
+            <label>
+              <input type="radio" name='type' value={1}
+                checked={this.state.type === 1}
+                onChange={this.handleChange} />
+              Income
+          </label>
+          </div>
+
+          <label>
+            Is Recurring Transaction:
           <input
-            name="is_recurring"
-            type="checkbox"
-            checked={this.state.is_recurring}
-            onChange={this.handleChange} />
-        </label><br />
+              name="is_recurring"
+              type="checkbox"
+              checked={this.state.is_recurring}
+              onChange={this.handleChange} />
+          </label><br />
 
-        <br />
-        {this.renderButton()}
+          <br />
+          {this.renderButton()}
 
-      </form>
-   
+        </form>
+
       </div>
     );
   }

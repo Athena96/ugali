@@ -80,6 +80,18 @@
   margin: 4px 2px;
 }
 
+.roundedShare {
+  border: none;
+  color: black;
+  padding: 3px;
+  text-align: left;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 8px;
+  font-size: 13px;
+  margin: 4px 2px;
+}
+
 .roundedOutline {
   width: 96%;
   border: solid;
