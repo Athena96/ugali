@@ -9,12 +9,33 @@ import { Auth } from 'aws-amplify';
 
 // graphql
 import { listTransactions } from './graphql/queries';
+import { createTransaction } from './graphql/mutations';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
 
 // Constants
 const TXN_LIMIT = 100;
+
+function getDoubleDigitFormat(number) {
+    return (number < 10) ? "0" + number : number;
+  }
+
+function convertDateStrToGraphqlDate(dateStr) {
+    var dateParts = dateStr.split('-');
+    if (dateParts.length >= 3) {
+      var year = dateParts[0];
+      var month = dateParts[1];
+      var day = dateParts[2];
+  
+      var currTime = new Date();
+      var hour = getDoubleDigitFormat(currTime.getHours());
+      var min = getDoubleDigitFormat(currTime.getMinutes());
+      var sec = getDoubleDigitFormat(currTime.getSeconds());
+      var formattedString = year + '-' + month + '-' + day + 'T' + hour + ':' + min + ':' + sec + '.000Z';
+      return formattedString;
+    }
+  }
 
 class Transactions extends Component {
     constructor(props) {
@@ -107,6 +128,19 @@ class Transactions extends Component {
         this.props.history.push('/AddTransaction/'+event.target.id)
     }
 
+    
+    async autoAdd(recurrTxn) {
+        try {                     
+
+            const res = await API.graphql(graphqlOperation(createTransaction, { input: recurrTxn }));
+
+            console.log("RES", res);
+            window.alert("Successfully AUTO added your transaction: ", recurrTxn.title);                                            
+          } catch (err) {
+            window.alert("ERROR: ",{err});
+          }
+    }
+    
     generateTimeline() {
         if (this.state.variable_exp_name === "") {
             if (localStorage.getItem("variable_exp_name") != null) {
@@ -151,7 +185,7 @@ class Transactions extends Component {
         const DAY_TO_CALCULATE = 31*6;
 
         var start = new Date();
-        start.setDate(start.getDate() - 1);
+        // start.setDate(start.getDate() - 1);
         var end = new Date();
         end.setDate(start.getDate() + DAY_TO_CALCULATE);
 
@@ -180,6 +214,24 @@ class Transactions extends Component {
                     } else {
                         recurringIncomes.push(recurrTxn)
                     }
+                    
+                    // if idx === 0 auto add.
+                    // if (idx === 0) {
+
+                    //     var d = convertDateStrToGraphqlDate(currentDay.getFullYear()+"-"+(currentDay.getUTCMonth()+1) + "-" +getDoubleDigitFormat(currentDay.getUTCDate()));
+                            
+                    //     recurrTxn.date = d;
+                    //     recurrTxn.title = "[AUTO ADD] " + recurrTxn.title;
+                    //     // console.log(recurrTxn);
+                    //     delete recurrTxn.id;
+                    //     delete recurrTxn.createdAt;
+                    //     recurrTxn.is_recurring = false;
+                    //     console.log(recurrTxn);
+
+                    //     // this.autoAdd(recurrTxn);
+
+                    // }
+
                 }
             }
 

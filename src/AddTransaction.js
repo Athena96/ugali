@@ -72,6 +72,10 @@ class AddTransaction extends Component {
 
   componentDidMount() {
 
+  if (localStorage.getItem("payment_method") != null) {
+      this.setState({payment_method: localStorage.getItem("payment_method") });
+  }
+
     if (this.state.updateTxnId != null) {
       Auth.currentAuthenticatedUser().then(user => {
         let email = user.attributes.email;
@@ -175,10 +179,18 @@ class AddTransaction extends Component {
       return;
     }
 
-    if (this.state.payment_method === undefined || this.state.payment_method === null || this.state.payment_method === "") {
-      window.alert("Please add a 'Payment Method'");
-      return;
-    }
+    if (this.state.payment_method === "") {
+      if (localStorage.getItem("payment_method") != null) {
+          this.state.payment_method = localStorage.getItem("payment_method");
+      } else {
+          window.alert("Please add a 'Payment Method'");
+          return;
+      }
+  } else {
+      if (localStorage.getItem("payment_method") == null || ( localStorage.getItem("payment_method") != null && localStorage.getItem("payment_method") != this.state.payment_method) ) {
+          localStorage.setItem("payment_method", this.state.payment_method);
+      }
+  }
 
     // get current user and set state
     var user = await Auth.currentAuthenticatedUser();

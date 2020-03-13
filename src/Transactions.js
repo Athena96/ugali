@@ -165,11 +165,33 @@ class Transactions extends Component {
     }
 
     async filterTransactions(e) {
-        console.log("SUBMIT")
-        if (this.state.year === "" || this.state.month === "") {
-            window.alert("Must enter year and month (YYYY for year, and MM for month)");
-            return;
+        if (this.state.year === "") {
+            if (localStorage.getItem("year") != null) {
+                this.state.year = localStorage.getItem("year");
+            } else {
+                window.alert("Must input value for year. (YYYY)");
+                return;
+            }
+        } else {
+            if (localStorage.getItem("year") == null || ( localStorage.getItem("year") != null && localStorage.getItem("year") != this.state.year) ) {
+                localStorage.setItem("year", this.state.year);
+            }
         }
+
+        if (this.state.month === "") {
+            if (localStorage.getItem("month") != null) {
+                this.state.month = localStorage.getItem("month");
+            } else {
+                window.alert("Must input value for month. (MM)");
+                return;
+            }
+        } else {
+            if (localStorage.getItem("month") == null || ( localStorage.getItem("month") != null && localStorage.getItem("month") != this.state.month) ) {
+                localStorage.setItem("month", this.state.month);
+            }
+        }
+
+       
         var filteredTxns = [];
 
         for (var txn of this.state.transactions) {
