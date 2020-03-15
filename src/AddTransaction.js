@@ -34,7 +34,8 @@ function convertDateStrToGraphqlDate(dateStr) {
 }
 
 var ORIGINAL_DATE = "";
-
+var IS_DUPLICATE = false;
+var IS_UPDATE = false;
 
 class AddTransaction extends Component {
 
@@ -42,9 +43,16 @@ class AddTransaction extends Component {
     super(props);
 
     var txnId = null;
-    if (props.history.location.pathname.split('/')[2] !== "") {
-      txnId = props.history.location.pathname.split('/')[2];
 
+    IS_DUPLICATE = props.history.location.pathname.split('/')[2] === "duplicate";
+    IS_UPDATE = props.history.location.pathname.split('/')[2] === "update";
+
+    console.log("IS_DUPLICATE: ", IS_DUPLICATE);
+    console.log("IS_UPDATE: ", IS_UPDATE);
+
+    if (IS_UPDATE || IS_DUPLICATE) {
+      txnId = props.history.location.pathname.split('/')[3];
+      console.log("UPDATE OR DUPLICATE: ", txnId)
     }
 
     var strDate = formatDate(new Date());
@@ -58,29 +66,22 @@ class AddTransaction extends Component {
       type: 2,
       is_recurring: false,
       user: "",
-      updateTxnId: txnId
+      exampleTxnId: txnId
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
-
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.renderButton = this.renderButton.bind(this);
-
-
   }
 
   componentDidMount() {
 
-  if (localStorage.getItem("payment_method") != null) {
-      this.setState({payment_method: localStorage.getItem("payment_method") });
-  }
-
-    if (this.state.updateTxnId != null) {
+    if (IS_UPDATE || IS_DUPLICATE) {
       Auth.currentAuthenticatedUser().then(user => {
         let email = user.attributes.email;
 
-        API.graphql(graphqlOperation(getTransaction, { id: this.state.updateTxnId })).then(data => {
+        API.graphql(graphqlOperation(getTransaction, { id: this.state.exampleTxnId })).then(data => {
 
           if (data.data.getTransaction.user !== email) {
             window.alert("Couldn't find the transaction.");
@@ -100,7 +101,7 @@ class AddTransaction extends Component {
             type: txn.type,
             user: txn.user,
             is_recurring: txn.is_recurring,
-            updateTxnId: this.state.updateTxnId
+            updateTxnId: this.state.exampleTxnId
           });
 
         }).catch((err) => {
@@ -110,6 +111,11 @@ class AddTransaction extends Component {
       }).catch((err) => {
         window.alert("Encountered error fetching your username: \n", err);
       });
+    } else {
+      // new TXN.. so populate the payment method
+      if (localStorage.getItem("payment_method") != null) {
+        this.setState({payment_method: localStorage.getItem("payment_method") });
+      }
     }
 
   }
@@ -130,8 +136,7 @@ class AddTransaction extends Component {
   }
 
   renderButton() {
-
-    if (this.state.updateTxnId != null) {
+    if (IS_UPDATE) {
       return (
         <input class="updateButton" type="submit" value="Update" />
       )
@@ -140,7 +145,6 @@ class AddTransaction extends Component {
         <input class="addButton" type="submit" value="Submit" />
       )
     }
-
   }
 
   resetState() {
@@ -180,12 +184,8 @@ class AddTransaction extends Component {
     }
 
     if (this.state.payment_method === "") {
-      if (localStorage.getItem("payment_method") != null) {
-          this.state.payment_method = localStorage.getItem("payment_method");
-      } else {
-          window.alert("Please add a 'Payment Method'");
-          return;
-      }
+        window.alert("Please add a 'Payment Method'");
+        return;
   } else {
       if (localStorage.getItem("payment_method") == null || ( localStorage.getItem("payment_method") != null && localStorage.getItem("payment_method") != this.state.payment_method) ) {
           localStorage.setItem("payment_method", this.state.payment_method);
@@ -201,8 +201,34 @@ class AddTransaction extends Component {
 
     // extract txn from state.
     var transaction = {};
-    if (this.state.updateTxnId == null) {
-      console.log("NEW");
+    if (IS_UPDATE) {
+
+      console.log("UPDATE");
+      console.log(this.state);
+
+      var d = "";
+      if (ORIGINAL_DATE.split('-')[2].split('T')[0] == this.state.date.split('-')[2]) {
+        d = ORIGINAL_DATE;
+      } else {
+        d = convertDateStrToGraphqlDate(this.state.date);
+
+      }
+
+      transaction = {
+        id: this.state.exampleTxnId,
+        title: this.state.title,
+        amount: this.state.amount,
+        category: this.state.category,
+        date: d,
+        description: this.state.description,
+        payment_method: this.state.payment_method,
+        type: this.state.type,
+        is_recurring: this.state.is_recurring,
+        user: this.state.user
+      }
+
+    } else {
+      console.log("NEW or DUP");
       transaction = {
         title: this.state.title,
         amount: this.state.amount,
@@ -216,32 +242,6 @@ class AddTransaction extends Component {
       }
 
       transaction.date = formattedDate;
-
-
-    } else {
-      console.log("UPDATE");
-      console.log(this.state);
-
-      var d = "";
-      if (ORIGINAL_DATE.split('-')[2].split('T')[0] == this.state.date.split('-')[2]) {
-        d = ORIGINAL_DATE;
-      } else {
-        d = convertDateStrToGraphqlDate(this.state.date);
-
-      }
-
-      transaction = {
-        id: this.state.updateTxnId,
-        title: this.state.title,
-        amount: this.state.amount,
-        category: this.state.category,
-        date: d,
-        description: this.state.description,
-        payment_method: this.state.payment_method,
-        type: this.state.type,
-        is_recurring: this.state.is_recurring,
-        user: this.state.user
-      }
     }
 
     // fill in description
@@ -259,10 +259,6 @@ class AddTransaction extends Component {
     transaction.user = email;
     transaction.amount = numberAmount;
 
-    // log the txn to be added
-    console.log("Adding Transaction:");
-    console.log(transaction);
-
     // remove whitespace
     transaction.title = transaction.title.trim();
     transaction.category = transaction.category.trim();
@@ -274,21 +270,18 @@ class AddTransaction extends Component {
     // submit
     try {
 
-      if (this.state.updateTxnId == null) {
-        console.log("ADD TXN...");
-        const res = await API.graphql(graphqlOperation(createTransaction, { input: transaction }));
-        console.log("SUCCESS! \n", res);
-        window.alert("Successfully added your transaction!");
-        this.resetState();
-
-      } else {
+      if (IS_UPDATE) {
         console.log("UPDATE TXN...");
         const res = await API.graphql(graphqlOperation(updateTransaction, { input: transaction }));
         console.log("SUCCESS! \n", res);
         window.alert("Successfully updated your transaction!");
-        this.resetState();
-
+      } else {
+        console.log("ADD TXN...");
+        const res = await API.graphql(graphqlOperation(createTransaction, { input: transaction }));
+        console.log("SUCCESS! \n", res);
+        window.alert("Successfully added your transaction!");
       }
+      this.resetState();
 
     } catch (err) {
       console.log("FAILURE! \n", err);

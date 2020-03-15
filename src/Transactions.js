@@ -29,6 +29,7 @@ class Transactions extends Component {
         this.deleteTransaction = this.deleteTransaction.bind(this);
         this.filterTransactions = this.filterTransactions.bind(this);
         this.updateTransaction = this.updateTransaction.bind(this);
+        this.duplicateTransaction = this.duplicateTransaction.bind(this);
     }
 
     async deleteTransaction(event) {
@@ -64,7 +65,11 @@ class Transactions extends Component {
     }
 
     updateTransaction(event) {
-        this.props.history.push('/AddTransaction/' + event.target.id)
+        this.props.history.push('/addTransaction/update/' + event.target.id)
+    }
+
+    duplicateTransaction(event) {
+        this.props.history.push('/addTransaction/duplicate/' + event.target.id)
     }
 
     renderTransactionData() {
@@ -84,6 +89,7 @@ class Transactions extends Component {
                             <p><b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}</p>
                             <span class="right">
                                 <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
+                                <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
                                 <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
                             </span>
 
@@ -102,6 +108,7 @@ class Transactions extends Component {
                             <p><b>Description:</b><br />{description}</p>
                             <span class="right">
                                 <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
+                                <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
                                 <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
                             </span>
 
@@ -325,6 +332,7 @@ class Transactions extends Component {
     render() {
         return (
             <div>
+                
                 <div>
                     <input
                         className="roundedOutline"
@@ -343,8 +351,10 @@ class Transactions extends Component {
                     <button class="filter" onClick={this.filterTransactions}>filter</button>
                 </div>
 
-                <div >
-                    <div class="barbooks">
+                <div>
+
+                    <div className="bar">
+
                         <table id='transactions'>
                         <h3>Category Summary</h3>
                             <tbody>
@@ -352,9 +362,7 @@ class Transactions extends Component {
                                 {this.renderCategoryTableData()}
                             </tbody>
                         </table>
-                    </div>
 
-                    <div class="barbooks">
                         <table id='transactions'>
                         <h3>Payment Method Summary</h3>
                             <tbody>
@@ -362,12 +370,13 @@ class Transactions extends Component {
                                 {this.renderPaymentMethodTableData()}
                             </tbody>
                         </table>
-                    </div>
-                </div>
-               
 
-                <div >
-                    {this.renderTransactionData()}
+                    </div>
+
+                    <div className="bar">
+                        {this.renderTransactionData()}
+                    </div>
+
                 </div>
 
             </div>
