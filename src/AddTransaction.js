@@ -155,7 +155,6 @@ class AddTransaction extends Component {
       category: "",
       date: strDate,
       description: "",
-      payment_method: "",
       type: 2,
       is_recurring: false,
       user: "",
@@ -299,7 +298,7 @@ class AddTransaction extends Component {
       <div className="addTransactionBackground">
         <form onSubmit={this.handleSubmit}>
           <label>
-            Title:<br />
+            <b>Title:</b><br />
             <input
               className="rounded"
               name="title"
@@ -308,7 +307,7 @@ class AddTransaction extends Component {
               onChange={this.handleChange} />
           </label><br />
           <label>
-            Amount:<br />
+          <b>Amount:</b><br />
             <input
               className="rounded"
               name="amount"
@@ -317,7 +316,7 @@ class AddTransaction extends Component {
               onChange={this.handleChange} />
           </label><br />
           <label>
-            New Category:
+           <b>New Category:</b>
             <input
               className="roundedShare"
               name="category"
@@ -326,13 +325,13 @@ class AddTransaction extends Component {
               onChange={this.handleChange} />
           </label>
           <label>
-          Previously Used Categories:
+          <b>Previously Used Categories:</b>
           <select value={this.state.value} onChange={this.handleChange}>
             {/* <option value="grapefruit">Grapefruit</option> */}
           </select><br />
         </label>
           <label>
-            Date:<br />
+          <b>Date:</b><br />
             <input
               className="rounded"
               name="date"
@@ -341,7 +340,7 @@ class AddTransaction extends Component {
               onChange={this.handleChange} />
           </label><br />
           <label>
-            Description:<br />
+          <b>Description:</b><br />
             <textarea
               className="rounded"
               name="description"
@@ -350,7 +349,7 @@ class AddTransaction extends Component {
               onChange={this.handleChange} />
           </label><br />
           <label>
-            Payment Method:<br />
+          <b>Payment Method:</b><br />
             <input
               className="rounded"
               name="payment_method"
@@ -377,13 +376,13 @@ class AddTransaction extends Component {
           </div>
 
           <label>
-            Is Recurring Transaction:
+          <b>Is Recurring Transaction:</b>
           <input
               name="is_recurring"
               type="checkbox"
               checked={this.state.is_recurring}
               onChange={this.handleChange} />
-          </label><br />
+          </label><small>*A recurring transaction will appear on your Timeline, each month, on the chosen date.*</small><br />
 
           <br />
           {this.renderButton()}

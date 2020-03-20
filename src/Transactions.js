@@ -20,8 +20,6 @@ const TXN_LIMIT = 100;
 
 class Transactions extends Component {
     constructor(props) {
-        console.log("constructor");
-
         super(props);
         this.state = { transactions: [], year: '', month: '', VISIBLE_TXNS: [] };
         this.handleChange = this.handleChange.bind(this);
@@ -34,10 +32,8 @@ class Transactions extends Component {
 
     async deleteTransaction(event) {
         try {
-            console.log(event.target.id);
             var txnId = event.target.id;
             const res = await API.graphql(graphqlOperation(deleteTransaction, { input: { id: txnId } }))
-            console.log(res);
             window.alert("Successfully deleted your transaction!");
 
             var newTxns = [];
@@ -59,7 +55,6 @@ class Transactions extends Component {
                 VISIBLE_TXNS: VISIBLETxns,
             });
         } catch (err) {
-            console.log("FAILURE! \n", err);
             window.alert(err);
         }
     }
@@ -139,8 +134,6 @@ class Transactions extends Component {
                     user: { eq: email } 
                 } 
             })).then(data => {
-
-                console.log(data);
                 var sortedTxns = data.data.listTransactions.items;
                 sortedTxns.sort((t1, t2) => {
                     var d1 = new Date(t1.date);
@@ -151,7 +144,6 @@ class Transactions extends Component {
                         return -1;
                     return 0;
                 });
-                console.log(sortedTxns);
                 this.setState({ transactions: sortedTxns });
                 this.setState({ VISIBLE_TXNS: sortedTxns });
 
@@ -210,9 +202,7 @@ class Transactions extends Component {
             }
         }
 
-        console.log("setting state.");
         this.setState({ VISIBLE_TXNS: filteredTxns });
-
     }
 
     handleChange(event) {
@@ -222,8 +212,6 @@ class Transactions extends Component {
         this.setState({
             [name]: value
         });
-        console.log(this.state.year);
-        console.log(this.state.month);
     }
 
 
@@ -242,10 +230,8 @@ class Transactions extends Component {
 
     renderCategorySummary() {
         var categoryAgg = {}
-        console.log("renderCategorySummary: ");
 
         for (var txn of this.state.VISIBLE_TXNS) {
-            console.log("txn: ", txn);
             if (categoryAgg[txn.category] === undefined) {
                 categoryAgg[txn.category] = 0.0
             }
@@ -257,7 +243,6 @@ class Transactions extends Component {
 
         }
 
-        console.log("categoryAgg: ", categoryAgg);
         var ret = [];
         for (var key in categoryAgg) {
             ret.push(<p>{key}: ${categoryAgg[key]}</p>);
@@ -271,7 +256,16 @@ class Transactions extends Component {
             if (categoryAgg[txn.category] === undefined) {
                 categoryAgg[txn.category] = 0.0
             }
-            categoryAgg[txn.category] += txn.amount;            
+            categoryAgg[txn.category] += txn.amount;
+            
+            if (txn.category.includes('-')) {
+                var keyParts = txn.category.split('-');
+                var masterKey = keyParts[0];
+                if (categoryAgg[masterKey] === undefined) {
+                    categoryAgg[masterKey] = 0.0
+                }
+                categoryAgg[masterKey] += txn.amount;
+            }
         }
 
         // convert to array
@@ -282,16 +276,25 @@ class Transactions extends Component {
 
         // sort
         var sortedCategoryArray = categoryArray.sort((a,b) => {
-            return (a.amount > b.amount) ? -1 : 1;
+            return (a.category > b.category) ? 1 : -1;
         });
 
         return sortedCategoryArray.map((catVal, index) => {
-            return (
-                <tr key={index}>
-                    <td>{catVal.category}</td>
-                    <td>${parseFloat(catVal.amount).toFixed(2)}</td>
-                </tr>
-            )
+            if (catVal.category.includes('-')) {
+                return (
+                    <tr key={index}>
+                        <td><i>- {catVal.category}</i></td>
+                        <td>${parseFloat(catVal.amount).toFixed(2)}</td>
+                    </tr>
+                )
+            } else {
+                return (
+                    <tr key={index}>
+                        <td><b>{catVal.category}</b></td>
+                        <td>${parseFloat(catVal.amount).toFixed(2)}</td>
+                    </tr>
+                )
+            }
         })
     }
 
