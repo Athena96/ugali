@@ -280,17 +280,22 @@ class Transactions extends Component {
         });
 
         return sortedCategoryArray.map((catVal, index) => {
+            var color = "black";
+            if (catVal.category.includes('income')) {
+                color = "green";
+            }
+            
             if (catVal.category.includes('-')) {
                 return (
                     <tr key={index}>
-                        <td><i>- {catVal.category}</i></td>
+                        <td><font color={color}><i>- {catVal.category}</i></font></td>
                         <td>${parseFloat(catVal.amount).toFixed(2)}</td>
                     </tr>
                 )
             } else {
                 return (
                     <tr key={index}>
-                        <td><b>{catVal.category}</b></td>
+                        <td><font color={color}><b>{catVal.category}</b></font></td>
                         <td>${parseFloat(catVal.amount).toFixed(2)}</td>
                     </tr>
                 )
@@ -325,7 +330,7 @@ class Transactions extends Component {
         return sortedPaymentMethodArray.map((paymentMethodVal, index) => {
             return (
                 <tr key={index}>
-                    <td>{paymentMethodVal.paymentMethod}</td>
+                    <td><b>{paymentMethodVal.paymentMethod}</b></td>
                     <td>${parseFloat(paymentMethodVal.amount).toFixed(2)}</td>
                 </tr>
             )

@@ -60,6 +60,7 @@ class AddTransaction extends Component {
       title: "",
       amount: "0.00",
       category: "",
+      sub_category: "",
       date: strDate,
       description: "",
       payment_method: "",
@@ -91,10 +92,20 @@ class AddTransaction extends Component {
 
           var dt = txn.date.split('-')[0] + "-" + txn.date.split('-')[1] + "-" + txn.date.split('-')[2].split('T')[0];
           ORIGINAL_DATE = txn.date;
+
+          var cat = txn.category;
+          var subCat = "";
+
+          if (cat.includes('-')) {
+            cat = txn.category.split('-')[0];
+            subCat = txn.category.split('-')[1];
+          }
+
           this.setState({
             title: txn.title,
             amount: txn.amount,
-            category: txn.category,
+            category: cat,
+            sub_category: subCat,
             date: dt,
             description: txn.description === null ? "" : txn.description,
             payment_method: txn.payment_method,
@@ -153,6 +164,7 @@ class AddTransaction extends Component {
       title: "",
       amount: "0.00",
       category: "",
+      sub_category: "",
       date: strDate,
       description: "",
       type: 2,
@@ -198,6 +210,11 @@ class AddTransaction extends Component {
     // reformat date "2020-03-29T19:06:28.446Z";
     var formattedDate = convertDateStrToGraphqlDate(this.state.date);
 
+    var fullCat = "";
+    if (this.state.sub_category != "") {
+      fullCat = this.state.category + "-" + this.state.sub_category;
+    }
+
     // extract txn from state.
     var transaction = {};
     if (IS_UPDATE) {
@@ -217,7 +234,7 @@ class AddTransaction extends Component {
         id: this.state.exampleTxnId,
         title: this.state.title,
         amount: this.state.amount,
-        category: this.state.category,
+        category: fullCat,
         date: d,
         description: this.state.description,
         payment_method: this.state.payment_method,
@@ -231,7 +248,7 @@ class AddTransaction extends Component {
       transaction = {
         title: this.state.title,
         amount: this.state.amount,
-        category: this.state.category,
+        category: fullCat,
         date: this.state.date,
         description: this.state.description,
         payment_method: this.state.payment_method,
@@ -316,7 +333,7 @@ class AddTransaction extends Component {
               onChange={this.handleChange} />
           </label><br />
           <label>
-           <b>New Category:</b>
+           <b>Category:</b>
             <input
               className="roundedShare"
               name="category"
@@ -325,11 +342,15 @@ class AddTransaction extends Component {
               onChange={this.handleChange} />
           </label>
           <label>
-          <b>Previously Used Categories:</b>
-          <select value={this.state.value} onChange={this.handleChange}>
-            {/* <option value="grapefruit">Grapefruit</option> */}
-          </select><br />
-        </label>
+           <b>Sub-Category (optional):</b>
+            <input
+              className="roundedShare"
+              name="sub_category"
+              type="text"
+              value={this.state.sub_category}
+              onChange={this.handleChange} />
+          </label><br />
+
           <label>
           <b>Date:</b><br />
             <input
