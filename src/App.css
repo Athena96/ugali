@@ -46,23 +46,20 @@
   padding: 10px;
 }
 
-#transactions {
-  padding-top: 15px;
-}
 
 #transactions td, #transactions th {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 4px;
 }
 
 
 #transactions tr:nth-child(even){background-color: #f2f2f2;}
 #transactions tr:hover {background-color: #ddd;}
 #transactions th {
-  padding-top: 12px;
-  padding-bottom: 12px;
+  padding-top: 8px;
+  padding-bottom: 8px;
   text-align: center;
-  background-color: #FFAC31;
+  background-color: rgb(255, 124, 123);
   color: white;
 }
 
@@ -89,8 +86,10 @@
 
 .rounded {
   width: 96%;
-  border: none;
   color: black;
+  border-color: black;
+  border-width: 1px;
+
   padding: 3px;
   text-align: left;
   text-decoration: none;
@@ -114,8 +113,9 @@
 
 .roundedOutline {
   width: 96%;
-  border: solid;
   color: black;
+  border-color: black;
+  border-width: 1px;
   padding: 3px;
   text-align: left;
   text-decoration: none;
@@ -154,9 +154,9 @@
 }
 
 .filter {
-  background-color: rgb(86, 90, 87);
+  background-color:rgb(199, 199, 199);
   border: none;
-  color: white;
+  color: black;
   padding: 10px;
   width: 98%;
   text-align: center;
@@ -164,7 +164,7 @@
   display: inline-block;
   border-radius: 8px;
   font-size: 13px;
-  margin: 4px 2px;
+  margin: 4px 4px;
 }
 
 .updateTxnButton {
@@ -204,6 +204,11 @@
   margin: 4px 2px;
 }
 
+.botRight {
+  position:absolute;
+  bottom:0;
+  right:0;
+}
 
 .button {
   background-color: #31465F;
@@ -219,9 +224,9 @@
 }
 
 .expenseTxn {
-  background-color: #31465F;
+  background-color:rgb(235, 235, 235);
   border: none;
-  color: white;
+  color: black;
   width: 100%;
   padding: 10px;
   text-align: left;
@@ -246,13 +251,15 @@
 }
 
 .addTransactionBackground {
-  background-color: rgb(197, 197, 197);
+  background-color:rgb(235, 235, 235);
   border-radius: 8px;
   padding: 10px;
-  width: 96%;
   display: inline-block;
 
-  margin: 4px 2px;
+  margin-left: 16px;
+  margin-top: 16px;
+  margin-right: 16px;
+
   border-radius: 8px;
 }
 .right{
@@ -263,16 +270,16 @@
   float:left;
 }
 .signOut {
-  background-color: rgb(89, 93, 97);
+  background-color: rgb(235, 235, 235);
   border: none;
-  color: white;
+  color: black;
   padding: 10px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
   border-radius: 8px;
   font-size: 13px;
-  margin: 4px 20px;
+  margin: 4px 4px;
 }
 
 
@@ -304,7 +311,7 @@
 }
 
 .bar {
-
+  padding-left: 16px;
   /* width: 100px;
   height: 100px; */
   float: left;

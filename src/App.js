@@ -1,7 +1,11 @@
 // React
 import React, { Component } from 'react';
 
-import { BrowserRouter, Route, Link, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+
+// React MDL
+import { Layout, Header, Navigation, Drawer, Content } from 'react-mdl';
+import { Link } from 'react-router-dom';
 
 // Amplify
 import { withAuthenticator } from 'aws-amplify-react';
@@ -12,9 +16,7 @@ import Amplify from 'aws-amplify';
 import { Auth } from 'aws-amplify';
 
 // Components
-import AddTransaction from "./AddTransaction";
-import Transactions from './Transactions';
-import Timeline from './Timeline';
+import Main from './components/main';
 
 // Style
 import './App.css';
@@ -52,36 +54,35 @@ class App extends Component {
 
   render() {
     return (
-      <div className="links">
-      
-
-      <BrowserRouter>
-      
-        <div>
-          <span class="left">
-          <Link className="Link" to="/timeline/">Timeline</Link>
-          <Link className="Link" to="/transactions/">Transactions</Link>
-          <Link className="Link" to="/addTransaction/">Add Transaction</Link>
-          </span>
-          <span class="right">
-            <b>{ "Hello  " + this.state.user}</b>
-            <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br/>
-          </span>​
-        </div>
-
-        <div>
-          
-          <Switch>
-            <Route path="/timeline/" component={Timeline} />
-            <Route path="/addTransaction/" component={AddTransaction} />
-            <Route path="/transactions/" component={Transactions} />
-            <Route path="/" component={Transactions} />
-          </Switch>
-
-        </div>
-
-      </BrowserRouter>
-      </div>
+      <div className="demo-big-content">
+    <Layout fixedHeader>
+        <Header style={{backgroundColor: 'rgb(255, 124, 123)'}} title={<Link style={{textDecoration: 'none', color: 'white'}} to="/">Zen Spending</Link>} scroll>
+            <Navigation>
+                <Link to="/timeline">Timeline</Link>
+                <Link to="/transactions">Transactions</Link>
+                <Link to="/addTransaction">Add Transaction</Link>
+            </Navigation>
+              <b>{this.state.user}</b>
+              <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br/>
+        </Header>
+        <Drawer title={<Link style={{textDecoration: 'none', color: 'black'}} to="/">Zen Spending</Link>}>
+            <Navigation>
+              <Link to="/timeline">Timeline</Link>
+              <Link to="/transactions">Transactions</Link>
+              <Link to="/addTransaction">Add Transaction</Link>
+            </Navigation>
+            <b>{this.state.user}</b>
+              <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br/>
+        </Drawer>
+        <Content>
+            <div className="page-content"> 
+            
+            <Main/>
+            </div>
+            
+        </Content>
+    </Layout>
+</div>
     );
   }
 

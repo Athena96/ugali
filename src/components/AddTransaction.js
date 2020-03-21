@@ -2,9 +2,9 @@ import React, { Component } from "react";
 
 import { Auth } from 'aws-amplify';
 import API, { graphqlOperation } from '@aws-amplify/api';
-import { createTransaction } from './graphql/mutations';
-import { getTransaction } from './graphql/queries';
-import { updateTransaction } from './graphql/mutations';
+import { createTransaction } from '../graphql/mutations';
+import { getTransaction } from '../graphql/queries';
+import { updateTransaction } from '../graphql/mutations';
 
 function getDoubleDigitFormat(number) {
   return (number < 10) ? "0" + number : number;
@@ -338,16 +338,16 @@ class AddTransaction extends Component {
           <label>
            <b>Category:</b>
             <input
-              className="roundedShare"
+              className="rounded"
               name="category"
               type="text"
               value={this.state.category}
               onChange={this.handleChange} />
-          </label>
+          </label><br />
           <label>
-           <b>Sub-Category (optional):</b>
+           <i>Sub-Category (optional):</i>
             <input
-              className="roundedShare"
+              className="rounded"
               name="sub_category"
               type="text"
               value={this.state.sub_category}

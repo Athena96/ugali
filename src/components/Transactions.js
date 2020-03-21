@@ -4,12 +4,12 @@ import React, { Component } from 'react';
 // Amplify
 import API, { graphqlOperation } from '@aws-amplify/api';
 import PubSub from '@aws-amplify/pubsub';
-import awsconfig from './aws-exports';
+import awsconfig from '../aws-exports';
 import { Auth } from 'aws-amplify';
-import { deleteTransaction } from './graphql/mutations';
+import { deleteTransaction } from '../graphql/mutations';
 
 // graphql
-import { listTransactions } from './graphql/queries';
+import { listTransactions } from '../graphql/queries';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
@@ -77,38 +77,43 @@ class Transactions extends Component {
                 return (
                     <div >
                         <div className={classname}>
-                            <span class="left"><font size="4.5">{title} - ${amount}</font></span>
-                            <span class="right"><font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</font></span>
-                            <br />
-                            <p><b>Category:</b> {category}  <b>Payment Method:</b> {payment_method}</p>
-                            <p><b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}</p>
+                            <span class="left">
+                                <font size="4.5">{title} - ${amount}<br /></font>
+                                <p><b>Category:</b> {category}<br />
+                                <b>Payment Method:</b> {payment_method}<br />
+                                <b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}</p>
+                            </span>
                             <span class="right">
+                                <font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</font><br />
                                 <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
                                 <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
                                 <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
                             </span>
-
-                        </div><br />
+                        </div>
                     </div>
                 )
             } else {
                 return (
-                    <div>
-                        <div className={classname}>
-                            <span class="left"><font size="4.5">{title} - ${amount}</font></span>
-                            <span class="right"><font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</font></span>
-                            <br />
-                            <p><b>Category:</b> {category}  <b>Payment Method:</b> {payment_method}</p>
-                            <p><b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}</p>
-                            <p><b>Description:</b><br />{description}</p>
-                            <span class="right">
-                                <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
-                                <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
-                                <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
-                            </span>
 
-                        </div><br />
+                    <div >
+                    <div className={classname}>
+                        <span class="left">
+                            <font size="4.5">{title} - ${amount}<br /></font>
+                            <p><b>Category:</b> {category}<br />
+                            <b>Payment Method:</b> {payment_method}<br />
+                            <b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}<br />
+                            <p><b>Description:</b><br />{description}</p>
+
+                            </p>
+                        </span>
+                        <span class="right">
+                            <font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</font><br />
+                            <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
+                            <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
+                            <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
+                        </span>
                     </div>
+                </div>
                 )
             }
 
@@ -356,7 +361,7 @@ class Transactions extends Component {
                         value={this.state.month}
                         onChange={this.handleChange} />
 
-                    <button class="filter" onClick={this.filterTransactions}>filter</button>
+                    <button class="filter" onClick={this.filterTransactions}><b>filter transactions</b></button>
                 </div>
 
                 <div>
@@ -364,7 +369,7 @@ class Transactions extends Component {
                     <div className="bar">
 
                         <table id='transactions'>
-                        <h3>Category Summary</h3>
+                        <h4><b>Category Summary</b></h4>
                             <tbody>
                                 <tr>{this.renderTableHeader()}</tr>
                                 {this.renderCategoryTableData()}
@@ -372,7 +377,7 @@ class Transactions extends Component {
                         </table>
 
                         <table id='transactions'>
-                        <h3>Payment Method Summary</h3>
+                        <h4><b>Payment Method<br />Summary</b></h4>
                             <tbody>
                                 <tr>{this.renderPaymentMethodTableHeader()}</tr>
                                 {this.renderPaymentMethodTableData()}
@@ -382,6 +387,7 @@ class Transactions extends Component {
                     </div>
 
                     <div className="bar">
+                     <h4><b>Transactions</b></h4>
                         {this.renderTransactionData()}
                     </div>
 

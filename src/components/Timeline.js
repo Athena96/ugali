@@ -4,12 +4,12 @@ import React, { Component } from 'react';
 // Amplify
 import API, { graphqlOperation } from '@aws-amplify/api';
 import PubSub from '@aws-amplify/pubsub';
-import awsconfig from './aws-exports';
+import awsconfig from '../aws-exports';
 import { Auth } from 'aws-amplify';
 
 // graphql
-import { listTransactions } from './graphql/queries';
-import { createTransaction } from './graphql/mutations';
+import { listTransactions } from '../graphql/queries';
+import { createTransaction } from '../graphql/mutations';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
@@ -352,6 +352,8 @@ class Transactions extends Component {
 
                 <div>
                     <table id='transactions' style={{ height: '100%', width: '100%' }}>
+                    <h4><b>Timeline</b></h4>
+
                         <tbody>
                             <tr>{this.renderTableHeader()}</tr>
                             {this.renderTableData()}
