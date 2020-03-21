@@ -213,6 +213,8 @@ class AddTransaction extends Component {
     var fullCat = "";
     if (this.state.sub_category != "") {
       fullCat = this.state.category + "-" + this.state.sub_category;
+    } else {
+      fullCat = this.state.category;
     }
 
     // extract txn from state.
@@ -227,7 +229,6 @@ class AddTransaction extends Component {
         d = ORIGINAL_DATE;
       } else {
         d = convertDateStrToGraphqlDate(this.state.date);
-
       }
 
       transaction = {
@@ -293,6 +294,8 @@ class AddTransaction extends Component {
         window.alert("Successfully updated your transaction!");
       } else {
         console.log("ADD TXN...");
+        console.log(transaction);
+
         const res = await API.graphql(graphqlOperation(createTransaction, { input: transaction }));
         console.log("SUCCESS! \n", res);
         window.alert("Successfully added your transaction!");

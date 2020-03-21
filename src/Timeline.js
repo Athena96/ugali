@@ -129,13 +129,20 @@ class Transactions extends Component {
     }
 
     
-    async autoAdd(recurrTxn) {
+    async autoAdd(recurrTxn, currentDay) {
+        var cpyTxn = JSON.parse(JSON.stringify(recurrTxn));
+
         try {                     
+            cpyTxn.title = "[AUTO ADD]: "+cpyTxn.title;
+            delete cpyTxn.id;
+            delete cpyTxn.createdAt;
+            cpyTxn.is_recurring = false;
+            var d = convertDateStrToGraphqlDate(currentDay.getFullYear()+"-"+getDoubleDigitFormat(currentDay.getUTCMonth()+1) + "-" +getDoubleDigitFormat(currentDay.getUTCDate()));
+            cpyTxn.date = d;
+            console.log(cpyTxn);
+            const res = API.graphql(graphqlOperation(createTransaction, { input: cpyTxn }));
 
-            const res = await API.graphql(graphqlOperation(createTransaction, { input: recurrTxn }));
-
-            console.log("RES", res);
-            window.alert("Successfully AUTO added your transaction: ", recurrTxn.title);                                            
+            window.alert("Successfully AUTO added your transaction: "+ cpyTxn.title);                                            
           } catch (err) {
             window.alert("ERROR: ",{err});
           }
@@ -214,24 +221,35 @@ class Transactions extends Component {
                     } else {
                         recurringIncomes.push(recurrTxn)
                     }
-                    
-                    // if idx === 0 auto add.
-                    // if (idx === 0) {
 
-                    //     var d = convertDateStrToGraphqlDate(currentDay.getFullYear()+"-"+(currentDay.getUTCMonth()+1) + "-" +getDoubleDigitFormat(currentDay.getUTCDate()));
-                            
-                    //     recurrTxn.date = d;
-                    //     recurrTxn.title = "[AUTO ADD] " + recurrTxn.title;
-                    //     // console.log(recurrTxn);
-                    //     delete recurrTxn.id;
-                    //     delete recurrTxn.createdAt;
-                    //     recurrTxn.is_recurring = false;
-                    //     console.log(recurrTxn);
+                    if (idx === 0) {
+                        // if I have a value stored in storage
+                        if (localStorage.getItem("last_auto_add_date") != null) {
+                            const lastAutoAddDt = localStorage.getItem("last_auto_add_date");
+                            var y = lastAutoAddDt.split('-')[0];
+                            var m = lastAutoAddDt.split('-')[1];
+                            var d = lastAutoAddDt.split('-')[2];
 
-                    //     // this.autoAdd(recurrTxn);
-
-                    // }
-
+                            // curr day
+                            var yc = currentDay.getFullYear();
+                            var mc = getDoubleDigitFormat(currentDay.getUTCMonth()+1);
+                            var dc = getDoubleDigitFormat(currentDay.getUTCDate());
+                            if (y!=yc || m!=mc || d!=dc) {
+                                console.log("DIFF DATES ADDING");
+                                console.log(yc+"-"+mc+"-"+dc);
+                                console.log(y+"-"+m+"-"+d);
+                                // if the saved date is different than the current date, then we upate our storage and auto add
+                                localStorage.setItem("last_auto_add_date", yc+"-"+mc+"-"+dc);
+                                this.autoAdd(recurrTxn, currentDay);
+                            }
+                        } else {
+                            var yc = currentDay.getFullYear();
+                            var mc = getDoubleDigitFormat(currentDay.getUTCMonth()+1);
+                            var dc = getDoubleDigitFormat(currentDay.getUTCDate());
+                            localStorage.setItem("last_auto_add_date", yc+"-"+mc+"-"+dc);
+                            this.autoAdd(recurrTxn, currentDay);
+                        }
+                    }
                 }
             }
 

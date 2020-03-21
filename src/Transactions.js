@@ -15,7 +15,7 @@ API.configure(awsconfig);
 PubSub.configure(awsconfig);
 
 // Constants
-const TXN_LIMIT = 100;
+const TXN_LIMIT = 200;
 
 
 class Transactions extends Component {
