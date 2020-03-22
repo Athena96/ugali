@@ -33,7 +33,7 @@ class Transactions extends Component {
     async deleteTransaction(event) {
         try {
             var txnId = event.target.id;
-            const res = await API.graphql(graphqlOperation(deleteTransaction, { input: { id: txnId } }))
+            await API.graphql(graphqlOperation(deleteTransaction, { input: { id: txnId } }))
             window.alert("Successfully deleted your transaction!");
 
             var newTxns = [];
@@ -71,7 +71,7 @@ class Transactions extends Component {
         return this.state.VISIBLE_TXNS.map((transaction, index) => {
             const { id, title, amount, category, date, type, payment_method, description, is_recurring } = transaction;
             var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
-            
+
             // verified that descripted comes as null from DDB when there is no description.
             if (description === null) {
                 return (
@@ -80,8 +80,8 @@ class Transactions extends Component {
                             <span class="left">
                                 <font size="4.5">{title} - ${amount}<br /></font>
                                 <p><b>Category:</b> {category}<br />
-                                <b>Payment Method:</b> {payment_method}<br />
-                                <b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}</p>
+                                    <b>Payment Method:</b> {payment_method}<br />
+                                    <b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}</p>
                             </span>
                             <span class="right">
                                 <font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</font><br />
@@ -96,24 +96,24 @@ class Transactions extends Component {
                 return (
 
                     <div >
-                    <div className={classname}>
-                        <span class="left">
-                            <font size="4.5">{title} - ${amount}<br /></font>
-                            <p><b>Category:</b> {category}<br />
-                            <b>Payment Method:</b> {payment_method}<br />
-                            <b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}<br />
-                            <p><b>Description:</b><br />{description}</p>
+                        <div className={classname}>
+                            <span class="left">
+                                <font size="4.5">{title} - ${amount}<br /></font>
+                                <p><b>Category:</b> {category}<br />
+                                    <b>Payment Method:</b> {payment_method}<br />
+                                    <b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}<br />
+                                    <p><b>Description:</b><br />{description}</p>
 
-                            </p>
-                        </span>
-                        <span class="right">
-                            <font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</font><br />
-                            <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
-                            <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
-                            <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
-                        </span>
+                                </p>
+                            </span>
+                            <span class="right">
+                                <font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</font><br />
+                                <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
+                                <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
+                                <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
+                            </span>
+                        </div>
                     </div>
-                </div>
                 )
             }
 
@@ -124,20 +124,20 @@ class Transactions extends Component {
     componentDidMount() {
 
         if (localStorage.getItem("year") != null) {
-            this.setState({year: localStorage.getItem("year") });
+            this.setState({ year: localStorage.getItem("year") });
         }
         if (localStorage.getItem("month") != null) {
-            this.setState({month: localStorage.getItem("month") });
+            this.setState({ month: localStorage.getItem("month") });
         }
 
         Auth.currentAuthenticatedUser().then(user => {
             let email = user.attributes.email;
 
-            API.graphql(graphqlOperation(listTransactions, { 
-                limit: TXN_LIMIT, 
-                filter: { 
-                    user: { eq: email } 
-                } 
+            API.graphql(graphqlOperation(listTransactions, {
+                limit: TXN_LIMIT,
+                filter: {
+                    user: { eq: email }
+                }
             })).then(data => {
                 var sortedTxns = data.data.listTransactions.items;
                 sortedTxns.sort((t1, t2) => {
@@ -177,7 +177,7 @@ class Transactions extends Component {
                 return;
             }
         } else {
-            if (localStorage.getItem("year") == null || ( localStorage.getItem("year") != null && localStorage.getItem("year") != this.state.year) ) {
+            if (localStorage.getItem("year") == null || (localStorage.getItem("year") != null && localStorage.getItem("year") != this.state.year)) {
                 localStorage.setItem("year", this.state.year);
             }
         }
@@ -190,12 +190,12 @@ class Transactions extends Component {
                 return;
             }
         } else {
-            if (localStorage.getItem("month") == null || ( localStorage.getItem("month") != null && localStorage.getItem("month") != this.state.month) ) {
+            if (localStorage.getItem("month") == null || (localStorage.getItem("month") != null && localStorage.getItem("month") != this.state.month)) {
                 localStorage.setItem("month", this.state.month);
             }
         }
 
-       
+
         var filteredTxns = [];
 
         for (var txn of this.state.transactions) {
@@ -262,7 +262,7 @@ class Transactions extends Component {
                 categoryAgg[txn.category] = 0.0
             }
             categoryAgg[txn.category] += txn.amount;
-            
+
             if (txn.category.includes('-')) {
                 var keyParts = txn.category.split('-');
                 var masterKey = keyParts[0];
@@ -276,11 +276,11 @@ class Transactions extends Component {
         // convert to array
         var categoryArray = [];
         for (var k of Object.keys(categoryAgg)) {
-            categoryArray.push({category: k, amount: categoryAgg[k]});
+            categoryArray.push({ category: k, amount: categoryAgg[k] });
         }
 
         // sort
-        var sortedCategoryArray = categoryArray.sort((a,b) => {
+        var sortedCategoryArray = categoryArray.sort((a, b) => {
             return (a.category > b.category) ? 1 : -1;
         });
 
@@ -289,7 +289,7 @@ class Transactions extends Component {
             if (catVal.category.includes('income')) {
                 color = "green";
             }
-            
+
             if (catVal.category.includes('-')) {
                 return (
                     <tr key={index}>
@@ -324,11 +324,11 @@ class Transactions extends Component {
         // convert to array
         var paymentMethodArray = [];
         for (var k of Object.keys(paymentMethodAgg)) {
-            paymentMethodArray.push({paymentMethod: k, amount: paymentMethodAgg[k]});
+            paymentMethodArray.push({ paymentMethod: k, amount: paymentMethodAgg[k] });
         }
 
         // sort
-        var sortedPaymentMethodArray = paymentMethodArray.sort((a,b) => {
+        var sortedPaymentMethodArray = paymentMethodArray.sort((a, b) => {
             return (a.amount > b.amount) ? -1 : 1;
         });
 
@@ -345,15 +345,18 @@ class Transactions extends Component {
     render() {
         return (
             <div>
-                
-                <div>
+
+                <div class="filtersInput">
+
+                    <b>Year:</b>
                     <input
                         className="roundedOutline"
                         name="year"
                         type="text"
                         value={this.state.year}
                         onChange={this.handleChange} />
-
+                    
+                    <b>&nbsp;Month:</b>
                     <input
                         className="roundedOutline"
                         name="month"
@@ -369,7 +372,7 @@ class Transactions extends Component {
                     <div className="bar">
 
                         <table id='transactions'>
-                        <h4><b>Category Summary</b></h4>
+                            <h4><b>Category Summary</b></h4>
                             <tbody>
                                 <tr>{this.renderTableHeader()}</tr>
                                 {this.renderCategoryTableData()}
@@ -377,7 +380,7 @@ class Transactions extends Component {
                         </table>
 
                         <table id='transactions'>
-                        <h4><b>Payment Method<br />Summary</b></h4>
+                            <h4><b>Payment Method<br />Summary</b></h4>
                             <tbody>
                                 <tr>{this.renderPaymentMethodTableHeader()}</tr>
                                 {this.renderPaymentMethodTableData()}
@@ -387,7 +390,7 @@ class Transactions extends Component {
                     </div>
 
                     <div className="bar">
-                     <h4><b>Transactions</b></h4>
+                        <h4><b>Transactions</b></h4>
                         {this.renderTransactionData()}
                     </div>
 

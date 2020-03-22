@@ -125,7 +125,7 @@ class AddTransaction extends Component {
     } else {
       // new TXN.. so populate the payment method
       if (localStorage.getItem("payment_method") != null) {
-        this.setState({payment_method: localStorage.getItem("payment_method") });
+        this.setState({ payment_method: localStorage.getItem("payment_method") });
       }
     }
 
@@ -195,13 +195,13 @@ class AddTransaction extends Component {
     }
 
     if (this.state.payment_method === "") {
-        window.alert("Please add a 'Payment Method'");
-        return;
-  } else {
-      if (localStorage.getItem("payment_method") == null || ( localStorage.getItem("payment_method") != null && localStorage.getItem("payment_method") != this.state.payment_method) ) {
-          localStorage.setItem("payment_method", this.state.payment_method);
+      window.alert("Please add a 'Payment Method'");
+      return;
+    } else {
+      if (localStorage.getItem("payment_method") == null || (localStorage.getItem("payment_method") != null && localStorage.getItem("payment_method") != this.state.payment_method)) {
+        localStorage.setItem("payment_method", this.state.payment_method);
       }
-  }
+    }
 
     // get current user and set state
     var user = await Auth.currentAuthenticatedUser();
@@ -327,7 +327,7 @@ class AddTransaction extends Component {
               onChange={this.handleChange} />
           </label><br />
           <label>
-          <b>Amount:</b><br />
+            <b>Amount:</b><br />
             <input
               className="rounded"
               name="amount"
@@ -336,7 +336,7 @@ class AddTransaction extends Component {
               onChange={this.handleChange} />
           </label><br />
           <label>
-           <b>Category:</b>
+            <b>Category:</b>
             <input
               className="rounded"
               name="category"
@@ -345,7 +345,7 @@ class AddTransaction extends Component {
               onChange={this.handleChange} />
           </label><br />
           <label>
-           <i>Sub-Category (optional):</i>
+            <i>Sub-Category (optional):</i>
             <input
               className="rounded"
               name="sub_category"
@@ -355,7 +355,7 @@ class AddTransaction extends Component {
           </label><br />
 
           <label>
-          <b>Date:</b><br />
+            <b>Date:</b><br />
             <input
               className="rounded"
               name="date"
@@ -364,7 +364,7 @@ class AddTransaction extends Component {
               onChange={this.handleChange} />
           </label><br />
           <label>
-          <b>Description:</b><br />
+            <b>Description:</b><br />
             <textarea
               className="rounded"
               name="description"
@@ -373,7 +373,7 @@ class AddTransaction extends Component {
               onChange={this.handleChange} />
           </label><br />
           <label>
-          <b>Payment Method:</b><br />
+            <b>Payment Method:</b><br />
             <input
               className="rounded"
               name="payment_method"
@@ -400,8 +400,8 @@ class AddTransaction extends Component {
           </div>
 
           <label>
-          <b>Is Recurring Transaction:</b>
-          <input
+            <b>Is Recurring Transaction:</b>
+            <input
               name="is_recurring"
               type="checkbox"
               checked={this.state.is_recurring}

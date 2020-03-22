@@ -112,7 +112,6 @@
 }
 
 .roundedOutline {
-  width: 96%;
   color: black;
   border-color: black;
   border-width: 1px;
@@ -158,7 +157,6 @@
   border: none;
   color: black;
   padding: 10px;
-  width: 98%;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -318,8 +316,44 @@
 }
 
 .barbooks {
+  padding-left: 16px;
+  padding-bottom: 16px;
+  padding-right: 16px;
 
   /* width: 100px;
   height: 100px; */
   float: left;
+}
+.footer {  
+  background-color: rgb(255, 124, 123);
+  color: rgb(255, 124, 123);
+  text-align: center;
+  position: absolute;
+  bottom: 0;
+  align-items: center;
+  width: 100%;
+  /* height: 30px; */
+  /* padding-bottom: 0px;   */
+  position: relative;
+  /* min-height: 100vh; */
+}
+
+.footerText {
+  padding-top: 8px;
+  text-align: center;
+  color: azure;
+}
+
+.inputs {
+  margin-top: 8px;
+  margin-left: 8px;
+  margin-right: 8px;
+  border-radius: 8px;
+}
+
+.filtersInput {
+  margin-top: 8px;
+
+  margin-left: 16px;
+
 }

@@ -19,32 +19,32 @@ const TXN_LIMIT = 100;
 
 function getDoubleDigitFormat(number) {
     return (number < 10) ? "0" + number : number;
-  }
+}
 
 function convertDateStrToGraphqlDate(dateStr) {
     var dateParts = dateStr.split('-');
     if (dateParts.length >= 3) {
-      var year = dateParts[0];
-      var month = dateParts[1];
-      var day = dateParts[2];
-  
-      var currTime = new Date();
-      var hour = getDoubleDigitFormat(currTime.getHours());
-      var min = getDoubleDigitFormat(currTime.getMinutes());
-      var sec = getDoubleDigitFormat(currTime.getSeconds());
-      var formattedString = year + '-' + month + '-' + day + 'T' + hour + ':' + min + ':' + sec + '.000Z';
-      return formattedString;
+        var year = dateParts[0];
+        var month = dateParts[1];
+        var day = dateParts[2];
+
+        var currTime = new Date();
+        var hour = getDoubleDigitFormat(currTime.getHours());
+        var min = getDoubleDigitFormat(currTime.getMinutes());
+        var sec = getDoubleDigitFormat(currTime.getSeconds());
+        var formattedString = year + '-' + month + '-' + day + 'T' + hour + ':' + min + ':' + sec + '.000Z';
+        return formattedString;
     }
-  }
+}
 
 class Transactions extends Component {
     constructor(props) {
         super(props);
-        this.state = { balance_rows: [], variable_exp_name: "", variable_exp_amount: "", recurring_txns: [], starting_balance: ""};
+        this.state = { balance_rows: [], variable_exp_name: "", variable_exp_amount: "", recurring_txns: [], starting_balance: "" };
         this.handleChange = this.handleChange.bind(this);
-        this.componentDidMount = this.componentDidMount.bind(this); 
-        this.generateTimeline = this.generateTimeline.bind(this); 
-        this.updateTransaction = this.updateTransaction.bind(this); 
+        this.componentDidMount = this.componentDidMount.bind(this);
+        this.generateTimeline = this.generateTimeline.bind(this);
+        this.updateTransaction = this.updateTransaction.bind(this);
     }
 
     renderTableHeader() {
@@ -76,24 +76,24 @@ class Transactions extends Component {
     componentDidMount() {
         // check local storage for saved values, if have some, populate the fields with it.
         if (localStorage.getItem("variable_exp_name") != null) {
-            this.setState({variable_exp_name: localStorage.getItem("variable_exp_name") });
+            this.setState({ variable_exp_name: localStorage.getItem("variable_exp_name") });
         }
         if (localStorage.getItem("variable_exp_amount") != null) {
-            this.setState({variable_exp_amount: localStorage.getItem("variable_exp_amount") });
+            this.setState({ variable_exp_amount: localStorage.getItem("variable_exp_amount") });
         }
         if (localStorage.getItem("starting_balance") != null) {
-            this.setState({starting_balance: localStorage.getItem("starting_balance") });
+            this.setState({ starting_balance: localStorage.getItem("starting_balance") });
         }
 
         Auth.currentAuthenticatedUser().then(user => {
             let email = user.attributes.email;
 
-            API.graphql(graphqlOperation(listTransactions, { 
+            API.graphql(graphqlOperation(listTransactions, {
                 limit: TXN_LIMIT,
                 filter: {
                     user: { eq: email },
-                    is_recurring: { eq: true } 
-                } 
+                    is_recurring: { eq: true }
+                }
             })).then(data => {
 
                 var sortedTxns = data.data.listTransactions.items;
@@ -111,43 +111,43 @@ class Transactions extends Component {
                 if (data.data.listTransactions.nextToken !== null) {
                     window.alert("There were some recurring transactions that could not be fetched, so your generated timeline is not accurate.");
                 }
-                
+
                 this.generateTimeline();
-                
+
             }).catch((err) => {
-                window.alert("Encountered error fetching your transactions: \n",err);
+                window.alert("Encountered error fetching your transactions: \n", err);
             })
-            
+
         }).catch((err) => {
-            window.alert("Encountered error fetching your username: \n",err);
+            window.alert("Encountered error fetching your username: \n", err);
         });
-        
+
     }
 
     updateTransaction(event) {
-        this.props.history.push('/AddTransaction/'+event.target.id)
+        this.props.history.push('/AddTransaction/' + event.target.id)
     }
 
-    
+
     async autoAdd(recurrTxn, currentDay) {
         var cpyTxn = JSON.parse(JSON.stringify(recurrTxn));
 
-        try {                     
-            cpyTxn.title = "[AUTO ADD]: "+cpyTxn.title;
+        try {
+            cpyTxn.title = "[AUTO ADD]: " + cpyTxn.title;
             delete cpyTxn.id;
             delete cpyTxn.createdAt;
             cpyTxn.is_recurring = false;
-            var d = convertDateStrToGraphqlDate(currentDay.getFullYear()+"-"+getDoubleDigitFormat(currentDay.getUTCMonth()+1) + "-" +getDoubleDigitFormat(currentDay.getUTCDate()));
+            var d = convertDateStrToGraphqlDate(currentDay.getFullYear() + "-" + getDoubleDigitFormat(currentDay.getUTCMonth() + 1) + "-" + getDoubleDigitFormat(currentDay.getUTCDate()));
             cpyTxn.date = d;
             console.log(cpyTxn);
             const res = API.graphql(graphqlOperation(createTransaction, { input: cpyTxn }));
 
-            window.alert("Successfully AUTO added your transaction: "+ cpyTxn.title);                                            
-          } catch (err) {
-            window.alert("ERROR: ",{err});
-          }
+            window.alert("Successfully AUTO added your transaction: " + cpyTxn.title);
+        } catch (err) {
+            window.alert("ERROR: ", { err });
+        }
     }
-    
+
     generateTimeline() {
         if (this.state.variable_exp_name === "") {
             if (localStorage.getItem("variable_exp_name") != null) {
@@ -157,7 +157,7 @@ class Transactions extends Component {
                 return;
             }
         } else {
-            if (localStorage.getItem("variable_exp_name") == null || ( localStorage.getItem("variable_exp_name") != null && localStorage.getItem("variable_exp_name") != this.state.variable_exp_name) ) {
+            if (localStorage.getItem("variable_exp_name") == null || (localStorage.getItem("variable_exp_name") != null && localStorage.getItem("variable_exp_name") != this.state.variable_exp_name)) {
                 localStorage.setItem("variable_exp_name", this.state.variable_exp_name);
             }
         }
@@ -170,7 +170,7 @@ class Transactions extends Component {
                 return;
             }
         } else {
-            if (localStorage.getItem("variable_exp_amount") == null || ( localStorage.getItem("variable_exp_amount") != null && localStorage.getItem("variable_exp_amount") != this.state.variable_exp_amount) ) {
+            if (localStorage.getItem("variable_exp_amount") == null || (localStorage.getItem("variable_exp_amount") != null && localStorage.getItem("variable_exp_amount") != this.state.variable_exp_amount)) {
                 localStorage.setItem("variable_exp_amount", this.state.variable_exp_amount);
             }
         }
@@ -183,13 +183,13 @@ class Transactions extends Component {
                 return;
             }
         } else {
-            if (localStorage.getItem("starting_balance") == null || ( localStorage.getItem("starting_balance") != null && localStorage.getItem("starting_balance") != this.state.starting_balance) ) {
+            if (localStorage.getItem("starting_balance") == null || (localStorage.getItem("starting_balance") != null && localStorage.getItem("starting_balance") != this.state.starting_balance)) {
                 localStorage.setItem("starting_balance", this.state.starting_balance);
             }
         }
-        
+
         var balanceRows = [];
-        const DAY_TO_CALCULATE = 31*6;
+        const DAY_TO_CALCULATE = 31 * 6;
 
         var start = new Date();
         // start.setDate(start.getDate() - 1);
@@ -198,12 +198,12 @@ class Transactions extends Component {
 
         var currentDay = new Date(start);
         var idx = 0;
-        while(currentDay < end){
-            
+        while (currentDay < end) {
+
             balanceRows[idx] = {
                 id: idx,
                 balanceDate: new Date(currentDay),
-                balance: (idx === 0) ? this.state.starting_balance : balanceRows[idx-1].balance,
+                balance: (idx === 0) ? this.state.starting_balance : balanceRows[idx - 1].balance,
                 income: "",
                 incomeDesc: "",
                 expense: "",
@@ -232,21 +232,21 @@ class Transactions extends Component {
 
                             // curr day
                             var yc = currentDay.getFullYear();
-                            var mc = getDoubleDigitFormat(currentDay.getUTCMonth()+1);
+                            var mc = getDoubleDigitFormat(currentDay.getUTCMonth() + 1);
                             var dc = getDoubleDigitFormat(currentDay.getUTCDate());
-                            if (y!=yc || m!=mc || d!=dc) {
+                            if (y != yc || m != mc || d != dc) {
                                 console.log("DIFF DATES ADDING");
-                                console.log(yc+"-"+mc+"-"+dc);
-                                console.log(y+"-"+m+"-"+d);
+                                console.log(yc + "-" + mc + "-" + dc);
+                                console.log(y + "-" + m + "-" + d);
                                 // if the saved date is different than the current date, then we upate our storage and auto add
-                                localStorage.setItem("last_auto_add_date", yc+"-"+mc+"-"+dc);
+                                localStorage.setItem("last_auto_add_date", yc + "-" + mc + "-" + dc);
                                 this.autoAdd(recurrTxn, currentDay);
                             }
                         } else {
                             var yc = currentDay.getFullYear();
-                            var mc = getDoubleDigitFormat(currentDay.getUTCMonth()+1);
+                            var mc = getDoubleDigitFormat(currentDay.getUTCMonth() + 1);
                             var dc = getDoubleDigitFormat(currentDay.getUTCDate());
-                            localStorage.setItem("last_auto_add_date", yc+"-"+mc+"-"+dc);
+                            localStorage.setItem("last_auto_add_date", yc + "-" + mc + "-" + dc);
                             this.autoAdd(recurrTxn, currentDay);
                         }
                     }
@@ -277,7 +277,7 @@ class Transactions extends Component {
                 var incomeDescStr = ""
                 var incomeLinks = [];
                 for (var incomeTxn of recurringIncomes) {
-                    incomeStr += ("$"+incomeTxn.amount.toString() + ", ");
+                    incomeStr += ("$" + incomeTxn.amount.toString() + ", ");
                     incomeDescStr += (incomeTxn.title + ", ");
                     incomeLinks.push(incomeTxn.id);
                 }
@@ -290,7 +290,7 @@ class Transactions extends Component {
                 var expenseDescStr = ""
                 var expenseLinks = [];
                 for (var expenseTxn of recurringExpenses) {
-                    expenseStr += ("$"+expenseTxn.amount.toString() + ", ");
+                    expenseStr += ("$" + expenseTxn.amount.toString() + ", ");
                     expenseDescStr += (expenseTxn.title + ", ");
                     expenseLinks.push(expenseTxn.id);
                 }
@@ -322,37 +322,47 @@ class Transactions extends Component {
     render() {
         return (
             <div>
-                <div>
-                    <input
-                    className="roundedOutline"
-                    name="variable_exp_name"
-                    type="text"
-                    placeholder="variable expense name"
-                    value={this.state.variable_exp_name}
-                    onChange={this.handleChange} />
+                <div class="filtersInput" >
 
-                    <input
-                    className="roundedOutline"
-                    name="variable_exp_amount"
-                    placeholder="variable expense amount"
-                    type="text"
-                    value={this.state.variable_exp_amount}
-                    onChange={this.handleChange} />
-                    
-                    <input
-                    className="roundedOutline"
-                    name="starting_balance"
-                    placeholder="starting balance"
-                    type="text"
-                    value={this.state.starting_balance}
-                    onChange={this.handleChange} />
-            
-                    <button class="filter" onClick={this.generateTimeline}>generate timeline</button>
+                    <div className="barbooks">
+                        <b>Variable Spending Name:</b><br />
+                        <input
+                            className="roundedOutline"
+                            name="variable_exp_name"
+                            type="text"
+                            placeholder="variable expense name"
+                            value={this.state.variable_exp_name}
+                            onChange={this.handleChange} /><br />
+                    </div>
+                    <div className="barbooks">
+
+                        <b>Amount:</b><br />
+                        <input
+                            className="roundedOutline"
+                            name="variable_exp_amount"
+                            placeholder="variable expense amount"
+                            type="text"
+                            value={this.state.variable_exp_amount}
+                            onChange={this.handleChange} /><br />
+                    </div>
+                    <div className="barbooks">
+
+                        <b>Starting Balance:</b><br />
+                        <input
+                            className="roundedOutline"
+                            name="starting_balance"
+                            placeholder="starting balance"
+                            type="text"
+                            value={this.state.starting_balance}
+                            onChange={this.handleChange} /><br />
+                    </div>
+
+                    <button class="filter" onClick={this.generateTimeline}><b>generate timeline</b></button>
                 </div>
 
                 <div>
-                    <table id='transactions' style={{ height: '100%', width: '100%' }}>
-                    <h4><b>Timeline</b></h4>
+                    <table id='transactions' align="center" style={{ height: '90%', width: '90%'}}>
+                        <h4><b>Timeline</b></h4>
 
                         <tbody>
                             <tr>{this.renderTableHeader()}</tr>

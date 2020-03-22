@@ -1,8 +1,6 @@
 // React
 import React, { Component } from 'react';
 
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
-
 // React MDL
 import { Layout, Header, Navigation, Drawer, Content } from 'react-mdl';
 import { Link } from 'react-router-dom';
@@ -46,48 +44,52 @@ class App extends Component {
   componentDidMount() {
     Auth.currentAuthenticatedUser().then(user => {
       let email = user.attributes.email;
-      this.setState({user: email});
+      this.setState({ user: email });
     }).catch((err) => {
-        window.alert("Encountered error fetching your username: \n",err);
+      window.alert("Encountered error fetching your username: \n", err);
     });
   }
 
   render() {
     return (
       <div className="demo-big-content">
-    <Layout fixedHeader>
-        <Header style={{backgroundColor: 'rgb(255, 124, 123)'}} title={<Link style={{textDecoration: 'none', color: 'white'}} to="/">Zen Spending</Link>} scroll>
-            <Navigation>
-                <Link to="/timeline">Timeline</Link>
-                <Link to="/transactions">Transactions</Link>
-                <Link to="/addTransaction">Add Transaction</Link>
-            </Navigation>
-              <b>{this.state.user}</b>
-              <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br/>
-        </Header>
-        <Drawer title={<Link style={{textDecoration: 'none', color: 'black'}} to="/">Zen Spending</Link>}>
+        <Layout fixedHeader>
+          <Header style={{ backgroundColor: 'rgb(255, 124, 123)' }} title={<Link style={{ textDecoration: 'none', color: 'white' }} to="/">Zen Spending</Link>} scroll>
             <Navigation>
               <Link to="/timeline">Timeline</Link>
               <Link to="/transactions">Transactions</Link>
               <Link to="/addTransaction">Add Transaction</Link>
             </Navigation>
             <b>{this.state.user}</b>
-              <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br/>
-        </Drawer>
-        <Content>
-            <div className="page-content"> 
-            
-            <Main/>
+            <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br />
+          </Header>
+          <Drawer title={<Link style={{ textDecoration: 'none', color: 'black' }} to="/">Zen Spending</Link>}>
+            <Navigation>
+              <Link to="/timeline">Timeline</Link>
+              <Link to="/transactions">Transactions</Link>
+              <Link to="/addTransaction">Add Transaction</Link>
+            </Navigation>
+            <p align="center"><b>{this.state.user}</b></p>
+            <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br />
+          </Drawer>
+          <Content>
+            <div className="page-content">
+              <Main />
+
+
             </div>
-            
-        </Content>
-    </Layout>
-</div>
+
+          </Content>
+          <footer class="footer">
+            <p class="footerText">© Copyright ZenSpending.com - All rights reserved<br/>For bugs, feature requests, or questions please email <b>zenspending@gmail.com</b></p>
+          </footer>
+        </Layout>
+      </div>
     );
   }
 
 }
-export default props =>  {
+export default props => {
   const AppComponent = withAuthenticator(App)
   return <AppComponent {...props} />
 }
