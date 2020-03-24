@@ -60,9 +60,16 @@ class Transactions extends Component {
             var year = balanceDate.getFullYear();
             var month = balanceDate.getMonth() + 1;
             var day = balanceDate.getDate();
+            const dayIdx = balanceDate.getDay();
+            const days = ["Sun","Mon","Tue","Wed","Thu","Fri", "Sat"];
+            var dayOfWeek = days[dayIdx];
+            var weekDay = <td>{year + "-" + month + "-" + day + " " + dayOfWeek}</td>;
+            if (dayIdx === 0 || dayIdx === 6) {
+                weekDay = <td><b>{year + "-" + month + "-" + day + " " + dayOfWeek}</b></td>;
+            }
             return (
                 <tr key={id}>
-                    <td>{year + "-" + month + "-" + day}</td>
+                    {weekDay}
                     <td>${parseFloat(balance).toFixed(2)}</td>
                     <td>{income}</td>
                     <td>{incomeDesc}</td>
@@ -112,8 +119,9 @@ class Transactions extends Component {
                     window.alert("There were some recurring transactions that could not be fetched, so your generated timeline is not accurate.");
                 }
 
-                this.generateTimeline();
-
+                if (this.state.variable_exp_name !== "" && this.state.variable_exp_amount !== "" && this.state.starting_balance !== "") {
+                    this.generateTimeline();
+                }
             }).catch((err) => {
                 window.alert("Encountered error fetching your transactions: \n", err);
             })

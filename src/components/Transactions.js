@@ -18,10 +18,14 @@ PubSub.configure(awsconfig);
 const TXN_LIMIT = 200;
 
 
+function getDoubleDigitFormat(number) {
+    return (number < 10) ? "0" + number : number;
+  }
+
 class Transactions extends Component {
     constructor(props) {
         super(props);
-        this.state = { transactions: [], year: '', month: '', VISIBLE_TXNS: [] };
+        this.state = { transactions: [], year: '', month: '', category: '', VISIBLE_TXNS: [] };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.deleteTransaction = this.deleteTransaction.bind(this);
@@ -130,6 +134,10 @@ class Transactions extends Component {
             this.setState({ month: localStorage.getItem("month") });
         }
 
+        if (localStorage.getItem("category") != null) {
+            this.setState({ category: localStorage.getItem("category") });
+        }
+
         Auth.currentAuthenticatedUser().then(user => {
             let email = user.attributes.email;
 
@@ -156,7 +164,9 @@ class Transactions extends Component {
                     window.alert("There were some recurring transactions that could not be fetched, so this page is not accurate.");
                 }
 
-                this.filterTransactions();
+                if (this.state.year !== "" && this.state.month !== "") {
+                    this.filterTransactions();
+                }
 
             }).catch((err) => {
                 window.alert("Encountered error fetching your transactions: \n", err);
@@ -196,6 +206,14 @@ class Transactions extends Component {
         }
 
 
+            if (localStorage.getItem("category") == null || (localStorage.getItem("category") != null && localStorage.getItem("category") != this.state.category)) {
+                console.log("updaing category");
+                localStorage.setItem("category", this.state.category);
+            }
+        
+
+
+
         var filteredTxns = [];
 
         for (var txn of this.state.transactions) {
@@ -203,7 +221,14 @@ class Transactions extends Component {
             var year = dateParts[0];
             var month = dateParts[1];
             if (year === this.state.year && month === this.state.month) {
-                filteredTxns.push(txn);
+
+                if (this.state.category !== "") {
+                    if (txn.category === this.state.category){
+                        filteredTxns.push(txn);
+                    }
+                } else {
+                    filteredTxns.push(txn);
+                }
             }
         }
 
@@ -364,6 +389,13 @@ class Transactions extends Component {
                         value={this.state.month}
                         onChange={this.handleChange} />
 
+                    <b>&nbsp;Category:</b>
+                    <input
+                        className="roundedOutline"
+                        name="category"
+                        type="text"
+                        value={this.state.category}
+                        onChange={this.handleChange} />
                     <button class="filter" onClick={this.filterTransactions}><b>filter transactions</b></button>
                 </div>
 
