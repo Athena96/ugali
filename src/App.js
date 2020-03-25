@@ -81,7 +81,7 @@ class App extends Component {
 
           </Content>
           <footer class="footer">
-            <p class="footerText">© Copyright ZenSpending.com - All rights reserved<br/>For bugs, feature requests, or questions please email <b>zenspending@gmail.com</b></p>
+            <p class="footerText">© Copyright ZenSpending.com - All rights reserved<br />For bugs, feature requests, or questions please email <b>zenspending@gmail.com</b></p>
           </footer>
         </Layout>
       </div>

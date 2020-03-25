@@ -1,6 +1,9 @@
 // React
 import React, { Component } from 'react';
 
+import LineChart from 'react-linechart';
+import '../../node_modules/react-linechart/dist/styles.css';
+
 // Amplify
 import API, { graphqlOperation } from '@aws-amplify/api';
 import PubSub from '@aws-amplify/pubsub';
@@ -11,31 +14,13 @@ import { Auth } from 'aws-amplify';
 import { listTransactions } from '../graphql/queries';
 import { createTransaction } from '../graphql/mutations';
 
+import { getDoubleDigitFormat, convertDateStrToGraphqlDate } from '../common/Utilities';
+
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
 
 // Constants
 const TXN_LIMIT = 100;
-
-function getDoubleDigitFormat(number) {
-    return (number < 10) ? "0" + number : number;
-}
-
-function convertDateStrToGraphqlDate(dateStr) {
-    var dateParts = dateStr.split('-');
-    if (dateParts.length >= 3) {
-        var year = dateParts[0];
-        var month = dateParts[1];
-        var day = dateParts[2];
-
-        var currTime = new Date();
-        var hour = getDoubleDigitFormat(currTime.getHours());
-        var min = getDoubleDigitFormat(currTime.getMinutes());
-        var sec = getDoubleDigitFormat(currTime.getSeconds());
-        var formattedString = year + '-' + month + '-' + day + 'T' + hour + ':' + min + ':' + sec + '.000Z';
-        return formattedString;
-    }
-}
 
 class Transactions extends Component {
     constructor(props) {
@@ -61,7 +46,7 @@ class Transactions extends Component {
             var month = balanceDate.getMonth() + 1;
             var day = balanceDate.getDate();
             const dayIdx = balanceDate.getDay();
-            const days = ["Sun","Mon","Tue","Wed","Thu","Fri", "Sat"];
+            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
             var dayOfWeek = days[dayIdx];
             var weekDay = <td>{year + "-" + month + "-" + day + " " + dayOfWeek}</td>;
             if (dayIdx === 0 || dayIdx === 6) {
@@ -327,11 +312,43 @@ class Transactions extends Component {
         });
     }
 
+    getGraphPoints() {
+        // https://www.npmjs.com/package/react-linechart
+        var dp = [];
+        var time = 1;
+        for (var balanceRow of this.state.balance_rows) {
+            dp.push({ x: time, y: balanceRow.balance });
+            time += 1;
+        }
+
+        const data = [
+            {
+                color: "steelblue",
+                points: dp
+            }
+        ];
+
+        return data;
+    }
+
     render() {
+
         return (
+
             <div>
                 <div class="filtersInput" >
-
+                    <div align="left" >
+                        <LineChart
+                            hidePoints={true}
+                            yMin={0}
+                            width={400}
+                            height={200}
+                            hideXLabel={true}
+                            hideXAxis={true}
+                            yLabel={"Balance"}
+                            data={this.getGraphPoints()}
+                        />
+                    </div>
                     <div className="barbooks">
                         <b>Variable Spending Name:</b><br />
                         <input
@@ -366,10 +383,13 @@ class Transactions extends Component {
                     </div>
 
                     <button class="filter" onClick={this.generateTimeline}><b>generate timeline</b></button>
+
                 </div>
 
+
                 <div>
-                    <table id='transactions' align="center" style={{ height: '90%', width: '90%'}}>
+
+                    <table id='transactions' align="center" style={{ height: '90%', width: '90%' }}>
                         <h4><b>Timeline</b></h4>
 
                         <tbody>
@@ -378,6 +398,7 @@ class Transactions extends Component {
                         </tbody>
                     </table>
                 </div>
+
             </div>
         );
     }

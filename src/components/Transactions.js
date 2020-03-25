@@ -17,11 +17,6 @@ PubSub.configure(awsconfig);
 // Constants
 const TXN_LIMIT = 200;
 
-
-function getDoubleDigitFormat(number) {
-    return (number < 10) ? "0" + number : number;
-  }
-
 class Transactions extends Component {
     constructor(props) {
         super(props);
@@ -76,52 +71,32 @@ class Transactions extends Component {
             const { id, title, amount, category, date, type, payment_method, description, is_recurring } = transaction;
             var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
 
-            // verified that descripted comes as null from DDB when there is no description.
-            if (description === null) {
-                return (
-                    <div >
-                        <div className={classname}>
-                            <span class="left">
-                                <font size="4.5">{title} - ${amount}<br /></font>
-                                <p><b>Category:</b> {category}<br />
-                                    <b>Payment Method:</b> {payment_method}<br />
-                                    <b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}</p>
-                            </span>
-                            <span class="right">
-                                <font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</font><br />
-                                <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
-                                <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
-                                <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
-                            </span>
-                        </div>
+            const dayIdx = new Date(date);
+            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            var dayOfWeek = days[dayIdx.getDay()];
+
+
+            var desc = <p><b>Description:</b><br />{description}</p>;
+
+            return (
+                <div >
+                    <div className={classname}>
+                        <span class="left">
+                            <font size="4.5">{title} - ${amount}<br /></font>
+                            <p><b>Category:</b> {category}<br />
+                                <b>Payment Method:</b> {payment_method}<br />
+                                <b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}</p>
+                            {description === null ? "" : desc}
+                        </span>
+                        <span class="right">
+                            <font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</font><br />
+                            <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
+                            <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
+                            <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
+                        </span>
                     </div>
-                )
-            } else {
-                return (
-
-                    <div >
-                        <div className={classname}>
-                            <span class="left">
-                                <font size="4.5">{title} - ${amount}<br /></font>
-                                <p><b>Category:</b> {category}<br />
-                                    <b>Payment Method:</b> {payment_method}<br />
-                                    <b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}<br />
-                                    <p><b>Description:</b><br />{description}</p>
-
-                                </p>
-                            </span>
-                            <span class="right">
-                                <font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]}</font><br />
-                                <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
-                                <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
-                                <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
-                            </span>
-                        </div>
-                    </div>
-                )
-            }
-
-
+                </div>
+            )
         })
     }
 
@@ -206,13 +181,10 @@ class Transactions extends Component {
         }
 
 
-            if (localStorage.getItem("category") == null || (localStorage.getItem("category") != null && localStorage.getItem("category") != this.state.category)) {
-                console.log("updaing category");
-                localStorage.setItem("category", this.state.category);
-            }
-        
-
-
+        if (localStorage.getItem("category") == null || (localStorage.getItem("category") != null && localStorage.getItem("category") != this.state.category)) {
+            console.log("updaing category");
+            localStorage.setItem("category", this.state.category);
+        }
 
         var filteredTxns = [];
 
@@ -223,7 +195,7 @@ class Transactions extends Component {
             if (year === this.state.year && month === this.state.month) {
 
                 if (this.state.category !== "") {
-                    if (txn.category === this.state.category){
+                    if (txn.category === this.state.category) {
                         filteredTxns.push(txn);
                     }
                 } else {
@@ -380,7 +352,7 @@ class Transactions extends Component {
                         type="text"
                         value={this.state.year}
                         onChange={this.handleChange} />
-                    
+
                     <b>&nbsp;Month:</b>
                     <input
                         className="roundedOutline"
