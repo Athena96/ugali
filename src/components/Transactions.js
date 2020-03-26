@@ -344,7 +344,7 @@ class Transactions extends Component {
             <div>
 
                 <div class="filtersInput">
-
+                <br/>
                     <b>Year:</b>
                     <input
                         className="roundedOutline"

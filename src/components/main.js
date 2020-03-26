@@ -3,14 +3,14 @@ import { Switch, Route } from 'react-router-dom';
 
 import AddTransaction from "./AddTransaction";
 import Transactions from './Transactions';
-import Timeline from './Timeline';
+import TimeTravel from './TimeTravel';
 
 
 const Main = () => (
   <Switch>
     <Route exact path="/" component={Transactions} />
     <Route path="/transactions" component={Transactions} />
-    <Route path="/timeline" component={Timeline} />
+    <Route path="/timeTravel" component={TimeTravel} />
     <Route path="/addTransaction" component={AddTransaction} />
   </Switch>
 )

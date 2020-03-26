@@ -34,8 +34,6 @@ class App extends Component {
     try {
       await Auth.signOut()
       this.props.rerender()
-
-      // this.props.navigation.navigate('Auth')
     } catch (err) {
       console.log('error signing out...', err)
     }
@@ -53,10 +51,10 @@ class App extends Component {
   render() {
     return (
       <div className="demo-big-content">
-        <Layout fixedHeader>
+        <Layout >
           <Header style={{ backgroundColor: 'rgb(255, 124, 123)' }} title={<Link style={{ textDecoration: 'none', color: 'white' }} to="/">Zen Spending</Link>} scroll>
             <Navigation>
-              <Link to="/timeline">Timeline</Link>
+              <Link to="/timeTravel">Time Travel</Link>
               <Link to="/transactions">Transactions</Link>
               <Link to="/addTransaction">Add Transaction</Link>
             </Navigation>
@@ -65,7 +63,7 @@ class App extends Component {
           </Header>
           <Drawer title={<Link style={{ textDecoration: 'none', color: 'black' }} to="/">Zen Spending</Link>}>
             <Navigation>
-              <Link to="/timeline">Timeline</Link>
+              <Link to="/timeTravel">Time Travel</Link>
               <Link to="/transactions">Transactions</Link>
               <Link to="/addTransaction">Add Transaction</Link>
             </Navigation>
@@ -73,10 +71,9 @@ class App extends Component {
             <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br />
           </Drawer>
           <Content>
+            <br/>
             <div className="page-content">
-              <Main />
-
-
+            <Main />
             </div>
 
           </Content>

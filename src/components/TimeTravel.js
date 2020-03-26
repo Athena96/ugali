@@ -22,7 +22,7 @@ PubSub.configure(awsconfig);
 // Constants
 const TXN_LIMIT = 100;
 
-class Transactions extends Component {
+class TimeTravel extends Component {
     constructor(props) {
         super(props);
         this.state = { balance_rows: [], variable_exp_name: "", variable_exp_amount: "", recurring_txns: [], starting_balance: "" };
@@ -336,9 +336,11 @@ class Transactions extends Component {
         return (
 
             <div>
+   
                 <div class="filtersInput" >
-                    <div align="left" >
-                        <LineChart
+   
+                <LineChart 
+                            margins={{ top: 0, right: 0, bottom: 0, left: 65 }}
                             hidePoints={true}
                             yMin={0}
                             width={400}
@@ -348,18 +350,16 @@ class Transactions extends Component {
                             yLabel={"Balance"}
                             data={this.getGraphPoints()}
                         />
-                    </div>
-                    <div className="barbooks">
+                        
                         <b>Variable Spending Name:</b><br />
                         <input
+                        
                             className="roundedOutline"
                             name="variable_exp_name"
                             type="text"
                             placeholder="variable expense name"
                             value={this.state.variable_exp_name}
                             onChange={this.handleChange} /><br />
-                    </div>
-                    <div className="barbooks">
 
                         <b>Amount:</b><br />
                         <input
@@ -369,29 +369,25 @@ class Transactions extends Component {
                             type="text"
                             value={this.state.variable_exp_amount}
                             onChange={this.handleChange} /><br />
-                    </div>
-                    <div className="barbooks">
+          
 
                         <b>Starting Balance:</b><br />
                         <input
+                        
                             className="roundedOutline"
                             name="starting_balance"
                             placeholder="starting balance"
                             type="text"
                             value={this.state.starting_balance}
                             onChange={this.handleChange} /><br />
-                    </div>
-
-                    <button class="filter" onClick={this.generateTimeline}><b>generate timeline</b></button>
-
+                    
+                    <button class="filterTimeline" onClick={this.generateTimeline}><b>generate timeline</b></button>
                 </div>
 
 
                 <div>
-
-                    <table id='transactions' align="center" style={{ height: '90%', width: '90%' }}>
+                    <table id='transactions' align="center" style={{ height: '90%', width: '95%' }}>
                         <h4><b>Timeline</b></h4>
-
                         <tbody>
                             <tr>{this.renderTableHeader()}</tr>
                             {this.renderTableData()}
@@ -404,4 +400,4 @@ class Transactions extends Component {
     }
 }
 
-export default Transactions;
+export default TimeTravel;
