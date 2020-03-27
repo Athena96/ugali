@@ -291,7 +291,6 @@ class AddTransaction extends Component {
   render() {
     return (
       <div>
-      <br/>
       <div className="addTransactionBackground">
        
         <form onSubmit={this.handleSubmit}>

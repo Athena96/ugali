@@ -338,18 +338,6 @@ class TimeTravel extends Component {
             <div>
    
                 <div class="filtersInput" >
-   
-                <LineChart 
-                            margins={{ top: 0, right: 0, bottom: 0, left: 65 }}
-                            hidePoints={true}
-                            yMin={0}
-                            width={400}
-                            height={200}
-                            hideXLabel={true}
-                            hideXAxis={true}
-                            yLabel={"Balance"}
-                            data={this.getGraphPoints()}
-                        />
                         
                         <b>Variable Spending Name:</b><br />
                         <input
@@ -382,9 +370,22 @@ class TimeTravel extends Component {
                             onChange={this.handleChange} /><br />
                     
                     <button class="filterTimeline" onClick={this.generateTimeline}><b>generate timeline</b></button>
+                
+                    <LineChart 
+                            margins={{ top: 0, right: 0, bottom: 0, left: 65 }}
+                            hidePoints={true}
+                            yMin={0}
+                            width={400}
+                            height={200}
+                            hideXLabel={true}
+                            hideXAxis={true}
+                            yLabel={"Balance"}
+                            data={this.getGraphPoints()}
+                        />
+
                 </div>
 
-
+             
                 <div>
                     <table id='transactions' align="center" style={{ height: '90%', width: '95%' }}>
                         <h4><b>Timeline</b></h4>

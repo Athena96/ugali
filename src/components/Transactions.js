@@ -66,7 +66,7 @@ class Transactions extends Component {
         this.props.history.push('/addTransaction/duplicate/' + event.target.id)
     }
 
-    renderTransactionData() {
+renderTransactionData() {
         return this.state.VISIBLE_TXNS.map((transaction, index) => {
             const { id, title, amount, category, date, type, payment_method, description, is_recurring } = transaction;
             var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
@@ -76,24 +76,21 @@ class Transactions extends Component {
             var dayOfWeek = days[dayIdx.getDay()];
 
 
-            var desc = <p><b>Description:</b><br />{description}</p>;
+            var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
 
             return (
                 <div >
                     <div className={classname}>
-                        <span class="left">
+                    <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
+
                             <font size="4.5">{title} - ${amount}<br /></font>
                             <p><b>Category:</b> {category}<br />
                                 <b>Payment Method:</b> {payment_method}<br />
                                 <b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}</p>
                             {description === null ? "" : desc}
-                        </span>
-                        <span class="right">
-                            <font size="4.5">{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</font><br />
                             <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
                             <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
                             <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
-                        </span>
                     </div>
                 </div>
             )
@@ -344,7 +341,6 @@ class Transactions extends Component {
             <div>
 
                 <div class="filtersInput">
-                <br/>
                     <b>Year:</b>
                     <input
                         className="roundedOutline"
@@ -371,10 +367,8 @@ class Transactions extends Component {
                     <button class="filter" onClick={this.filterTransactions}><b>filter transactions</b></button>
                 </div>
 
-                <div>
-
+                <div  >
                     <div className="bar">
-
                         <table id='transactions'>
                             <h4><b>Category Summary</b></h4>
                             <tbody>
@@ -393,7 +387,7 @@ class Transactions extends Component {
 
                     </div>
 
-                    <div className="bar">
+                    <div className="barBig">
                         <h4><b>Transactions</b></h4>
                         {this.renderTransactionData()}
                     </div>

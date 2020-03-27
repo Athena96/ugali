@@ -51,15 +51,15 @@ class App extends Component {
   render() {
     return (
       <div className="demo-big-content">
-        <Layout >
-          <Header style={{ backgroundColor: 'rgb(255, 124, 123)' }} title={<Link style={{ textDecoration: 'none', color: 'white' }} to="/">Zen Spending</Link>} scroll>
+        <Layout fixedHeader>
+          <Header style={{ backgroundColor: 'rgb(255, 124, 123)' }}  seamed>
             <Navigation>
               <Link to="/timeTravel">Time Travel</Link>
               <Link to="/transactions">Transactions</Link>
               <Link to="/addTransaction">Add Transaction</Link>
             </Navigation>
-            <b>{this.state.user}</b>
-            <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br />
+            {/* <b>{this.state.users}</b> */}
+            {/* <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br /> */}
           </Header>
           <Drawer title={<Link style={{ textDecoration: 'none', color: 'black' }} to="/">Zen Spending</Link>}>
             <Navigation>
@@ -71,7 +71,6 @@ class App extends Component {
             <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br />
           </Drawer>
           <Content>
-            <br/>
             <div className="page-content">
             <Main />
             </div>

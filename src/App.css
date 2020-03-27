@@ -244,7 +244,7 @@
   background-color:rgb(235, 235, 235);
   border: none;
   color: black;
-  width: 100%;
+  width: 75%;
   padding: 10px;
   text-align: left;
   text-decoration: none;
@@ -257,7 +257,7 @@
   background-color: rgb(3, 54, 6);
   border: none;
   color: white;
-  width: 100%;
+  width: 75%;
   padding: 10px;
   text-align: left;
   text-decoration: none;
@@ -328,11 +328,22 @@
 }
 
 .bar {
-  padding-left: 16px;
   /* width: 100px;
   height: 100px; */
   float: left;
+  width: 275px;
+  padding-left: 16px;
+
 }
+
+.barBig {
+  padding-left: 16px;
+    /* width: 100px;
+    height: 100px; */
+    float: left;
+}
+
+
 
 .barbooks {
   padding-left: 16px;
@@ -378,4 +389,8 @@
   margin-top: 8px;
   margin-left: 12px;
   margin-right: 12px;
+}
+
+.desc {
+  width: 75%;
 }
