@@ -4,7 +4,7 @@ import { Switch, Route } from 'react-router-dom';
 import AddTransaction from "./AddTransaction";
 import Transactions from './Transactions';
 import TimeTravel from './TimeTravel';
-
+import About from './About';
 
 const Main = () => (
   <Switch>
@@ -12,6 +12,7 @@ const Main = () => (
     <Route path="/transactions" component={Transactions} />
     <Route path="/timeTravel" component={TimeTravel} />
     <Route path="/addTransaction" component={AddTransaction} />
+    <Route path="/about" component={About} />
   </Switch>
 )
 

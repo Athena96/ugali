@@ -33,7 +33,7 @@ class TimeTravel extends Component {
     }
 
     renderTableHeader() {
-        let header = ['balance_date', 'balance', 'income', 'income_desc', 'expense', 'expense_desc'];
+        let header = ['date', 'balance', 'income-expense'];
         return header.map((key, index) => {
             return <th key={index}>{key.toUpperCase()}</th>
         })
@@ -52,16 +52,44 @@ class TimeTravel extends Component {
             if (dayIdx === 0 || dayIdx === 6) {
                 weekDay = <td><b>{year + "-" + month + "-" + day + " " + dayOfWeek}</b></td>;
             }
-            return (
-                <tr key={id}>
-                    {weekDay}
-                    <td>${parseFloat(balance).toFixed(2)}</td>
-                    <td>{income}</td>
-                    <td>{incomeDesc}</td>
-                    <td>{expense}</td>
-                    <td>{expenseDesc}</td>
-                </tr>
-            )
+
+            console.log(incomeDesc);
+            console.log(expenseDesc);
+
+            if (incomeDesc !== "" && expenseDesc === "") {
+                return (
+                    <tr key={id}>
+                        {weekDay}
+                        <td>${parseFloat(balance).toFixed(2)}</td>
+                        <td>+{income} ({incomeDesc})</td>
+                    </tr>
+                )
+            } else if (incomeDesc === "" && expenseDesc !== "") {
+                return (
+                    <tr key={id}>
+                        {weekDay}
+                        <td>${parseFloat(balance).toFixed(2)}</td>
+                        <td>-{expense} ({expenseDesc})</td>
+                    </tr>
+                )
+            } else if  (incomeDesc !== "" && expenseDesc !== "") {
+                return (
+                    <tr key={id}>
+                        {weekDay}
+                        <td>${parseFloat(balance).toFixed(2)}</td>
+                        <td>+{income} ({incomeDesc}){<br/>}-{expense} ({expenseDesc})</td>
+                    </tr>
+                )
+            } else {
+                return (
+                    <tr key={id}>
+                        {weekDay}
+                        <td>${parseFloat(balance).toFixed(2)}</td>
+                        <td></td>
+                    </tr>
+                )
+            }
+            
         })
     }
 
@@ -132,7 +160,6 @@ class TimeTravel extends Component {
             cpyTxn.is_recurring = false;
             var d = convertDateStrToGraphqlDate(currentDay.getFullYear() + "-" + getDoubleDigitFormat(currentDay.getUTCMonth() + 1) + "-" + getDoubleDigitFormat(currentDay.getUTCDate()));
             cpyTxn.date = d;
-            console.log(cpyTxn);
             const res = API.graphql(graphqlOperation(createTransaction, { input: cpyTxn }));
 
             window.alert("Successfully AUTO added your transaction: " + cpyTxn.title);
@@ -228,9 +255,6 @@ class TimeTravel extends Component {
                             var mc = getDoubleDigitFormat(currentDay.getUTCMonth() + 1);
                             var dc = getDoubleDigitFormat(currentDay.getUTCDate());
                             if (y != yc || m != mc || d != dc) {
-                                console.log("DIFF DATES ADDING");
-                                console.log(yc + "-" + mc + "-" + dc);
-                                console.log(y + "-" + m + "-" + d);
                                 // if the saved date is different than the current date, then we upate our storage and auto add
                                 localStorage.setItem("last_auto_add_date", yc + "-" + mc + "-" + dc);
                                 this.autoAdd(recurrTxn, currentDay);
@@ -262,6 +286,7 @@ class TimeTravel extends Component {
                 var totalIncome = recurringIncomes.map(item => item.amount).reduce((prev, next) => prev + next, 0.0);
                 var totalExpense = recurringExpenses.map(item => item.amount).reduce((prev, next) => prev + next, 0.0);
 
+                balanceRows[idx].balance = parseFloat(balanceRows[idx].balance);
                 balanceRows[idx].balance += totalIncome;
                 balanceRows[idx].balance -= totalExpense;
 
@@ -387,7 +412,7 @@ class TimeTravel extends Component {
 
              
                 <div>
-                    <table id='transactions' align="center" style={{ height: '90%', width: '95%' }}>
+                    <table id='transactions' align="center" style={{ height: '90%', width: '98%' }}>
                         <h4><b>Timeline</b></h4>
                         <tbody>
                             <tr>{this.renderTableHeader()}</tr>

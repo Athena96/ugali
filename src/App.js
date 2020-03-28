@@ -66,6 +66,7 @@ class App extends Component {
               <Link to="/timeTravel">Time Travel</Link>
               <Link to="/transactions">Transactions</Link>
               <Link to="/addTransaction">Add Transaction</Link>
+              <Link to="/about">About</Link>
             </Navigation>
             <p align="center"><b>{this.state.user}</b></p>
             <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br />
@@ -77,7 +78,7 @@ class App extends Component {
 
           </Content>
           <footer class="footer">
-            <p class="footerText">© Copyright ZenSpending.com - All rights reserved<br />For bugs, feature requests, or questions please email <b>zenspending@gmail.com</b></p>
+            <p class="footerText"><small>© Copyright ZenSpending.com - All rights reserved </small></p>
           </footer>
         </Layout>
       </div>

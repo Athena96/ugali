@@ -195,10 +195,6 @@ class AddTransaction extends Component {
     // extract txn from state.
     var transaction = {};
     if (IS_UPDATE) {
-
-      console.log("UPDATE");
-      console.log(this.state);
-
       var d = "";
       if (ORIGINAL_DATE.split('-')[2].split('T')[0] == this.state.date.split('-')[2]) {
         d = ORIGINAL_DATE;
@@ -220,7 +216,6 @@ class AddTransaction extends Component {
       }
 
     } else {
-      console.log("NEW or DUP");
       transaction = {
         title: this.state.title,
         amount: this.state.amount,
@@ -359,6 +354,7 @@ class AddTransaction extends Component {
               onChange={this.handleChange} />
           </label><br />
 
+          <b>Expense or Income?:</b>
           <div className="radio">
             <label>
               <input type="radio" name='type' value={2}
@@ -377,13 +373,13 @@ class AddTransaction extends Component {
           </div>
 
           <label>
-            <b>Is Recurring Transaction:</b>
+            <b>Is Recurring Transaction?:</b>
             <input
               name="is_recurring"
               type="checkbox"
               checked={this.state.is_recurring}
               onChange={this.handleChange} />
-          </label><small>*A recurring transaction will appear on your Timeline, each month, on the chosen date.*</small><br />
+          </label><small>*A recurring transaction will appear on your 'Time Travel' page, each month, on the chosen date.*</small><br />
 
           <br />
           {this.renderButton()}

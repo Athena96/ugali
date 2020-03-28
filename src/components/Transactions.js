@@ -336,6 +336,48 @@ renderTransactionData() {
         })
     }
 
+    renderMain() {
+
+        if (this.state.transactions.length === 0) {
+            return (
+                <div class="indent">
+                    <h4>You haven't added any transactions yet.</h4>
+                    <h4>Click <b>'Add Transactions'</b> to add some!</h4>
+                </div>
+            )
+        } else {
+
+            return (
+                <div >
+                <div className="bar">
+                    <table id='transactions'>
+                        <h4><b>Category Summary</b></h4>
+                        <tbody>
+                            <tr>{this.renderTableHeader()}</tr>
+                            {this.renderCategoryTableData()}
+                        </tbody>
+                    </table>
+    
+                    <table id='transactions'>
+                        <h4><b>Payment Method<br />Summary</b></h4>
+                        <tbody>
+                            <tr>{this.renderPaymentMethodTableHeader()}</tr>
+                            {this.renderPaymentMethodTableData()}
+                        </tbody>
+                    </table>
+    
+                </div>
+    
+                <div className="barBig">
+                    <h4><b>Transactions</b></h4>
+                    {this.renderTransactionData()}
+                </div>
+    
+            </div>
+            )
+        }
+    }
+
     render() {
         return (
             <div>
@@ -367,32 +409,7 @@ renderTransactionData() {
                     <button class="filter" onClick={this.filterTransactions}><b>filter transactions</b></button>
                 </div>
 
-                <div  >
-                    <div className="bar">
-                        <table id='transactions'>
-                            <h4><b>Category Summary</b></h4>
-                            <tbody>
-                                <tr>{this.renderTableHeader()}</tr>
-                                {this.renderCategoryTableData()}
-                            </tbody>
-                        </table>
-
-                        <table id='transactions'>
-                            <h4><b>Payment Method<br />Summary</b></h4>
-                            <tbody>
-                                <tr>{this.renderPaymentMethodTableHeader()}</tr>
-                                {this.renderPaymentMethodTableData()}
-                            </tbody>
-                        </table>
-
-                    </div>
-
-                    <div className="barBig">
-                        <h4><b>Transactions</b></h4>
-                        {this.renderTransactionData()}
-                    </div>
-
-                </div>
+              {this.renderMain()}
 
             </div>
 

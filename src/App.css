@@ -394,3 +394,7 @@
 .desc {
   width: 75%;
 }
+
+.indent {
+  margin-left: 16px;
+}
