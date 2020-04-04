@@ -14,6 +14,7 @@ export const getTransaction = `query GetTransaction($id: ID!) {
     createdAt
     user
     is_recurring
+    is_recurring_period
   }
 }
 `;
@@ -35,6 +36,7 @@ export const listTransactions = `query ListTransactions(
       createdAt
       user
       is_recurring
+      is_recurring_period
     }
     nextToken
   }

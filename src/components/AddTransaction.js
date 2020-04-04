@@ -41,6 +41,7 @@ class AddTransaction extends Component {
       payment_method: "",
       type: 2,
       is_recurring: false,
+      is_recurring_period: false,
       user: "",
       exampleTxnId: txnId
     };
@@ -64,7 +65,7 @@ class AddTransaction extends Component {
             return;
           }
           const txn = data.data.getTransaction;
-
+          console.log(txn);
           var dt = txn.date.split('-')[0] + "-" + txn.date.split('-')[1] + "-" + txn.date.split('-')[2].split('T')[0];
           ORIGINAL_DATE = txn.date;
 
@@ -87,6 +88,7 @@ class AddTransaction extends Component {
             type: txn.type,
             user: txn.user,
             is_recurring: txn.is_recurring,
+            is_recurring_period: txn.is_recurring_period,
             updateTxnId: this.state.exampleTxnId
           });
 
@@ -144,6 +146,7 @@ class AddTransaction extends Component {
       description: "",
       type: 2,
       is_recurring: false,
+      is_recurring_period: false,
       user: "",
       updateTxnId: null
     });
@@ -196,7 +199,9 @@ class AddTransaction extends Component {
     var transaction = {};
     if (IS_UPDATE) {
       var d = "";
-      if (ORIGINAL_DATE.split('-')[2].split('T')[0] == this.state.date.split('-')[2]) {
+      if (ORIGINAL_DATE.split('-')[2].split('T')[0] == this.state.date.split('-')[2] 
+      && ORIGINAL_DATE.split('-')[1] == this.state.date.split('-')[1]
+      && ORIGINAL_DATE.split('-')[0] == this.state.date.split('-')[0]) {
         d = ORIGINAL_DATE;
       } else {
         d = convertDateStrToGraphqlDate(this.state.date);
@@ -212,6 +217,7 @@ class AddTransaction extends Component {
         payment_method: this.state.payment_method,
         type: this.state.type,
         is_recurring: this.state.is_recurring,
+        is_recurring_period: this.state.is_recurring_period,
         user: this.state.user
       }
 
@@ -225,6 +231,7 @@ class AddTransaction extends Component {
         payment_method: this.state.payment_method,
         type: this.state.type,
         is_recurring: this.state.is_recurring,
+        is_recurring_period: this.state.is_recurring_period,
         user: this.state.user
       }
 
@@ -373,13 +380,23 @@ class AddTransaction extends Component {
           </div>
 
           <label>
-            <b>Is Recurring Transaction?:</b>
+            <b>Place on 'Time Travel'?:</b>
             <input
               name="is_recurring"
               type="checkbox"
               checked={this.state.is_recurring}
               onChange={this.handleChange} />
+          </label><small>*The transaction will appear on your 'Time Travel' page.*</small><br />
+
+          <label>
+            <i>- Make recurring?:</i>
+            <input
+              name="is_recurring_period"
+              type="checkbox"
+              checked={this.state.is_recurring_period}
+              onChange={this.handleChange} />
           </label><small>*A recurring transaction will appear on your 'Time Travel' page, each month, on the chosen date.*</small><br />
+
 
           <br />
           {this.renderButton()}

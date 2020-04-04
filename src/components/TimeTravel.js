@@ -25,6 +25,7 @@ const TXN_LIMIT = 100;
 class TimeTravel extends Component {
     constructor(props) {
         super(props);
+        this.shownRecorded = {};
         this.state = { balance_rows: [], variable_exp_name: "", variable_exp_amount: "", recurring_txns: [], starting_balance: "" };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
@@ -52,39 +53,38 @@ class TimeTravel extends Component {
             if (dayIdx === 0 || dayIdx === 6) {
                 weekDay = <td><b>{year + "-" + month + "-" + day + " " + dayOfWeek}</b></td>;
             }
+            var balColor = (balance <= 0.0) ? "red" : "black";
 
-            console.log(incomeDesc);
-            console.log(expenseDesc);
 
             if (incomeDesc !== "" && expenseDesc === "") {
                 return (
                     <tr key={id}>
                         {weekDay}
-                        <td>${parseFloat(balance).toFixed(2)}</td>
-                        <td>+{income} ({incomeDesc})</td>
+                        <td><font color={balColor}>${parseFloat(balance).toFixed(2)}</font></td>
+                        <td><font color="green">+{income}</font> ({incomeDesc})</td>
                     </tr>
                 )
             } else if (incomeDesc === "" && expenseDesc !== "") {
                 return (
                     <tr key={id}>
                         {weekDay}
-                        <td>${parseFloat(balance).toFixed(2)}</td>
-                        <td>-{expense} ({expenseDesc})</td>
+                        <td><font color={balColor}>${parseFloat(balance).toFixed(2)}</font></td>
+                        <td><font color="red">-{expense}</font> ({expenseDesc})</td>
                     </tr>
                 )
             } else if  (incomeDesc !== "" && expenseDesc !== "") {
                 return (
                     <tr key={id}>
                         {weekDay}
-                        <td>${parseFloat(balance).toFixed(2)}</td>
-                        <td>+{income} ({incomeDesc}){<br/>}-{expense} ({expenseDesc})</td>
+                        <td><font color={balColor}>${parseFloat(balance).toFixed(2)}</font></td>
+                        <td><font color="green">+{income}</font> ({incomeDesc}){<br/>}<font color="red">-{expense}</font> ({expenseDesc})</td>
                     </tr>
                 )
             } else {
                 return (
                     <tr key={id}>
                         {weekDay}
-                        <td>${parseFloat(balance).toFixed(2)}</td>
+                        <td><font color={balColor}>${parseFloat(balance).toFixed(2)}</font></td>
                         <td></td>
                     </tr>
                 )
@@ -158,6 +158,7 @@ class TimeTravel extends Component {
             delete cpyTxn.id;
             delete cpyTxn.createdAt;
             cpyTxn.is_recurring = false;
+            cpyTxn.is_recurring_period = false;
             var d = convertDateStrToGraphqlDate(currentDay.getFullYear() + "-" + getDoubleDigitFormat(currentDay.getUTCMonth() + 1) + "-" + getDoubleDigitFormat(currentDay.getUTCDate()));
             cpyTxn.date = d;
             const res = API.graphql(graphqlOperation(createTransaction, { input: cpyTxn }));
@@ -235,13 +236,34 @@ class TimeTravel extends Component {
             var recurringExpenses = [];
             for (var recurrTxn of this.state.recurring_txns) {
                 var recurrTxnDay = parseInt(recurrTxn.date.split('-')[2].split('T')[0]);
+                var recurrTxnMonth = parseInt(recurrTxn.date.split('-')[1]);
+
                 if (recurrTxnDay === currentDay.getDate()) {
-                    if (recurrTxn.type === 2) {
-                        recurringExpenses.push(recurrTxn);
+
+                    // only show once
+                    if (recurrTxn.is_recurring_period === false) {
+              
+                        if (this.shownRecorded[recurrTxn.title] === undefined) {
+                            // not yet shown!
+                            if (recurrTxnMonth === (currentDay.getMonth()+1)) {
+                                if (recurrTxn.type === 2) {
+                                    recurringExpenses.push(recurrTxn);
+                                } else {
+                                    recurringIncomes.push(recurrTxn)
+                                }
+                                this.shownRecorded[recurrTxn.title] = true;
+                            }
+                            
+                        }
                     } else {
-                        recurringIncomes.push(recurrTxn)
+                        if (recurrTxn.type === 2) {
+                            recurringExpenses.push(recurrTxn);
+                        } else {
+                            recurringIncomes.push(recurrTxn)
+                        }
                     }
 
+                    // AUTO ADD
                     if (idx === 0) {
                         // if I have a value stored in storage
                         if (localStorage.getItem("last_auto_add_date") != null) {
@@ -403,7 +425,6 @@ class TimeTravel extends Component {
                             width={400}
                             height={200}
                             hideXLabel={true}
-                            hideXAxis={true}
                             yLabel={"Balance"}
                             data={this.getGraphPoints()}
                         />
