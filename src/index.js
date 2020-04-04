@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import AppWithAuth from './components/AppWithAuth'
 import * as serviceWorker from './serviceWorker';
 
 import 'react-mdl/extra/material.css';
@@ -12,7 +13,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 ReactDOM.render(
     <BrowserRouter>
-  <App />
+      <AppWithAuth />
     </BrowserRouter>
     , document.getElementById('root'));
 

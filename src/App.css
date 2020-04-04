@@ -398,3 +398,30 @@
 .indent {
   margin-left: 16px;
 }
+
+.signIn {
+  /* background-color:rgb(235, 235, 235); */
+  margin-left: 16px;
+  margin-top: 16px;
+  margin-right: 16px;
+
+}
+
+.onep {
+  width: 100%;
+
+}
+.login {
+  background-color:rgb(255, 255, 255);
+  border: none;
+  color: rgb(255, 124, 123);;
+  padding: 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-top: 4px;
+  width: 100%;
+
+}

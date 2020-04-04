@@ -33,6 +33,7 @@ class App extends Component {
   async signOut() {
     try {
       await Auth.signOut()
+      this.window.open('/');
       this.props.rerender()
     } catch (err) {
       console.log('error signing out...', err)
@@ -44,11 +45,13 @@ class App extends Component {
       let email = user.attributes.email;
       this.setState({ user: email });
     }).catch((err) => {
-      window.alert("Encountered error fetching your username: \n", err);
+      // window.alert("Encountered error fetching your username: \n", err);
     });
   }
 
   render() {
+    if (this.props.authState == "signedIn") {
+
     return (
       <div className="demo-big-content">
         <Layout fixedHeader>
@@ -83,10 +86,17 @@ class App extends Component {
         </Layout>
       </div>
     );
+    } else {
+      return null;
+    }
   }
 
 }
-export default props => {
-  const AppComponent = withAuthenticator(App)
-  return <AppComponent {...props} />
-}
+
+export default App;
+
+
+// export default props => {
+//   // const AppComponent = withAuthenticator(App)
+//   return <AppComponent {...props} />
+// }
