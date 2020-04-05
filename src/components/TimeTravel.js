@@ -10,23 +10,31 @@ import PubSub from '@aws-amplify/pubsub';
 import awsconfig from '../aws-exports';
 import { Auth } from 'aws-amplify';
 
+// PayPal
+import { PayPalButton } from "react-paypal-button-v2";
+
 // graphql
 import { listTransactions } from '../graphql/queries';
 import { createTransaction } from '../graphql/mutations';
+import { createPremiumUsers } from '../graphql/mutations';
+import { listPremiumUserss } from '../graphql/queries';
 
-import { getDoubleDigitFormat, convertDateStrToGraphqlDate } from '../common/Utilities';
+import { getDoubleDigitFormat, convertDateStrToGraphqlDate, graphqlDateFromJSDate } from '../common/Utilities';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
 
 // Constants
 const TXN_LIMIT = 100;
+const PREMIUM_USER_LIMIT = 1;
+
+const PREMIUM_USERS = ['italianstallion26.21@gmail.com'];
 
 class TimeTravel extends Component {
     constructor(props) {
         super(props);
         this.shownRecorded = {};
-        this.state = { balance_rows: [], variable_exp_name: "", variable_exp_amount: "", recurring_txns: [], starting_balance: "" };
+        this.state = { balance_rows: [], variable_exp_name: "", variable_exp_amount: "", recurring_txns: [], starting_balance: "", user: "", isPremiumUser: false };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.generateTimeline = this.generateTimeline.bind(this);
@@ -72,12 +80,12 @@ class TimeTravel extends Component {
                         <td><font color="red">-{expense}</font> ({expenseDesc})</td>
                     </tr>
                 )
-            } else if  (incomeDesc !== "" && expenseDesc !== "") {
+            } else if (incomeDesc !== "" && expenseDesc !== "") {
                 return (
                     <tr key={id}>
                         {weekDay}
                         <td><font color={balColor}>${parseFloat(balance).toFixed(2)}</font></td>
-                        <td><font color="green">+{income}</font> ({incomeDesc}){<br/>}<font color="red">-{expense}</font> ({expenseDesc})</td>
+                        <td><font color="green">+{income}</font> ({incomeDesc}){<br />}<font color="red">-{expense}</font> ({expenseDesc})</td>
                     </tr>
                 )
             } else {
@@ -89,11 +97,45 @@ class TimeTravel extends Component {
                     </tr>
                 )
             }
-            
+
         })
     }
 
     componentDidMount() {
+
+        console.log("componentDidMount");
+
+        // get premium users list
+        Auth.currentAuthenticatedUser().then(user => {
+            let email = user.attributes.email;
+
+            API.graphql(graphqlOperation(listPremiumUserss, {
+                limit: PREMIUM_USER_LIMIT,
+                filter: {
+                    user: { eq: email }
+                }
+            })).then(data => {
+                console.log(data);
+                const premiumUsers = data.data.listPremiumUserss.items;
+                if (premiumUsers.length === 0) {
+                    this.setState({ isPremiumUser: false });
+                } else {
+                    const today = new Date();
+                    const expDate = new Date(premiumUsers[0].expiryDate);
+                    if (today < expDate) {
+                        this.setState({ isPremiumUser: true });
+                    }
+                }
+            }).catch((err) => {
+                console.log(err);
+            })
+
+        }).catch((err) => {
+            window.alert("Encountered error fetching your username: \n", err);
+        });
+
+
+
         // check local storage for saved values, if have some, populate the fields with it.
         if (localStorage.getItem("variable_exp_name") != null) {
             this.setState({ variable_exp_name: localStorage.getItem("variable_exp_name") });
@@ -165,11 +207,12 @@ class TimeTravel extends Component {
 
             window.alert("Successfully AUTO added your transaction: " + cpyTxn.title);
         } catch (err) {
-            window.alert("ERROR: ", { err });
+            window.alert("Encountered error AUTO adding your transaction.");
         }
     }
 
     generateTimeline() {
+        this.shownRecorded = {}
         if (this.state.variable_exp_name === "") {
             if (localStorage.getItem("variable_exp_name") != null) {
                 this.state.variable_exp_name = localStorage.getItem("variable_exp_name");
@@ -242,10 +285,10 @@ class TimeTravel extends Component {
 
                     // only show once
                     if (recurrTxn.is_recurring_period === false) {
-              
+
                         if (this.shownRecorded[recurrTxn.title] === undefined) {
                             // not yet shown!
-                            if (recurrTxnMonth === (currentDay.getMonth()+1)) {
+                            if (recurrTxnMonth === (currentDay.getMonth() + 1)) {
                                 if (recurrTxn.type === 2) {
                                     recurringExpenses.push(recurrTxn);
                                 } else {
@@ -253,7 +296,7 @@ class TimeTravel extends Component {
                                 }
                                 this.shownRecorded[recurrTxn.title] = true;
                             }
-                            
+
                         }
                     } else {
                         if (recurrTxn.type === 2) {
@@ -378,17 +421,28 @@ class TimeTravel extends Component {
         return data;
     }
 
+    async addNewPremiumUser(premiumUser) {
+        // submit
+        try {
+            const res = await API.graphql(graphqlOperation(createPremiumUsers, { input: premiumUser }));
+        } catch (err) {
+            console.log(err);
+            window.alert("Encountered error adding you to our premium user list.\nEmail: zenspending@gmail for support.");
+        }
+    }
+
     render() {
+        if (this.state.isPremiumUser) {
 
-        return (
+            return (
 
-            <div>
-   
-                <div class="filtersInput" >
-                        
+                <div>
+
+                    <div class="filtersInput" >
+
                         <b>Variable Spending Name:</b><br />
                         <input
-                        
+
                             className="roundedOutline"
                             name="variable_exp_name"
                             type="text"
@@ -404,21 +458,21 @@ class TimeTravel extends Component {
                             type="text"
                             value={this.state.variable_exp_amount}
                             onChange={this.handleChange} /><br />
-          
+
 
                         <b>Starting Balance:</b><br />
                         <input
-                        
+
                             className="roundedOutline"
                             name="starting_balance"
                             placeholder="starting balance"
                             type="text"
                             value={this.state.starting_balance}
                             onChange={this.handleChange} /><br />
-                    
-                    <button class="filterTimeline" onClick={this.generateTimeline}><b>generate timeline</b></button>
-                
-                    <LineChart 
+
+                        <button class="filterTimeline" onClick={this.generateTimeline}><b>generate timeline</b></button>
+
+                        <LineChart
                             margins={{ top: 0, right: 0, bottom: 0, left: 65 }}
                             hidePoints={true}
                             yMin={0}
@@ -429,21 +483,70 @@ class TimeTravel extends Component {
                             data={this.getGraphPoints()}
                         />
 
-                </div>
+                    </div>
 
-             
-                <div>
-                    <table id='transactions' align="center" style={{ height: '90%', width: '98%' }}>
-                        <h4><b>Timeline</b></h4>
-                        <tbody>
-                            <tr>{this.renderTableHeader()}</tr>
-                            {this.renderTableData()}
-                        </tbody>
-                    </table>
-                </div>
 
-            </div>
-        );
+                    <div>
+                        <table id='transactions' align="center" style={{ height: '90%', width: '98%' }}>
+                            <h4><b>Timeline</b></h4>
+                            <tbody>
+                                <tr>{this.renderTableHeader()}</tr>
+                                {this.renderTableData()}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            );
+
+        } else {
+            return (
+                <div className="indent">
+                    <h4><b>Time Travel</b> is a premium feature, and it costs $ to develop, maintain, and host an app ;)</h4>
+                    <h4>Purchase a <b>1 year subscription</b> for $15.01</h4>
+
+                    <PayPalButton
+                        amount="15.01"
+                        shippingPreference="NO_SHIPPING" // default is "GET_FROM_FILE"
+                        onSuccess={(details, data) => {
+
+                            Auth.currentAuthenticatedUser().then(user => {
+                                let email = user.attributes.email;
+                                this.setState({ user: email });
+
+                                // construct premium user
+                                const today = new Date();
+                                var year = today.getFullYear();
+                                var month = today.getMonth();
+                                var day = today.getDate();
+                                var expDate = new Date(year + 1, month, day);
+
+                                const premiumUser = {
+                                    user: email,
+                                    oderId: data.orderID,
+                                    expiryDate: graphqlDateFromJSDate(expDate)
+                                }
+                                console.log(premiumUser);
+                                this.setState({ isPremiumUser: true });
+                                // add user to premium user table.
+                                this.addNewPremiumUser(premiumUser);
+                                alert("Transaction completed!\nWe here at ZenSpending thank you!\nRefresh the page to start using Premium Features!");
+
+
+
+                            }).catch((err) => {
+                                // window.alert("Encountered error fetching your username: \n", err);
+                            });
+
+
+                        }}
+                        options={{
+                            clientId: "AUn2TFaV5cB3lVtq0Q3yOlPTMNaU7kGqN8s1togkHH78v3NUsGPvvBkhxApFkCubpYUk3QhZh8xfGbOX"
+                        }}
+                    />
+                </div>
+            );
+        }
     }
 }
 

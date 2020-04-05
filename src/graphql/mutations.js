@@ -61,3 +61,39 @@ export const deleteTransaction = `mutation DeleteTransaction(
   }
 }
 `;
+export const createPremiumUsers = `mutation CreatePremiumUsers(
+  $input: CreatePremiumUsersInput!
+  $condition: ModelPremiumUsersConditionInput
+) {
+  createPremiumUsers(input: $input, condition: $condition) {
+    id
+    user
+    oderId
+    expiryDate
+  }
+}
+`;
+export const updatePremiumUsers = `mutation UpdatePremiumUsers(
+  $input: UpdatePremiumUsersInput!
+  $condition: ModelPremiumUsersConditionInput
+) {
+  updatePremiumUsers(input: $input, condition: $condition) {
+    id
+    user
+    oderId
+    expiryDate
+  }
+}
+`;
+export const deletePremiumUsers = `mutation DeletePremiumUsers(
+  $input: DeletePremiumUsersInput!
+  $condition: ModelPremiumUsersConditionInput
+) {
+  deletePremiumUsers(input: $input, condition: $condition) {
+    id
+    user
+    oderId
+    expiryDate
+  }
+}
+`;

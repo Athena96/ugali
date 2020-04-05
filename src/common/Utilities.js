@@ -23,3 +23,14 @@ export function convertDateStrToGraphqlDate(dateStr) {
         return formattedString;
     }
 }
+
+export function graphqlDateFromJSDate(date) {
+    const year = date.getFullYear();
+    const month = getDoubleDigitFormat(date.getMonth() + 1);
+    const day = getDoubleDigitFormat(date.getDate());
+    var hour = getDoubleDigitFormat(date.getHours());
+    var min = getDoubleDigitFormat(date.getMinutes());
+    var sec = getDoubleDigitFormat(date.getSeconds());
+    var formattedString = year + '-' + month + '-' + day + 'T' + hour + ':' + min + ':' + sec + '.000Z';
+    return formattedString;
+}

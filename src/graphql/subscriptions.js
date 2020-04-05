@@ -52,3 +52,30 @@ export const onDeleteTransaction = `subscription OnDeleteTransaction {
   }
 }
 `;
+export const onCreatePremiumUsers = `subscription OnCreatePremiumUsers {
+  onCreatePremiumUsers {
+    id
+    user
+    oderId
+    expiryDate
+  }
+}
+`;
+export const onUpdatePremiumUsers = `subscription OnUpdatePremiumUsers {
+  onUpdatePremiumUsers {
+    id
+    user
+    oderId
+    expiryDate
+  }
+}
+`;
+export const onDeletePremiumUsers = `subscription OnDeletePremiumUsers {
+  onDeletePremiumUsers {
+    id
+    user
+    oderId
+    expiryDate
+  }
+}
+`;

@@ -12,3 +12,10 @@ type Transaction @model {
   is_recurring: Boolean
   is_recurring_period: Boolean
 }
+
+type PremiumUsers @model {
+  id: ID!
+  user: String!
+  oderId: String!
+  expiryDate: AWSDateTime!
+}
