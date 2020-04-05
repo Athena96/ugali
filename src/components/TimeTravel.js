@@ -18,6 +18,7 @@ import { listTransactions } from '../graphql/queries';
 import { createTransaction } from '../graphql/mutations';
 import { createPremiumUsers } from '../graphql/mutations';
 import { listPremiumUserss } from '../graphql/queries';
+import { updatePremiumUsers } from '../graphql/mutations';
 
 import { getDoubleDigitFormat, convertDateStrToGraphqlDate, graphqlDateFromJSDate } from '../common/Utilities';
 
@@ -34,7 +35,7 @@ class TimeTravel extends Component {
     constructor(props) {
         super(props);
         this.shownRecorded = {};
-        this.state = { balance_rows: [], variable_exp_name: "", variable_exp_amount: "", recurring_txns: [], starting_balance: "", user: "", isPremiumUser: false };
+        this.state = { balance_rows: [], variable_exp_name: "", variable_exp_amount: "", recurring_txns: [], starting_balance: "", user: "", isPremiumUser: false, subscriptionExpired: true, premiumUsers:{}};
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.generateTimeline = this.generateTimeline.bind(this);
@@ -119,11 +120,18 @@ class TimeTravel extends Component {
                 const premiumUsers = data.data.listPremiumUserss.items;
                 if (premiumUsers.length === 0) {
                     this.setState({ isPremiumUser: false });
+                    this.setState({ subscriptionExpired: true });
+
                 } else {
+                    this.setState({premiumUser: premiumUsers[0]});
                     const today = new Date();
                     const expDate = new Date(premiumUsers[0].expiryDate);
                     if (today < expDate) {
                         this.setState({ isPremiumUser: true });
+                        this.setState({ subscriptionExpired: false });
+                    } else {
+                        this.setState({ isPremiumUser: true });
+                        this.setState({ subscriptionExpired: true });
                     }
                 }
             }).catch((err) => {
@@ -431,8 +439,19 @@ class TimeTravel extends Component {
         }
     }
 
+    async updatePremiumUser(premiumUser) {
+        // submit
+        try {
+            const res = await API.graphql(graphqlOperation(updatePremiumUsers, { input: premiumUser }));
+        } catch (err) {
+            console.log(err);
+            window.alert("Encountered error updating your premium user subscription.\nEmail: zenspending@gmail for support.");
+        }
+    }
+
     render() {
-        if (this.state.isPremiumUser) {
+
+        if (this.state.isPremiumUser && !this.state.subscriptionExpired) {
 
             return (
 
@@ -502,38 +521,63 @@ class TimeTravel extends Component {
         } else {
             return (
                 <div className="indent">
-                    <h4><b>Time Travel</b> is a premium feature, and it costs $ to develop, maintain, and host an app ;)</h4>
-                    <h4>Purchase a <b>1 year subscription</b> for $15.01</h4>
+                    <h4><b>Time Travel</b> is a premium feature, <br/>it costs $ to develop, maintain, and host an app ;)</h4>
+                    <h4>Purchase a <b>1 year subscription</b> for <b>$15.01</b></h4>
 
                     <PayPalButton
                         amount="15.01"
                         shippingPreference="NO_SHIPPING" // default is "GET_FROM_FILE"
+                        style={{color:"black"}}
                         onSuccess={(details, data) => {
 
                             Auth.currentAuthenticatedUser().then(user => {
                                 let email = user.attributes.email;
                                 this.setState({ user: email });
 
-                                // construct premium user
-                                const today = new Date();
-                                var year = today.getFullYear();
-                                var month = today.getMonth();
-                                var day = today.getDate();
-                                var expDate = new Date(year + 1, month, day);
+                                // add user or update subscription?
+                                if (this.state.isPremiumUser && this.state.subscriptionExpired) {
+                                    // update 
+                                    console.log("UPDATE");
 
-                                const premiumUser = {
-                                    user: email,
-                                    oderId: data.orderID,
-                                    expiryDate: graphqlDateFromJSDate(expDate)
+                                    // construct premium user
+                                    const today = new Date();
+                                    var year = today.getFullYear();
+                                    var month = today.getMonth();
+                                    var day = today.getDate();
+                                    var newExpDate = new Date(year + 1, month, day);
+
+                                    const updatedUser = {
+                                        id: this.state.premiumUser.id,
+                                        user: email,
+                                        oderId: data.orderID,
+                                        expiryDate: graphqlDateFromJSDate(newExpDate)
+                                    }
+                                    console.log(updatedUser);
+                                    this.setState({ isPremiumUser: true });
+                                    this.setState({ subscriptionExpired: false });
+
+                                    // add user to premium user table.
+                                    this.updatePremiumUser(updatedUser);
+                                    alert("Transaction completed!\nWe here at ZenSpending thank you for renewing your membership!\nRefresh the page to start using Premium Features!");
+                                } else if (this.state.isPremiumUser == false) {
+                                    // construct premium user
+                                    const today = new Date();
+                                    var year = today.getFullYear();
+                                    var month = today.getMonth();
+                                    var day = today.getDate();
+                                    var expDate = new Date(year + 1, month, day);
+
+                                    const premiumUser = {
+                                        user: email,
+                                        oderId: data.orderID,
+                                        expiryDate: graphqlDateFromJSDate(expDate)
+                                    }
+                                    console.log(premiumUser);
+                                    this.setState({ isPremiumUser: true });
+                                    // add user to premium user table.
+                                    this.addNewPremiumUser(premiumUser);
+                                    alert("Transaction completed!\nWe here at ZenSpending thank you!\nRefresh the page to start using Premium Features!");
                                 }
-                                console.log(premiumUser);
-                                this.setState({ isPremiumUser: true });
-                                // add user to premium user table.
-                                this.addNewPremiumUser(premiumUser);
-                                alert("Transaction completed!\nWe here at ZenSpending thank you!\nRefresh the page to start using Premium Features!");
-
-
-
                             }).catch((err) => {
                                 // window.alert("Encountered error fetching your username: \n", err);
                             });
@@ -541,6 +585,7 @@ class TimeTravel extends Component {
 
                         }}
                         options={{
+                            disableFunding: ["credit", "card"],
                             clientId: "AUn2TFaV5cB3lVtq0Q3yOlPTMNaU7kGqN8s1togkHH78v3NUsGPvvBkhxApFkCubpYUk3QhZh8xfGbOX"
                         }}
                     />
