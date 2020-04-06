@@ -221,7 +221,6 @@ class TimeTravel extends Component {
 
     generateTimeline() {
         console.log(process.env);
-        console.log("");
         console.log(process.env.PAYPALL_PROD_CLIENTID);
         this.shownRecorded = {}
         if (this.state.variable_exp_name === "") {
