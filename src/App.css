@@ -240,6 +240,20 @@
   margin: 4px 2px;
 }
 
+.ccBillBox {
+  background-color:rgb(255, 124, 123);
+  border: none;
+  color: rgb(255, 255, 255);
+  width: 75%;
+  padding: 10px;
+  text-align: left;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 8px;
+  font-size: 13px;
+  margin: 4px 2px;
+}
+
 .expenseTxn {
   background-color:rgb(235, 235, 235);
   border: none;
@@ -426,4 +440,8 @@
   margin-top: 4px;
   width: 100%;
 
+}
+
+.outerCCBillBox {
+  padding-top: 70px;
 }

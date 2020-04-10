@@ -220,12 +220,6 @@ renderTransactionData() {
             return <th key={index}>{key.toUpperCase()}</th>
         })
     }
-    renderPaymentMethodTableHeader() {
-        let header = ['payment_method', 'amount'];
-        return header.map((key, index) => {
-            return <th key={index}>{key.toUpperCase()}</th>
-        })
-    }
 
     renderCategorySummary() {
         var categoryAgg = {}
@@ -302,38 +296,28 @@ renderTransactionData() {
         })
     }
 
-    renderPaymentMethodTableData() {
-        var paymentMethodAgg = {}
+    getCCSpending() {
+        var sum = 0.0;
         for (var txn of this.state.VISIBLE_TXNS) {
-            if (paymentMethodAgg[txn.payment_method] === undefined) {
-                paymentMethodAgg[txn.payment_method] = 0.0
-            }
-            if (txn.type === 2) {
-                paymentMethodAgg[txn.payment_method] += txn.amount
-            } else {
-                paymentMethodAgg[txn.payment_method] -= txn.amount
+            if (txn.payment_method.includes("cc") || txn.payment_method.includes("credit")) {
+                if (txn.type === 2) {
+                    sum += txn.amount;
+                } else {
+                    sum -= txn.amount;
+                }
             }
         }
+        return sum.toFixed(2);
+    }
 
-        // convert to array
-        var paymentMethodArray = [];
-        for (var k of Object.keys(paymentMethodAgg)) {
-            paymentMethodArray.push({ paymentMethod: k, amount: paymentMethodAgg[k] });
-        }
-
-        // sort
-        var sortedPaymentMethodArray = paymentMethodArray.sort((a, b) => {
-            return (a.amount > b.amount) ? -1 : 1;
-        });
-
-        return sortedPaymentMethodArray.map((paymentMethodVal, index) => {
-            return (
-                <tr key={index}>
-                    <td><b>{paymentMethodVal.paymentMethod}</b></td>
-                    <td>${parseFloat(paymentMethodVal.amount).toFixed(2)}</td>
-                </tr>
-            )
-        })
+    getMonth() {
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+        // const d = new Date();
+        // return monthNames[d.getMonth()];
+        console.log(this.state.month)
+        return monthNames[parseInt(this.state.month)-1];
     }
 
     renderMain() {
@@ -350,6 +334,14 @@ renderTransactionData() {
             return (
                 <div >
                 <div className="bar">
+    
+                <div className="outerCCBillBox" >
+                    <div className="ccBillBox">
+                    <h4>{this.getMonth()} <b>Credit Card Bill:</b> ${this.getCCSpending()}</h4>
+                    </div>
+                </div>
+
+
                     <table id='transactions'>
                         <h4><b>Category Summary</b></h4>
                         <tbody>
@@ -357,15 +349,7 @@ renderTransactionData() {
                             {this.renderCategoryTableData()}
                         </tbody>
                     </table>
-    
-                    <table id='transactions'>
-                        <h4><b>Payment Method<br />Summary</b></h4>
-                        <tbody>
-                            <tr>{this.renderPaymentMethodTableHeader()}</tr>
-                            {this.renderPaymentMethodTableData()}
-                        </tbody>
-                    </table>
-    
+        
                 </div>
     
                 <div className="barBig">
