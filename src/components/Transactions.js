@@ -66,7 +66,7 @@ class Transactions extends Component {
         this.props.history.push('/addTransaction/duplicate/' + event.target.id)
     }
 
-renderTransactionData() {
+    renderTransactionData() {
         return this.state.VISIBLE_TXNS.map((transaction, index) => {
             const { id, title, amount, category, date, type, payment_method, description, is_recurring } = transaction;
             var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
@@ -79,19 +79,17 @@ renderTransactionData() {
             var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
 
             return (
-                <div >
-                    <div className={classname}>
+                <div className={classname}>
                     <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
 
-                            <font size="4.5">{title} - ${amount}<br /></font>
-                            <p><b>Category:</b> {category}<br />
-                                <b>Payment Method:</b> {payment_method}<br />
-                                <b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}</p>
-                            {description === null ? "" : desc}
-                            <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
-                            <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
-                            <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
-                    </div>
+                    <font size="4.5">{title} - ${amount}<br /></font>
+                    <p><b>Category:</b> {category}<br />
+                        <b>Payment Method:</b> {payment_method}<br />
+                        <b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}</p>
+                    {description === null ? "" : desc}
+                    <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
+                    <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
+                    <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
                 </div>
             )
         })
@@ -282,14 +280,14 @@ renderTransactionData() {
                 return (
                     <tr key={index}>
                         <td><font color={color}><i>- {catVal.category}</i></font></td>
-                        <td>${parseFloat(catVal.amount).toFixed(2)}</td>
+                        <td><font color='black'>${parseFloat(catVal.amount).toFixed(2)}</font></td>
                     </tr>
                 )
             } else {
                 return (
                     <tr key={index}>
                         <td><font color={color}><b>{catVal.category}</b></font></td>
-                        <td>${parseFloat(catVal.amount).toFixed(2)}</td>
+                        <td><font color='black'>${parseFloat(catVal.amount).toFixed(2)}</font></td>
                     </tr>
                 )
             }
@@ -312,12 +310,12 @@ renderTransactionData() {
 
     getMonth() {
         const monthNames = ["January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
-];
+            "July", "August", "September", "October", "November", "December"
+        ];
         // const d = new Date();
         // return monthNames[d.getMonth()];
         console.log(this.state.month)
-        return monthNames[parseInt(this.state.month)-1];
+        return monthNames[parseInt(this.state.month) - 1];
     }
 
     renderMain() {
@@ -332,32 +330,35 @@ renderTransactionData() {
         } else {
 
             return (
-                <div >
-                <div className="bar">
-    
-                <div className="outerCCBillBox" >
-                    <div className="ccBillBox">
-                    <h4>{this.getMonth()} <b>Credit Card Bill:</b> ${this.getCCSpending()}</h4>
+                <div class="row">
+                    <div class="column1" >
+
+                            <div className="ccBillBox">
+                                <h4>{this.getMonth()} <b>Credit Card Bill:</b> ${this.getCCSpending()}</h4>
+                            </div>
+
+                            <div className="ccBillBox">
+                            <table id='transactions' style={{width: "100%"}}>
+                                <h4><b>Category Summary</b></h4>
+                                <tbody>
+                                    <tr>{this.renderTableHeader()}</tr>
+                                    {this.renderCategoryTableData()}
+                                </tbody>
+                            </table>
+
+                            </div>
+
+
+                    </div>
+                    <div class="column2">
+                        
+                        <div>
+                            <h4><b>Transactions</b></h4>
+                            {this.renderTransactionData()}
+                        </div>
+
                     </div>
                 </div>
-
-
-                    <table id='transactions'>
-                        <h4><b>Category Summary</b></h4>
-                        <tbody>
-                            <tr>{this.renderTableHeader()}</tr>
-                            {this.renderCategoryTableData()}
-                        </tbody>
-                    </table>
-        
-                </div>
-    
-                <div className="barBig">
-                    <h4><b>Transactions</b></h4>
-                    {this.renderTransactionData()}
-                </div>
-    
-            </div>
             )
         }
     }
@@ -393,7 +394,7 @@ renderTransactionData() {
                     <button class="filter" onClick={this.filterTransactions}><b>filter transactions</b></button>
                 </div>
 
-              {this.renderMain()}
+                {this.renderMain()}
 
             </div>
 

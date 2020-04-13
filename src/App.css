@@ -46,14 +46,20 @@
   padding: 10px;
 }
 
+.transactions {
+  table-layout: fixed;
+
+}
 
 #transactions td, #transactions th {
-  border: 1px solid #ddd;
+  border: 2px solid rgb(0, 0, 0);
   padding: 4px;
+  word-wrap:break-word
+
 }
 
 
-#transactions tr:nth-child(even){background-color: #f2f2f2;}
+#transactions tr {background-color: #f2f2f2;}
 #transactions tr:hover {background-color: #ddd;}
 #transactions th {
   padding-top: 8px;
@@ -244,7 +250,7 @@
   background-color:rgb(255, 124, 123);
   border: none;
   color: rgb(255, 255, 255);
-  width: 75%;
+  width: 100%;
   padding: 10px;
   text-align: left;
   text-decoration: none;
@@ -258,7 +264,7 @@
   background-color:rgb(235, 235, 235);
   border: none;
   color: black;
-  width: 75%;
+  width: 95%;
   padding: 10px;
   text-align: left;
   text-decoration: none;
@@ -271,7 +277,7 @@
   background-color: rgb(3, 54, 6);
   border: none;
   color: white;
-  width: 75%;
+  width: 95%;
   padding: 10px;
   text-align: left;
   text-decoration: none;
@@ -345,16 +351,13 @@
   /* width: 100px;
   height: 100px; */
   float: left;
-  width: 275px;
   padding-left: 16px;
 
 }
 
 .barBig {
+  float: left;
   padding-left: 16px;
-    /* width: 100px;
-    height: 100px; */
-    float: left;
 }
 
 
@@ -443,5 +446,44 @@
 }
 
 .outerCCBillBox {
-  padding-top: 70px;
+  padding-top: 35px;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+/* Create four equal columns that floats next to each other */
+.column1 {
+  padding-top: 35px;
+
+  float: left;
+  width: 25%;
+  padding-left: 10px;
+  padding-right: 10px;
+
+}
+
+.column2 {
+  
+  float: left;
+  width: 75%;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 1000px) {
+  .column1  {
+    width: 100%;
+  }
 }

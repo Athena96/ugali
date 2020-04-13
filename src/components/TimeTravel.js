@@ -29,8 +29,6 @@ PubSub.configure(awsconfig);
 const TXN_LIMIT = 100;
 const PREMIUM_USER_LIMIT = 1;
 
-const PREMIUM_USERS = ['italianstallion26.21@gmail.com'];
-
 class TimeTravel extends Component {
     constructor(props) {
         super(props);
@@ -419,13 +417,20 @@ class TimeTravel extends Component {
         var dp = [];
         var time = 1;
         for (var balanceRow of this.state.balance_rows) {
-            dp.push({ x: time, y: balanceRow.balance });
+            var d = new Date(balanceRow.balanceDate);
+            var dt = "" + d.getFullYear() +"-"+ getDoubleDigitFormat(d.getMonth()+1) +"-" + getDoubleDigitFormat(d.getDate()+1);
+            
+            const pt = { x: dt, y: balanceRow.balance };
+            
+            console.log(pt);
+
+            dp.push(pt);
             time += 1;
         }
 
         const data = [
             {
-                color: "steelblue",
+                color: "#FF7C7B",
                 points: dp
             }
         ];
@@ -498,11 +503,14 @@ class TimeTravel extends Component {
                         <LineChart
                             margins={{ top: 0, right: 0, bottom: 0, left: 65 }}
                             hidePoints={true}
+                            isDate={true}
                             yMin={0}
                             width={400}
                             height={200}
-                            hideXLabel={true}
+                            hideXLabel={false}
                             yLabel={"Balance"}
+                            xLabel={"Time"}
+
                             data={this.getGraphPoints()}
                         />
 
@@ -525,9 +533,13 @@ class TimeTravel extends Component {
         } else {
             return (
                 <div className="indent">
-                    <h4><b>Time Travel</b> is a premium feature, <br/>it costs $ to develop, maintain, and host an app ;)</h4>
+                    <h4><b>Time Travel</b> is a premium feature, 
+                    <br/>it costs $ to develop, maintain, and host an app ;)</h4>
                     <h4>Purchase a <b>1 year subscription</b> for <b>$15.01</b></h4>
-
+                    <ul>
+                    <li><h5>After a year, you will <b>not</b> be auto re-subscribed.</h5></li>
+                    <li><h5>You can cancel you're membership anytime, withen the first month, and receive a full refund.</h5></li>
+                    </ul>
                     <PayPalButton
                         amount="15.01"
                         shippingPreference="NO_SHIPPING" // default is "GET_FROM_FILE"

@@ -16,7 +16,7 @@ export class CustomSignIn extends SignIn {
           <div className="indent">
             <h1 style={{ color: 'white' }}>Zen Spending<img src={Logo} width="100" height="100"></img></h1>
              
-            <h4 style={{ color: 'white' }}>Measure where your money's been, <br/>so you can <b><i>decide</i></b> where it's going.</h4>
+            <h4 style={{ color: 'white' }}>Measure where your money went, <br/>so you can <b><i>decide</i></b> where it's going.</h4>
             <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <div className="mb-4">
               <label
