@@ -73,16 +73,16 @@ export class CustomSignIn extends SignIn {
               >
                 <h5>Login</h5>
               </button>
-              <p className="text-grey-dark text-xs">
-                No Account?{" "}
-                <a
-                  className="text-indigo cursor-pointer hover:text-indigo-darker"
-                  onClick={() => super.changeState("signUp")}
-                  style={{ color: 'blue' }}
-                >
-                  Create account
-              </a>
-              </p>
+
+              <button
+                className="create"
+                type="button"
+                onClick={() => super.changeState("signUp")}
+                style={{ marginLeft: "6px", marginRight: "6px" }}
+              >
+                <h5>Create account</h5>
+              </button>
+
             </div>
           </form>
           </div>

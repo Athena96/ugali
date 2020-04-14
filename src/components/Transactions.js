@@ -338,6 +338,7 @@ class Transactions extends Component {
                             </div>
 
                             <div className="ccBillBox">
+                            <font size="3" >
                             <table id='transactions' style={{width: "100%"}}>
                                 <h4><b>Category Summary</b></h4>
                                 <tbody>
@@ -345,6 +346,7 @@ class Transactions extends Component {
                                     {this.renderCategoryTableData()}
                                 </tbody>
                             </table>
+                            </font>
 
                             </div>
 

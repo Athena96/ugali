@@ -53,7 +53,6 @@
 
 #transactions td, #transactions th {
   border: 2px solid rgb(0, 0, 0);
-  padding: 4px;
   word-wrap:break-word
 
 }
@@ -62,8 +61,7 @@
 #transactions tr {background-color: #f2f2f2;}
 #transactions tr:hover {background-color: #ddd;}
 #transactions th {
-  padding-top: 8px;
-  padding-bottom: 8px;
+
   text-align: center;
   background-color: rgb(255, 124, 123);
   color: white;
@@ -404,6 +402,7 @@
 
 .filtersInput {
   margin-top: 8px;
+
   margin-left: 12px;
   margin-right: 12px;
 }
@@ -440,7 +439,25 @@
   text-decoration: none;
   display: inline-block;
   border-radius: 8px;
-  margin-top: 4px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+
+  width: 100%;
+
+}
+
+.create {
+  background-color:rgb(255, 255, 255);
+  border: none;
+  color: rgb(0, 135, 177);
+  padding: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 8px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+
   width: 100%;
 
 }
@@ -459,7 +476,7 @@
   padding-top: 35px;
 
   float: left;
-  width: 25%;
+  width: 30%;
   padding-left: 10px;
   padding-right: 10px;
 
@@ -468,7 +485,7 @@
 .column2 {
   
   float: left;
-  width: 75%;
+  width: 70%;
   padding-left: 10px;
   padding-right: 10px;
 }
