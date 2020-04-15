@@ -31,7 +31,7 @@ class About extends Component {
 
             <div className="indent">
                 <h2><b>About</b></h2>
-                <p>For bugs, feature requests, or questions please email <b>zenspending@gmail.com</b></p>
+                <p>To report a bug, submit a feature request, or ask a question please email <b>zenspending@gmail.com</b></p>
             </div>
         );
     }
