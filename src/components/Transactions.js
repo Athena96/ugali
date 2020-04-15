@@ -10,12 +10,15 @@ import { deleteTransaction } from '../graphql/mutations';
 
 // graphql
 import { listTransactions } from '../graphql/queries';
+import { listPremiumUserss } from '../graphql/queries';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
 
 // Constants
 const TXN_LIMIT = 200;
+var IS_PREMIUM_USER = false;
+const PREMIUM_USER_LIMIT = 1;
 
 class Transactions extends Component {
     constructor(props) {
@@ -78,6 +81,8 @@ class Transactions extends Component {
 
             var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
 
+            var recurring = IS_PREMIUM_USER ? <><b>Is Recurring Transaction: </b> {is_recurring ? "yes" : "no"}</> : "";
+
             return (
                 <div className={classname}>
                     <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
@@ -85,8 +90,8 @@ class Transactions extends Component {
                     <font size="4.5">{title} - ${amount}<br /></font>
                     <p><b>Category:</b> {category}<br />
                         <b>Payment Method:</b> {payment_method}<br />
-                        <b>Is Recurring Transaction:</b> {is_recurring ? "yes" : "no"}</p>
-                    {description === null ? "" : desc}
+                        {recurring}
+                    {description === null ? "" : desc}</p>
                     <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
                     <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
                     <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
@@ -111,36 +116,49 @@ class Transactions extends Component {
         Auth.currentAuthenticatedUser().then(user => {
             let email = user.attributes.email;
 
-            API.graphql(graphqlOperation(listTransactions, {
-                limit: TXN_LIMIT,
+            API.graphql(graphqlOperation(listPremiumUserss, {
+                limit: PREMIUM_USER_LIMIT,
                 filter: {
                     user: { eq: email }
                 }
             })).then(data => {
-                var sortedTxns = data.data.listTransactions.items;
-                sortedTxns.sort((t1, t2) => {
-                    var d1 = new Date(t1.date);
-                    var d2 = new Date(t2.date);
-                    if (d1 < d2)
-                        return 1;
-                    if (d1 > d2)
-                        return -1;
-                    return 0;
-                });
-                this.setState({ transactions: sortedTxns });
-                this.setState({ VISIBLE_TXNS: sortedTxns });
-
-                if (data.data.listTransactions.nextToken !== null) {
-                    window.alert("There were some recurring transactions that could not be fetched, so this page is not accurate.");
-                }
-
-                if (this.state.year !== "" && this.state.month !== "") {
-                    this.filterTransactions();
-                }
-
+                const premiumUsers = data.data.listPremiumUserss.items;
+                IS_PREMIUM_USER = (premiumUsers.length === 0) ? false : true;
+                API.graphql(graphqlOperation(listTransactions, {
+                    limit: TXN_LIMIT,
+                    filter: {
+                        user: { eq: email }
+                    }
+                })).then(data => {
+                    var sortedTxns = data.data.listTransactions.items;
+                    sortedTxns.sort((t1, t2) => {
+                        var d1 = new Date(t1.date);
+                        var d2 = new Date(t2.date);
+                        if (d1 < d2)
+                            return 1;
+                        if (d1 > d2)
+                            return -1;
+                        return 0;
+                    });
+                    this.setState({ transactions: sortedTxns });
+                    this.setState({ VISIBLE_TXNS: sortedTxns });
+    
+                    if (data.data.listTransactions.nextToken !== null) {
+                        window.alert("There were some recurring transactions that could not be fetched, so this page is not accurate.");
+                    }
+    
+                    if (this.state.year !== "" && this.state.month !== "") {
+                        this.filterTransactions();
+                    }
+    
+                }).catch((err) => {
+                    window.alert("Encountered error fetching your transactions: \n", err);
+                })
             }).catch((err) => {
-                window.alert("Encountered error fetching your transactions: \n", err);
+                console.log(err);
             })
+
+
 
         }).catch((err) => {
             window.alert("Encountered error fetching your username: \n", err);
@@ -338,7 +356,6 @@ class Transactions extends Component {
                             </div>
 
                             <div className="ccBillBox">
-                            <font size="3" >
                             <table id='transactions' style={{width: "100%"}}>
                                 <h4><b>Category Summary</b></h4>
                                 <tbody>
@@ -346,7 +363,6 @@ class Transactions extends Component {
                                     {this.renderCategoryTableData()}
                                 </tbody>
                             </table>
-                            </font>
 
                             </div>
 

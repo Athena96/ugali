@@ -80,7 +80,7 @@ export class CustomSignIn extends SignIn {
                 onClick={() => super.changeState("signUp")}
                 style={{ marginLeft: "6px", marginRight: "6px" }}
               >
-                <h5>Create account</h5>
+                <h5>Create Account</h5>
               </button>
 
             </div>
