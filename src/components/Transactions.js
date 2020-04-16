@@ -122,6 +122,8 @@ class Transactions extends Component {
                     user: { eq: email }
                 }
             })).then(data => {
+                console.log(data);
+
                 const premiumUsers = data.data.listPremiumUserss.items;
                 IS_PREMIUM_USER = (premiumUsers.length === 0) ? false : true;
                 API.graphql(graphqlOperation(listTransactions, {
@@ -130,6 +132,7 @@ class Transactions extends Component {
                         user: { eq: email }
                     }
                 })).then(data => {
+                    console.log(data);
                     var sortedTxns = data.data.listTransactions.items;
                     sortedTxns.sort((t1, t2) => {
                         var d1 = new Date(t1.date);

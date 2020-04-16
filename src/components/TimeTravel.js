@@ -26,7 +26,7 @@ API.configure(awsconfig);
 PubSub.configure(awsconfig);
 
 // Constants
-const TXN_LIMIT = 100;
+const TXN_LIMIT = 200;
 const PREMIUM_USER_LIMIT = 1;
 
 class TimeTravel extends Component {
@@ -156,6 +156,8 @@ class TimeTravel extends Component {
         Auth.currentAuthenticatedUser().then(user => {
             let email = user.attributes.email;
 
+            // TODO this is not good. has to search every txn for all useds. 
+            // how to query?
             API.graphql(graphqlOperation(listTransactions, {
                 limit: TXN_LIMIT,
                 filter: {
@@ -176,6 +178,7 @@ class TimeTravel extends Component {
                 });
                 this.setState({ recurring_txns: sortedTxns });
 
+                console.log(data);
                 if (data.data.listTransactions.nextToken !== null) {
                     window.alert("There were some recurring transactions that could not be fetched, so your generated timeline is not accurate.");
                 }
@@ -422,8 +425,6 @@ class TimeTravel extends Component {
             
             const pt = { x: dt, y: balanceRow.balance };
             
-            console.log(pt);
-
             dp.push(pt);
             time += 1;
         }

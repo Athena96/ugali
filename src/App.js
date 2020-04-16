@@ -6,7 +6,6 @@ import { Layout, Header, Navigation, Drawer, Content } from 'react-mdl';
 import { Link } from 'react-router-dom';
 
 // Amplify
-import { withAuthenticator } from 'aws-amplify-react';
 import API from '@aws-amplify/api';
 import PubSub from '@aws-amplify/pubsub';
 import awsconfig from './aws-exports';
@@ -95,8 +94,3 @@ class App extends Component {
 
 export default App;
 
-
-// export default props => {
-//   // const AppComponent = withAuthenticator(App)
-//   return <AppComponent {...props} />
-// }
