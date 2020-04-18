@@ -27,7 +27,7 @@ PubSub.configure(awsconfig);
 
 // Constants
 const TXN_LIMIT = 200;
-const PREMIUM_USER_LIMIT = 1;
+const PREMIUM_USER_LIMIT = 200;
 
 class TimeTravel extends Component {
     constructor(props) {
@@ -114,6 +114,8 @@ class TimeTravel extends Component {
                     user: { eq: email }
                 }
             })).then(data => {
+                console.log(email);
+
                 console.log(data);
                 const premiumUsers = data.data.listPremiumUserss.items;
                 if (premiumUsers.length === 0) {
@@ -539,7 +541,7 @@ class TimeTravel extends Component {
                     <h4>Purchase a <b>1 year subscription</b> for <b>$15.01</b></h4>
                     <ul>
                     <li><h5>After a year, you will <b>not</b> be auto re-subscribed.</h5></li>
-                    <li><h5>You can cancel you're membership anytime, withen the first month, and receive a full refund.</h5></li>
+                    <li><h5>You can cancel your membership anytime, within the first month, and receive a full refund. Just email <b>zenspending.@gmail.com</b> asking for a refund.</h5></li>
                     </ul>
                     <PayPalButton
                         amount="15.01"

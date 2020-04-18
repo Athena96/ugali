@@ -14,7 +14,7 @@ import { formatDate, convertDateStrToGraphqlDate } from '../common/Utilities';
 var ORIGINAL_DATE = "";
 var IS_DUPLICATE = false;
 var IS_UPDATE = false;
-const PREMIUM_USER_LIMIT = 1;
+const PREMIUM_USER_LIMIT = 200;
 var IS_PREMIUM_USER = false;
 
 class AddTransaction extends Component {

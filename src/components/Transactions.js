@@ -18,7 +18,7 @@ PubSub.configure(awsconfig);
 // Constants
 const TXN_LIMIT = 200;
 var IS_PREMIUM_USER = false;
-const PREMIUM_USER_LIMIT = 1;
+const PREMIUM_USER_LIMIT = 200;
 
 class Transactions extends Component {
     constructor(props) {
