@@ -389,7 +389,7 @@ class Transactions extends Component {
             <div>
 
                 <div class="filtersInput">
-                    <b>Year:</b>
+                    <b>Year</b> (format: YYYY):
                     <input
                         className="roundedOutline"
                         name="year"
@@ -397,7 +397,7 @@ class Transactions extends Component {
                         value={this.state.year}
                         onChange={this.handleChange} />
 
-                    <b>&nbsp;Month:</b>
+                    <b>&nbsp;Month</b> (format: MM):
                     <input
                         className="roundedOutline"
                         name="month"
@@ -405,7 +405,7 @@ class Transactions extends Component {
                         value={this.state.month}
                         onChange={this.handleChange} />
 
-                    <b>&nbsp;Category:</b>
+                    <b>&nbsp;Category</b> (optional):
                     <input
                         className="roundedOutline"
                         name="category"
