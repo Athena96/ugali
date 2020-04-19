@@ -67,3 +67,37 @@ export const listPremiumUserss = `query ListPremiumUserss(
   }
 }
 `;
+export const transactionsByUserDate = `query TransactionsByUserDate(
+  $user: String
+  $createdAt: ModelStringKeyConditionInput
+  $sortDirection: ModelSortDirection
+  $filter: ModelTransactionFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  transactionsByUserDate(
+    user: $user
+    createdAt: $createdAt
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      title
+      amount
+      category
+      date
+      description
+      payment_method
+      type
+      createdAt
+      user
+      is_recurring
+      is_recurring_period
+    }
+    nextToken
+  }
+}
+`;

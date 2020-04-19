@@ -6,6 +6,7 @@ import { createTransaction } from '../graphql/mutations';
 import { getTransaction } from '../graphql/queries';
 import { updateTransaction } from '../graphql/mutations';
 import { listPremiumUserss } from '../graphql/queries';
+import { transactionsByUserDate } from '../graphql/queries';
 
 import { formatDate, convertDateStrToGraphqlDate } from '../common/Utilities';
 
@@ -16,6 +17,7 @@ var IS_DUPLICATE = false;
 var IS_UPDATE = false;
 const PREMIUM_USER_LIMIT = 200;
 var IS_PREMIUM_USER = false;
+const TXN_LIMIT = 100;
 
 class AddTransaction extends Component {
 
@@ -48,7 +50,8 @@ class AddTransaction extends Component {
       is_recurring: false,
       is_recurring_period: false,
       user: "",
-      exampleTxnId: txnId
+      exampleTxnId: txnId,
+      usersLatestCateogories: [],
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
@@ -58,6 +61,30 @@ class AddTransaction extends Component {
   }
 
   componentDidMount() {
+    Auth.currentAuthenticatedUser().then(user => {
+      let email = user.attributes.email;
+
+      API.graphql(graphqlOperation(transactionsByUserDate, {
+        limit: TXN_LIMIT,
+        user: email, createdAt: { between: ["2020-04-01T00:00:00.000Z", "2020-04-30T00:00:00.000Z"] }
+      })).then(data => {
+        console.log("NEW QUERY");
+        var cats = [];
+        for (var txn of data.data.transactionsByUserDate.items) {
+          if (!cats.includes(txn.category)) {
+            cats.push(txn.category);
+          }
+        }
+
+        this.setState({ usersLatestCateogories: cats });
+
+        console.log(this.state.usersLatestCateogories);
+      }).catch((err) => {
+        console.log(err);
+      })
+    }).catch((err) => {
+      console.log(err);
+    });
 
     // get premium users list
     Auth.currentAuthenticatedUser().then(user => {
@@ -147,9 +174,23 @@ class AddTransaction extends Component {
     if (name === "type") {
       value = parseInt(value);
     }
-    this.setState({
-      [name]: value
-    });
+
+    else if (name === "full_category") {
+      this.setState({
+        category: value.split('-')[0],
+        sub_category: ""
+      });
+
+      if (value.split('-').length > 1) {
+        this.setState({
+          sub_category: value.split('-')[1]
+        });
+      }
+    } else {
+      this.setState({
+        [name]: value
+      });
+    }
   }
 
   renderButton() {
@@ -331,6 +372,7 @@ class AddTransaction extends Component {
       } else {
         console.log("ADD TXN...");
         console.log(transaction);
+        transaction.createdAt = transaction.date;
 
         const res = await API.graphql(graphqlOperation(createTransaction, { input: transaction }));
         console.log("SUCCESS! \n", res);
@@ -347,6 +389,14 @@ class AddTransaction extends Component {
       var errorStr = errorMessages.join(", ");
       window.alert(errorStr);
     }
+  }
+
+  renderOptions() {
+    var catOptions = [];
+    for (var cat of this.state.usersLatestCateogories) {
+      catOptions.push(<option value={cat}>{cat}</option>)
+    }
+    return (catOptions);
   }
 
   render() {
@@ -373,24 +423,34 @@ class AddTransaction extends Component {
                 value={this.state.amount}
                 onChange={this.handleChange} />
             </label><br />
-            <label>
-              <b>Category:</b>
-              <input
-                className="rounded"
-                name="category"
-                type="text"
-                value={this.state.category}
-                onChange={this.handleChange} />
+
+    
+
+              <label>
+                <b>Category:</b><br />
+                <label>
+                Choose from previously used categories: 
+              <select name="full_category" value={this.state.category + ((this.state.sub_category !== "") ? ("-"+this.state.sub_category): "")} onChange={this.handleChange}>
+                {this.renderOptions()}
+              </select>
             </label><br />
-            <label>
-              <i>Sub-Category (optional):</i>
-              <input
-                className="rounded"
-                name="sub_category"
-                type="text"
-                value={this.state.sub_category}
-                onChange={this.handleChange} />
-            </label><br />
+                <input
+                  className="rounded"
+                  name="category"
+                  type="text"
+                  value={this.state.category}
+                  onChange={this.handleChange} />
+              </label><br />
+
+              <label>
+                <i>Sub-Category (optional):</i>
+                <input
+                  className="rounded"
+                  name="sub_category"
+                  type="text"
+                  value={this.state.sub_category}
+                  onChange={this.handleChange} />
+              </label><br />
 
             <label>
               <b>Date:</b><br />
