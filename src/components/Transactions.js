@@ -9,8 +9,9 @@ import { Auth } from 'aws-amplify';
 import { deleteTransaction } from '../graphql/mutations';
 
 // graphql
-import { listTransactions } from '../graphql/queries';
+import { transactionsByUserDate } from '../graphql/queries';
 import { listPremiumUserss } from '../graphql/queries';
+import { getDoubleDigitFormat } from '../common/Utilities';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
@@ -19,11 +20,15 @@ PubSub.configure(awsconfig);
 const TXN_LIMIT = 200;
 var IS_PREMIUM_USER = false;
 const PREMIUM_USER_LIMIT = 200;
+const MONTH_PERIOD = 30;
 
 class Transactions extends Component {
     constructor(props) {
         super(props);
-        this.state = { transactions: [], year: '', month: '', category: '', VISIBLE_TXNS: [] };
+
+        const today = new Date();
+
+        this.state = { transactions: [], year: today.getFullYear().toString(), month: getDoubleDigitFormat(today.getMonth()+1), category: '', VISIBLE_TXNS: [] };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.deleteTransaction = this.deleteTransaction.bind(this);
@@ -102,17 +107,35 @@ class Transactions extends Component {
 
     componentDidMount() {
 
-        if (localStorage.getItem("year") != null) {
-            this.setState({ year: localStorage.getItem("year") });
-        }
-        if (localStorage.getItem("month") != null) {
-            this.setState({ month: localStorage.getItem("month") });
-        }
+        this.loadTxns();
 
-        if (localStorage.getItem("category") != null) {
-            this.setState({ category: localStorage.getItem("category") });
-        }
+    }
 
+    loadTxns() {
+                // if (localStorage.getItem("year") != null) {
+        //     this.setState({ year: localStorage.getItem("year") });
+        // }
+        // if (localStorage.getItem("month") != null) {
+        //     this.setState({ month: localStorage.getItem("month") });
+        // }
+
+        // if (localStorage.getItem("category") != null) {
+        //     this.setState({ category: localStorage.getItem("category") });
+        // }
+
+        console.log(this.state.month)
+
+        var lastDay = new Date(this.state.year, this.state.month, 0);
+        var firstDay = new Date(this.state.year,this.state.month-1, 1)
+
+        console.log("lastDay: ",lastDay);
+        console.log("firstDay: ",firstDay);
+
+        // last day of month
+        var start = firstDay.getFullYear() + "-" + getDoubleDigitFormat(firstDay.getMonth()+1) + "-" +getDoubleDigitFormat(firstDay.getDate()+1)+"T00:00:00.000Z"
+        var end = lastDay.getFullYear() + "-" + getDoubleDigitFormat(lastDay.getMonth()+1) + "-" +getDoubleDigitFormat(lastDay.getDate()+1)+"T23:59:59.000Z"
+
+        console.log([start,end]);
         Auth.currentAuthenticatedUser().then(user => {
             let email = user.attributes.email;
 
@@ -126,14 +149,12 @@ class Transactions extends Component {
 
                 const premiumUsers = data.data.listPremiumUserss.items;
                 IS_PREMIUM_USER = (premiumUsers.length === 0) ? false : true;
-                API.graphql(graphqlOperation(listTransactions, {
+                API.graphql(graphqlOperation(transactionsByUserDate, {
                     limit: TXN_LIMIT,
-                    filter: {
-                        user: { eq: email }
-                    }
+                    user: email, createdAt: { between: [start, end] }
                 })).then(data => {
                     console.log(data);
-                    var sortedTxns = data.data.listTransactions.items;
+                    var sortedTxns = data.data.transactionsByUserDate.items;
                     sortedTxns.sort((t1, t2) => {
                         var d1 = new Date(t1.date);
                         var d2 = new Date(t2.date);
@@ -146,15 +167,12 @@ class Transactions extends Component {
                     this.setState({ transactions: sortedTxns });
                     this.setState({ VISIBLE_TXNS: sortedTxns });
     
-                    if (data.data.listTransactions.nextToken !== null) {
-                        window.alert("There were some recurring transactions that could not be fetched, so this page is not accurate.");
-                    }
-    
                     if (this.state.year !== "" && this.state.month !== "") {
-                        this.filterTransactions();
+                        this.filterTransactionsToYearMonth(this.state.year, this.state.month);
                     }
     
                 }).catch((err) => {
+                    console.log(err);
                     window.alert("Encountered error fetching your transactions: \n", err);
                 })
             }).catch((err) => {
@@ -166,49 +184,16 @@ class Transactions extends Component {
         }).catch((err) => {
             window.alert("Encountered error fetching your username: \n", err);
         });
-
     }
 
-    async filterTransactions(e) {
-        if (this.state.year === "") {
-            if (localStorage.getItem("year") != null) {
-                this.state.year = localStorage.getItem("year");
-            } else {
-                window.alert("Must input value for year. (YYYY)");
-                return;
-            }
-        } else {
-            if (localStorage.getItem("year") == null || (localStorage.getItem("year") != null && localStorage.getItem("year") != this.state.year)) {
-                localStorage.setItem("year", this.state.year);
-            }
-        }
-
-        if (this.state.month === "") {
-            if (localStorage.getItem("month") != null) {
-                this.state.month = localStorage.getItem("month");
-            } else {
-                window.alert("Must input value for month. (MM)");
-                return;
-            }
-        } else {
-            if (localStorage.getItem("month") == null || (localStorage.getItem("month") != null && localStorage.getItem("month") != this.state.month)) {
-                localStorage.setItem("month", this.state.month);
-            }
-        }
-
-
-        if (localStorage.getItem("category") == null || (localStorage.getItem("category") != null && localStorage.getItem("category") != this.state.category)) {
-            console.log("updaing category");
-            localStorage.setItem("category", this.state.category);
-        }
-
+    filterTransactionsToYearMonth(fyear, fmonth) {
         var filteredTxns = [];
 
         for (var txn of this.state.transactions) {
-            var dateParts = txn.date.split("-");
+            var dateParts = txn.createdAt.split("-");
             var year = dateParts[0];
             var month = dateParts[1];
-            if (year === this.state.year && month === this.state.month) {
+            if (year === fyear && month === fmonth) {
 
                 if (this.state.category !== "") {
                     if (txn.category === this.state.category) {
@@ -221,6 +206,42 @@ class Transactions extends Component {
         }
 
         this.setState({ VISIBLE_TXNS: filteredTxns });
+    }
+
+    async filterTransactions(e) {
+        // if (this.state.year === "") {
+        //     if (localStorage.getItem("year") != null) {
+        //         this.state.year = localStorage.getItem("year");
+        //     } else {
+        //         window.alert("Must input value for year. (YYYY)");
+        //         return;
+        //     }
+        // } else {
+        //     if (localStorage.getItem("year") == null || (localStorage.getItem("year") != null && localStorage.getItem("year") != this.state.year)) {
+        //         localStorage.setItem("year", this.state.year);
+        //     }
+        // }
+
+        // if (this.state.month === "") {
+        //     if (localStorage.getItem("month") != null) {
+        //         this.state.month = localStorage.getItem("month");
+        //     } else {
+        //         window.alert("Must input value for month. (MM)");
+        //         return;
+        //     }
+        // } else {
+        //     if (localStorage.getItem("month") == null || (localStorage.getItem("month") != null && localStorage.getItem("month") != this.state.month)) {
+        //         localStorage.setItem("month", this.state.month);
+        //     }
+        // }
+
+
+        // if (localStorage.getItem("category") == null || (localStorage.getItem("category") != null && localStorage.getItem("category") != this.state.category)) {
+        //     console.log("updaing category");
+        //     localStorage.setItem("category", this.state.category);
+        // }
+
+        this.loadTxns();
     }
 
     handleChange(event) {

@@ -18,6 +18,7 @@ var IS_UPDATE = false;
 const PREMIUM_USER_LIMIT = 200;
 var IS_PREMIUM_USER = false;
 const TXN_LIMIT = 100;
+const CATEGORY_LOOKBACK_DAYS = 30;
 
 class AddTransaction extends Component {
 
@@ -64,11 +65,13 @@ class AddTransaction extends Component {
     Auth.currentAuthenticatedUser().then(user => {
       let email = user.attributes.email;
 
+      var today = new Date();
+      var catLookBack = (new Date()).setDate(today.getDate() - CATEGORY_LOOKBACK_DAYS);
+
       API.graphql(graphqlOperation(transactionsByUserDate, {
         limit: TXN_LIMIT,
-        user: email, createdAt: { between: ["2020-04-01T00:00:00.000Z", "2020-04-30T00:00:00.000Z"] }
+        user: email, createdAt: { between: [catLookBack, today] }
       })).then(data => {
-        console.log("NEW QUERY");
         var cats = [];
         for (var txn of data.data.transactionsByUserDate.items) {
           if (!cats.includes(txn.category)) {
