@@ -37,9 +37,29 @@ class TimeTravel extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.generateTimeline = this.generateTimeline.bind(this);
-        this.updateTransaction = this.updateTransaction.bind(this);
     }
 
+    // operation
+    async autoAdd(recurrTxn, currentDay) {
+        var cpyTxn = JSON.parse(JSON.stringify(recurrTxn));
+
+        try {
+            cpyTxn.title = "[AUTO ADD]: " + cpyTxn.title;
+            delete cpyTxn.id;
+            delete cpyTxn.createdAt;
+            cpyTxn.is_recurring = false;
+            cpyTxn.is_recurring_period = false;
+            var d = convertDateStrToGraphqlDate(currentDay.getFullYear() + "-" + getDoubleDigitFormat(currentDay.getUTCMonth() + 1) + "-" + getDoubleDigitFormat(currentDay.getUTCDate()));
+            cpyTxn.date = d;
+            const res = API.graphql(graphqlOperation(createTransaction, { input: cpyTxn }));
+
+            window.alert("Successfully AUTO added your transaction: " + cpyTxn.title);
+        } catch (err) {
+            window.alert("Encountered error AUTO adding your transaction.");
+        }
+    }
+    
+    // render / ui
     renderTableHeader() {
         let header = ['date', 'balance', 'income-expense'];
         return header.map((key, index) => {
@@ -61,7 +81,6 @@ class TimeTravel extends Component {
                 weekDay = <td><b>{year + "-" + month + "-" + day + " " + dayOfWeek}</b></td>;
             }
             var balColor = (balance <= 0.0) ? "red" : "black";
-
 
             if (incomeDesc !== "" && expenseDesc === "") {
                 return (
@@ -100,14 +119,11 @@ class TimeTravel extends Component {
         })
     }
 
+    // life cycle
     componentDidMount() {
-
-        console.log("componentDidMount");
-
         // get premium users list
         Auth.currentAuthenticatedUser().then(user => {
             let email = user.attributes.email;
-
             API.graphql(graphqlOperation(listPremiumUserss, {
                 limit: PREMIUM_USER_LIMIT,
                 filter: {
@@ -137,12 +153,9 @@ class TimeTravel extends Component {
             }).catch((err) => {
                 console.log(err);
             })
-
         }).catch((err) => {
             window.alert("Encountered error fetching your username: \n", err);
         });
-
-
 
         // check local storage for saved values, if have some, populate the fields with it.
         if (localStorage.getItem("variable_exp_amount") != null) {
@@ -154,9 +167,7 @@ class TimeTravel extends Component {
 
         Auth.currentAuthenticatedUser().then(user => {
             let email = user.attributes.email;
-
-            // TODO this is not good. has to search every txn for all useds. 
-            // how to query?
+            
             API.graphql(graphqlOperation(listTransactions, {
                 limit: TXN_LIMIT,
                 filter: {
@@ -164,7 +175,6 @@ class TimeTravel extends Component {
                     is_recurring: { eq: true }
                 }
             })).then(data => {
-
                 var sortedTxns = data.data.listTransactions.items;
                 sortedTxns.sort((t1, t2) => {
                     var d1 = new Date(t1.date);
@@ -188,44 +198,13 @@ class TimeTravel extends Component {
             }).catch((err) => {
                 window.alert("Encountered error fetching your transactions: \n", err);
             })
-
         }).catch((err) => {
             window.alert("Encountered error fetching your username: \n", err);
         });
-
-    }
-
-    updateTransaction(event) {
-        this.props.history.push('/AddTransaction/' + event.target.id)
-    }
-
-
-    async autoAdd(recurrTxn, currentDay) {
-        var cpyTxn = JSON.parse(JSON.stringify(recurrTxn));
-
-        try {
-            cpyTxn.title = "[AUTO ADD]: " + cpyTxn.title;
-            delete cpyTxn.id;
-            delete cpyTxn.createdAt;
-            cpyTxn.is_recurring = false;
-            cpyTxn.is_recurring_period = false;
-            var d = convertDateStrToGraphqlDate(currentDay.getFullYear() + "-" + getDoubleDigitFormat(currentDay.getUTCMonth() + 1) + "-" + getDoubleDigitFormat(currentDay.getUTCDate()));
-            cpyTxn.date = d;
-            const res = API.graphql(graphqlOperation(createTransaction, { input: cpyTxn }));
-
-            window.alert("Successfully AUTO added your transaction: " + cpyTxn.title);
-        } catch (err) {
-            window.alert("Encountered error AUTO adding your transaction.");
-        }
     }
 
     generateTimeline() {
-        console.log(process.env);
-        //
-        
-        console.log(process.env.PAYPALL_PROD_CLIENTID);
         this.shownRecorded = {}
-
         if (this.state.variable_exp_amount == "") {
             if (localStorage.getItem("variable_exp_amount") != null) {
                 this.state.variable_exp_amount = localStorage.getItem("variable_exp_amount");
@@ -254,16 +233,13 @@ class TimeTravel extends Component {
 
         var balanceRows = [];
         const DAY_TO_CALCULATE = 31 * 6;
-
         var start = new Date();
-        // start.setDate(start.getDate() - 1);
         var end = new Date();
         end.setDate(start.getDate() + DAY_TO_CALCULATE);
 
         var currentDay = new Date(start);
         var idx = 0;
         while (currentDay < end) {
-
             balanceRows[idx] = {
                 id: idx,
                 balanceDate: new Date(currentDay),
@@ -277,17 +253,14 @@ class TimeTravel extends Component {
             // if any recurring txns happen today, then save them
             var recurringIncomes = [];
             var recurringExpenses = [];
+            var numRecurrTxns = this.state.recurring_txns.length;
             for (var recurrTxn of this.state.recurring_txns) {
                 var recurrTxnDay = parseInt(recurrTxn.date.split('-')[2].split('T')[0]);
                 var recurrTxnMonth = parseInt(recurrTxn.date.split('-')[1]);
 
                 if (recurrTxnDay === currentDay.getDate()) {
-
-                    // only show once
                     if (recurrTxn.is_recurring_period === false) {
-
                         if (this.shownRecorded[recurrTxn.title] === undefined) {
-                            // not yet shown!
                             if (recurrTxnMonth === (currentDay.getMonth() + 1)) {
                                 if (recurrTxn.type === 2) {
                                     recurringExpenses.push(recurrTxn);
@@ -296,7 +269,6 @@ class TimeTravel extends Component {
                                 }
                                 this.shownRecorded[recurrTxn.title] = true;
                             }
-
                         }
                     } else {
                         if (recurrTxn.type === 2) {
@@ -309,7 +281,7 @@ class TimeTravel extends Component {
                     // AUTO ADD
                     if (idx === 0) {
                         // if I have a value stored in storage
-                        if (localStorage.getItem("last_auto_add_date") != null) {
+                        if (localStorage.getItem("last_auto_add_date") != null && numRecurrTxns !== 0) {
                             const lastAutoAddDt = localStorage.getItem("last_auto_add_date");
                             var y = lastAutoAddDt.split('-')[0];
                             var m = lastAutoAddDt.split('-')[1];
@@ -330,6 +302,7 @@ class TimeTravel extends Component {
                             var dc = getDoubleDigitFormat(currentDay.getUTCDate());
                             localStorage.setItem("last_auto_add_date", yc + "-" + mc + "-" + dc);
                             this.autoAdd(recurrTxn, currentDay);
+                            numRecurrTxns -= 1;
                         }
                     }
                 }
@@ -409,20 +382,16 @@ class TimeTravel extends Component {
         for (var balanceRow of this.state.balance_rows) {
             var d = new Date(balanceRow.balanceDate);
             var dt = "" + d.getFullYear() +"-"+ getDoubleDigitFormat(d.getMonth()+1) +"-" + getDoubleDigitFormat(d.getDate()+1);
-            
             const pt = { x: dt, y: balanceRow.balance };
-            
             dp.push(pt);
             time += 1;
         }
-
         const data = [
             {
                 color: "#FF7C7B",
                 points: dp
             }
         ];
-
         return data;
     }
 
@@ -449,13 +418,9 @@ class TimeTravel extends Component {
     render() {
 
         if (this.state.isPremiumUser && !this.state.subscriptionExpired) {
-
             return (
-
                 <div>
-
                     <div class="filtersInput" >
-
                         <b>Amount:</b><br />
                         <input
                             className="roundedOutline"
@@ -491,10 +456,7 @@ class TimeTravel extends Component {
 
                             data={this.getGraphPoints()}
                         />
-
                     </div>
-
-
                     <div>
                         <table id='transactions' align="center" style={{ height: '90%', width: '98%' }}>
                             <h4><b>Timeline</b></h4>
@@ -504,7 +466,6 @@ class TimeTravel extends Component {
                             </tbody>
                         </table>
                     </div>
-
                 </div>
             );
 
@@ -520,7 +481,7 @@ class TimeTravel extends Component {
                     </ul>
                     <PayPalButton
                         amount="15.01"
-                        shippingPreference="NO_SHIPPING" // default is "GET_FROM_FILE"
+                        shippingPreference="NO_SHIPPING" 
                         style={{color:"black"}}
                         onSuccess={(details, data) => {
 
@@ -573,10 +534,8 @@ class TimeTravel extends Component {
                                     alert("Transaction completed!\nWe here at ZenSpending thank you!\nRefresh the page to start using Premium Features!");
                                 }
                             }).catch((err) => {
-                                // window.alert("Encountered error fetching your username: \n", err);
+                                console.log(err);
                             });
-
-
                         }}
                         options={{
                             disableFunding: ["credit", "card"],

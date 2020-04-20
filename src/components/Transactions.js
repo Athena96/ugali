@@ -13,7 +13,7 @@ import { transactionsByUserDate } from '../graphql/queries';
 import { listPremiumUserss } from '../graphql/queries';
 import { getDoubleDigitFormat } from '../common/Utilities';
 
-import { getCategoriesFromTransactions } from '../common/Utilities';
+import { fetchTransactions } from '../dataAccess/TransactionAccess';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
@@ -22,7 +22,6 @@ PubSub.configure(awsconfig);
 const TXN_LIMIT = 200;
 var IS_PREMIUM_USER = false;
 const PREMIUM_USER_LIMIT = 200;
-const MONTH_PERIOD = 30;
 
 class Transactions extends Component {
     constructor(props) {
@@ -30,7 +29,14 @@ class Transactions extends Component {
 
         const today = new Date();
 
-        this.state = { transactions: [], year: today.getFullYear().toString(), month: getDoubleDigitFormat(today.getMonth()+1), category: '', VISIBLE_TXNS: [], categories: [] };
+        this.state = {
+            transactions: [],
+            year: today.getFullYear().toString(),
+            month: getDoubleDigitFormat(today.getMonth() + 1),
+            category: '',
+            VISIBLE_TXNS: [],
+            categories: []
+        };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.deleteTransaction = this.deleteTransaction.bind(this);
@@ -39,6 +45,7 @@ class Transactions extends Component {
         this.duplicateTransaction = this.duplicateTransaction.bind(this);
     }
 
+    // operations
     async deleteTransaction(event) {
         try {
             var txnId = event.target.id;
@@ -76,100 +83,7 @@ class Transactions extends Component {
         this.props.history.push('/addTransaction/duplicate/' + event.target.id)
     }
 
-    renderTransactionData() {
-        return this.state.VISIBLE_TXNS.map((transaction, index) => {
-            const { id, title, amount, category, date, type, payment_method, description, is_recurring } = transaction;
-            var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
-
-            const dayIdx = new Date(date);
-            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-            var dayOfWeek = days[dayIdx.getDay()];
-
-
-            var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
-
-            var recurring = IS_PREMIUM_USER ? <><b>Is Recurring Transaction: </b> {is_recurring ? "yes" : "no"}</> : "";
-
-            return (
-                <div className={classname}>
-                    <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
-
-                    <font size="4.5">{title} - ${amount}<br /></font>
-                    <p><b>Category:</b> {category}<br />
-                        <b>Payment Method:</b> {payment_method}<br />
-                        {recurring}
-                    {description === null ? "" : desc}</p>
-                    <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
-                    <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
-                    <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
-                </div>
-            )
-        })
-    }
-
-    componentDidMount() {
-
-        this.loadTxns(this.state.year, this.state.month, this.state.category);
-
-    }
-
-     loadTxns(year, month, category) {
-        var lastDay = new Date(year, month, 0);
-        var firstDay = new Date(year,month-1, 1)
-        
-        var start = firstDay.getFullYear() + "-" + getDoubleDigitFormat(firstDay.getMonth()+1) + "-" +getDoubleDigitFormat(firstDay.getDate()+1)+"T00:00:00.000Z"
-        var end = lastDay.getFullYear() + "-" + getDoubleDigitFormat(lastDay.getMonth()+1) + "-" +getDoubleDigitFormat(lastDay.getDate()+1)+"T23:59:59.000Z"
-
-        Auth.currentAuthenticatedUser().then(user => {
-            let email = user.attributes.email;
-
-            API.graphql(graphqlOperation(listPremiumUserss, {
-                limit: PREMIUM_USER_LIMIT,
-                filter: {
-                    user: { eq: email }
-                }
-            })).then(data => {
-                const premiumUsers = data.data.listPremiumUserss.items;
-                IS_PREMIUM_USER = (premiumUsers.length === 0) ? false : true;
-                API.graphql(graphqlOperation(transactionsByUserDate, {
-                    limit: TXN_LIMIT,
-                    user: email, createdAt: { between: [start, end] }
-                })).then(data => {
-                    console.log(email);
-                    console.log(data);
-                    var sortedTxns = data.data.transactionsByUserDate.items;
-                    sortedTxns.sort((t1, t2) => {
-                        var d1 = new Date(t1.date);
-                        var d2 = new Date(t2.date);
-                        if (d1 < d2)
-                            return 1;
-                        if (d1 > d2)
-                            return -1;
-                        return 0;
-                    });
-
-                    console.log(sortedTxns);
-                    this.setState({ categories: getCategoriesFromTransactions(sortedTxns)})
-                    this.setState({ transactions: sortedTxns });
-                    this.setState({ VISIBLE_TXNS: sortedTxns });
-    
-                    if (year !== "" && month !== "") {
-                        this.filterTransactions(year, month, category);
-                    }
-    
-                }).catch((err) => {
-                    console.log(err);
-                    window.alert("Encountered error fetching your transactions: \n", err);
-                })
-            }).catch((err) => {
-                console.log(err);
-            })
-
-        }).catch((err) => {
-            window.alert("Encountered error fetching your username: \n", err);
-        });
-    }
-
+    // helper
     filterTransactions(fyear, fmonth, category) {
         var filteredTxns = [];
 
@@ -177,10 +91,10 @@ class Transactions extends Component {
             var dateParts = txn.createdAt.split("-");
             var year = dateParts[0];
             var month = dateParts[1];
-            if (year === fyear && month === fmonth) {
 
-                if (this.state.category !== "" && this.state.category !== "ALL" ) {
-                    if (txn.category === this.state.category) {
+            if (year === fyear && month === fmonth) {
+                if (category !== "" && category !== "ALL") {
+                    if (txn.category === category) {
                         filteredTxns.push(txn);
                     }
                 } else {
@@ -192,55 +106,65 @@ class Transactions extends Component {
         this.setState({ VISIBLE_TXNS: filteredTxns });
     }
 
-    async filterTransactionsButton() {
-        this.loadTxns(this.state.year, this.state.month, this.state.category);
+    getMonth() {
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        console.log(this.state.month)
+        return monthNames[parseInt(this.state.month) - 1];
     }
 
-    handleChange(event) {
-        var target = event.target;
-        var value = target.value;
-        var name = target.name;
-        this.setState({
-            [name]: value
-        });
-    }
-
-
-    renderTableHeader() {
-        let header = ['category', 'amount'];
-        return header.map((key, index) => {
-            return <th key={index}>{key.toUpperCase()}</th>
-        })
-    }
-
-    renderCategorySummary() {
-        var categoryAgg = {}
-
+    getCCSpending() {
+        var sum = 0.0;
         for (var txn of this.state.VISIBLE_TXNS) {
-            if (categoryAgg[txn.category] === undefined) {
-                categoryAgg[txn.category] = 0.0
+            if (txn.payment_method.includes("cc") || txn.payment_method.includes("credit")) {
+                if (txn.type === 2) {
+                    sum += txn.amount;
+                } else {
+                    sum -= txn.amount;
+                }
             }
-            if (txn.type === 2) {
-                categoryAgg[txn.category] += txn.amount
-            } else {
-                categoryAgg[txn.category] -= txn.amount
-            }
-
         }
-
-        var ret = [];
-        for (var key in categoryAgg) {
-            ret.push(<p>{key}: ${categoryAgg[key]}</p>);
-        }
-        return ret;
+        return sum.toFixed(2);
     }
 
-    renderOptions() {
-        var catOptions = [<option value="ALL">{"ALL"}</option>];
-        for (var cat of this.state.categories) {
-          catOptions.push(<option value={cat}>{cat}</option>)
+    // render / ui
+    renderMain() {
+        if (this.state.transactions.length === 0) {
+            return (
+                <div class="indent">
+                    <h4>You haven't added any transactions yet.</h4>
+                    <h4>Click <b>'Add Transactions'</b> to add some!</h4>
+                </div>
+            )
+        } else {
+            return (
+                <div class="row">
+                    <div class="column1" >
+                        <div className="ccBillBox">
+                            <h4>{this.getMonth()} <b>Credit Card Bill:</b> ${this.getCCSpending()}</h4>
+                        </div>
+
+                        <div className="ccBillBox">
+                            <table id='transactions' style={{ width: "100%" }}>
+                                <h4><b>Category Summary</b></h4>
+                                <tbody>
+                                    <tr>{this.renderTableHeader()}</tr>
+                                    {this.renderCategoryTableData()}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                    <div class="column2">
+                        <div>
+                            <h4><b>Transactions</b></h4>
+                            {this.renderTransactionData()}
+                        </div>
+                    </div>
+                </div>
+            )
         }
-        return (catOptions);
     }
 
     renderCategoryTableData() {
@@ -296,78 +220,113 @@ class Transactions extends Component {
         })
     }
 
-    getCCSpending() {
-        var sum = 0.0;
+    renderTableHeader() {
+        let header = ['category', 'amount'];
+        return header.map((key, index) => {
+            return <th key={index}>{key.toUpperCase()}</th>
+        })
+    }
+
+    renderCategorySummary() {
+        var categoryAgg = {}
+
         for (var txn of this.state.VISIBLE_TXNS) {
-            if (txn.payment_method.includes("cc") || txn.payment_method.includes("credit")) {
-                if (txn.type === 2) {
-                    sum += txn.amount;
-                } else {
-                    sum -= txn.amount;
-                }
+            if (categoryAgg[txn.category] === undefined) {
+                categoryAgg[txn.category] = 0.0
+            }
+            if (txn.type === 2) {
+                categoryAgg[txn.category] += txn.amount
+            } else {
+                categoryAgg[txn.category] -= txn.amount
             }
         }
-        return sum.toFixed(2);
-    }
 
-    getMonth() {
-        const monthNames = ["January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-        ];
-        // const d = new Date();
-        // return monthNames[d.getMonth()];
-        console.log(this.state.month)
-        return monthNames[parseInt(this.state.month) - 1];
-    }
-
-    renderMain() {
-        if (this.state.transactions.length === 0) {
-            return (
-                <div class="indent">
-                    <h4>You haven't added any transactions yet.</h4>
-                    <h4>Click <b>'Add Transactions'</b> to add some!</h4>
-                </div>
-            )
-        } else {
-
-            return (
-                <div class="row">
-                    <div class="column1" >
-
-                            <div className="ccBillBox">
-                                <h4>{this.getMonth()} <b>Credit Card Bill:</b> ${this.getCCSpending()}</h4>
-                            </div>
-
-                            <div className="ccBillBox">
-                            <table id='transactions' style={{width: "100%"}}>
-                                <h4><b>Category Summary</b></h4>
-                                <tbody>
-                                    <tr>{this.renderTableHeader()}</tr>
-                                    {this.renderCategoryTableData()}
-                                </tbody>
-                            </table>
-
-                            </div>
-
-
-                    </div>
-                    <div class="column2">
-                        
-                        <div>
-                            <h4><b>Transactions</b></h4>
-                            {this.renderTransactionData()}
-                        </div>
-
-                    </div>
-                </div>
-            )
+        var ret = [];
+        for (var key in categoryAgg) {
+            ret.push(<p>{key}: ${categoryAgg[key]}</p>);
         }
+        return ret;
+    }
+
+    renderOptions() {
+        var catOptions = [<option value="ALL">{"ALL"}</option>];
+        for (var cat of this.state.categories) {
+            catOptions.push(<option value={cat}>{cat}</option>)
+        }
+        return (catOptions);
+    }
+
+    renderTransactionData() {
+        return this.state.VISIBLE_TXNS.map((transaction, index) => {
+            const { id, title, amount, category, date, type, payment_method, description, is_recurring } = transaction;
+            var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
+            const dayIdx = new Date(date);
+            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            var dayOfWeek = days[dayIdx.getDay()];
+            var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
+            var recurring = IS_PREMIUM_USER ? <><b>Is Recurring Transaction: </b> {is_recurring ? "yes" : "no"}</> : "";
+
+            return (
+                <div className={classname}>
+                    <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
+                    <font size="4.5">{title} - ${amount}<br /></font>
+                    <p><b>Category:</b> {category}<br />
+                        <b>Payment Method:</b> {payment_method}<br />
+                        {recurring}
+                        {description === null ? "" : desc}</p>
+                    <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
+                    <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
+                    <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
+                </div>
+            )
+        })
+    }
+
+    filterTransactionsButton() {
+        this.fetchTransactionsUpdateState()
+    }
+
+    // data
+    fetchTransactionsUpdateState() {
+        let currentComponent = this;
+        fetchTransactions(this.state.year, this.state.month, this.state.category)
+            .then(function (response) {
+                console.log(response);
+                currentComponent.setState({ categories: response.categories })
+                currentComponent.setState({ transactions: response.transactions });
+                currentComponent.setState({ VISIBLE_TXNS: response.VISIBLE_TXNS });
+
+                if (currentComponent.state.year !== "" && currentComponent.state.month !== "") {
+                    console.log("fileterr");
+                    currentComponent.filterTransactions(currentComponent.state.year, currentComponent.state.month, currentComponent.state.category);
+                } else {
+                    console.log("nooo");
+
+                }
+            })
+            .catch(function (response) {
+                // Handle error
+                console.log(response);
+            });
+    }
+
+    // life cycle
+    handleChange(event) {
+        var target = event.target;
+        var value = target.value;
+        var name = target.name;
+        this.setState({
+            [name]: value
+        });
+    }
+
+    componentDidMount() {
+        this.fetchTransactionsUpdateState()
     }
 
     render() {
         return (
             <div>
-
                 <div class="filtersInput">
                     <b>Year</b> (format: YYYY):
                     <input
@@ -389,17 +348,10 @@ class Transactions extends Component {
                     <label>
                         <b>Category:</b><br />
                         <select name="category" value={this.state.category} onChange={this.handleChange}>
-                            {this.renderOptions()} 
-                        </select> 
+                            {this.renderOptions()}
+                        </select>
                     </label>
 
-                    {/* <b>&nbsp;Category</b> (optional):
-                    <input
-                        className="roundedOutline"
-                        name="category"
-                        type="text"
-                        value={this.state.category}
-                        onChange={this.handleChange} /> */}
                     <button class="filter" onClick={this.filterTransactionsButton}><b>filter transactions</b></button>
                 </div>
 
