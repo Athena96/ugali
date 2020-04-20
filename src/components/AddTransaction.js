@@ -395,7 +395,7 @@ class AddTransaction extends Component {
   }
 
   renderOptions() {
-    var catOptions = [];
+    var catOptions = [<option value="">{""}</option>];
     for (var cat of this.state.usersLatestCateogories) {
       catOptions.push(<option value={cat}>{cat}</option>)
     }
@@ -406,10 +406,11 @@ class AddTransaction extends Component {
     return (
       <div>
         <div className="addTransactionBackground">
+        <small>* required fields</small>
 
           <form onSubmit={this.handleSubmit}>
             <label>
-              <b>Title:</b><br />
+              <b>*Title:</b><br />
               <input
                 className="rounded"
                 name="title"
@@ -418,7 +419,7 @@ class AddTransaction extends Component {
                 onChange={this.handleChange} />
             </label><br />
             <label>
-              <b>Amount:</b><br />
+              <b>*Amount:</b><br />
               <input
                 className="rounded"
                 name="amount"
@@ -430,33 +431,36 @@ class AddTransaction extends Component {
     
 
               <label>
-                <b>Category:</b><br />
+                <b>*Category:</b><br />
+                  Choose from previously used categories: 
+                  <select name="full_category" value={this.state.category + ((this.state.sub_category !== "") ? ("-"+this.state.sub_category): "")} onChange={this.handleChange}>
+                    {this.renderOptions()} 
+                  </select> 
+                  {" "} (*or enter a new category below)
+                </label>
+
                 <label>
-                Choose from previously used categories: 
-              <select name="full_category" value={this.state.category + ((this.state.sub_category !== "") ? ("-"+this.state.sub_category): "")} onChange={this.handleChange}>
-                {this.renderOptions()}
-              </select>
-            </label><br />
-                <input
-                  className="rounded"
-                  name="category"
-                  type="text"
-                  value={this.state.category}
-                  onChange={this.handleChange} />
-              </label><br />
+                  <input
+                    className="rounded"
+                    name="category"
+                    type="text"
+                    placeholder="category"
+                    value={this.state.category}
+                    onChange={this.handleChange} />
+                </label>
 
               <label>
-                <i>Sub-Category (optional):</i>
                 <input
                   className="rounded"
                   name="sub_category"
+                  placeholder="(optional) sub category"
                   type="text"
                   value={this.state.sub_category}
                   onChange={this.handleChange} />
               </label><br />
 
             <label>
-              <b>Date:</b><br />
+              <b>*Date:</b><br />
               <input
                 className="rounded"
                 name="date"
@@ -510,8 +514,9 @@ class AddTransaction extends Component {
           </label>
             </div>
 
-
-            {this.renderPremiumFeatures()}
+            <div className="premiumFeatureBackground">
+              {this.renderPremiumFeatures()}
+            </div>
 
             <br />
             {this.renderButton()}

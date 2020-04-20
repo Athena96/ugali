@@ -33,7 +33,7 @@ class TimeTravel extends Component {
     constructor(props) {
         super(props);
         this.shownRecorded = {};
-        this.state = { balance_rows: [], variable_exp_name: "", variable_exp_amount: "", recurring_txns: [], starting_balance: "", user: "", isPremiumUser: false, subscriptionExpired: true, premiumUsers:{}};
+        this.state = { balance_rows: [], variable_exp_name: "Variably Monthly Spending (Credit Card)", variable_exp_amount: "0.0", recurring_txns: [], starting_balance: "0.0", user: "", isPremiumUser: false, subscriptionExpired: true, premiumUsers:{}};
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.generateTimeline = this.generateTimeline.bind(this);
@@ -145,9 +145,6 @@ class TimeTravel extends Component {
 
 
         // check local storage for saved values, if have some, populate the fields with it.
-        if (localStorage.getItem("variable_exp_name") != null) {
-            this.setState({ variable_exp_name: localStorage.getItem("variable_exp_name") });
-        }
         if (localStorage.getItem("variable_exp_amount") != null) {
             this.setState({ variable_exp_amount: localStorage.getItem("variable_exp_amount") });
         }
@@ -228,18 +225,6 @@ class TimeTravel extends Component {
         
         console.log(process.env.PAYPALL_PROD_CLIENTID);
         this.shownRecorded = {}
-        if (this.state.variable_exp_name === "") {
-            if (localStorage.getItem("variable_exp_name") != null) {
-                this.state.variable_exp_name = localStorage.getItem("variable_exp_name");
-            } else {
-                window.alert("Must input value for variable spending, name, value and initial balance.");
-                return;
-            }
-        } else {
-            if (localStorage.getItem("variable_exp_name") == null || (localStorage.getItem("variable_exp_name") != null && localStorage.getItem("variable_exp_name") != this.state.variable_exp_name)) {
-                localStorage.setItem("variable_exp_name", this.state.variable_exp_name);
-            }
-        }
 
         if (this.state.variable_exp_amount == "") {
             if (localStorage.getItem("variable_exp_amount") != null) {
@@ -470,16 +455,6 @@ class TimeTravel extends Component {
                 <div>
 
                     <div class="filtersInput" >
-
-                        <b>Variable Spending Name:</b><br />
-                        <input
-
-                            className="roundedOutline"
-                            name="variable_exp_name"
-                            type="text"
-                            placeholder="variable expense name"
-                            value={this.state.variable_exp_name}
-                            onChange={this.handleChange} /><br />
 
                         <b>Amount:</b><br />
                         <input

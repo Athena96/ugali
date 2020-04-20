@@ -13,6 +13,8 @@ import { transactionsByUserDate } from '../graphql/queries';
 import { listPremiumUserss } from '../graphql/queries';
 import { getDoubleDigitFormat } from '../common/Utilities';
 
+import { getCategoriesFromTransactions } from '../common/Utilities';
+
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
 
@@ -28,11 +30,11 @@ class Transactions extends Component {
 
         const today = new Date();
 
-        this.state = { transactions: [], year: today.getFullYear().toString(), month: getDoubleDigitFormat(today.getMonth()+1), category: '', VISIBLE_TXNS: [] };
+        this.state = { transactions: [], year: today.getFullYear().toString(), month: getDoubleDigitFormat(today.getMonth()+1), category: '', VISIBLE_TXNS: [], categories: [] };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.deleteTransaction = this.deleteTransaction.bind(this);
-        this.filterTransactions = this.filterTransactions.bind(this);
+        this.filterTransactionsButton = this.filterTransactionsButton.bind(this);
         this.updateTransaction = this.updateTransaction.bind(this);
         this.duplicateTransaction = this.duplicateTransaction.bind(this);
     }
@@ -107,35 +109,17 @@ class Transactions extends Component {
 
     componentDidMount() {
 
-        this.loadTxns();
+        this.loadTxns(this.state.year, this.state.month, this.state.category);
 
     }
 
-    loadTxns() {
-                // if (localStorage.getItem("year") != null) {
-        //     this.setState({ year: localStorage.getItem("year") });
-        // }
-        // if (localStorage.getItem("month") != null) {
-        //     this.setState({ month: localStorage.getItem("month") });
-        // }
-
-        // if (localStorage.getItem("category") != null) {
-        //     this.setState({ category: localStorage.getItem("category") });
-        // }
-
-        console.log(this.state.month)
-
-        var lastDay = new Date(this.state.year, this.state.month, 0);
-        var firstDay = new Date(this.state.year,this.state.month-1, 1)
-
-        console.log("lastDay: ",lastDay);
-        console.log("firstDay: ",firstDay);
-
-        // last day of month
+     loadTxns(year, month, category) {
+        var lastDay = new Date(year, month, 0);
+        var firstDay = new Date(year,month-1, 1)
+        
         var start = firstDay.getFullYear() + "-" + getDoubleDigitFormat(firstDay.getMonth()+1) + "-" +getDoubleDigitFormat(firstDay.getDate()+1)+"T00:00:00.000Z"
         var end = lastDay.getFullYear() + "-" + getDoubleDigitFormat(lastDay.getMonth()+1) + "-" +getDoubleDigitFormat(lastDay.getDate()+1)+"T23:59:59.000Z"
 
-        console.log([start,end]);
         Auth.currentAuthenticatedUser().then(user => {
             let email = user.attributes.email;
 
@@ -145,14 +129,13 @@ class Transactions extends Component {
                     user: { eq: email }
                 }
             })).then(data => {
-                console.log(data);
-
                 const premiumUsers = data.data.listPremiumUserss.items;
                 IS_PREMIUM_USER = (premiumUsers.length === 0) ? false : true;
                 API.graphql(graphqlOperation(transactionsByUserDate, {
                     limit: TXN_LIMIT,
                     user: email, createdAt: { between: [start, end] }
                 })).then(data => {
+                    console.log(email);
                     console.log(data);
                     var sortedTxns = data.data.transactionsByUserDate.items;
                     sortedTxns.sort((t1, t2) => {
@@ -164,11 +147,14 @@ class Transactions extends Component {
                             return -1;
                         return 0;
                     });
+
+                    console.log(sortedTxns);
+                    this.setState({ categories: getCategoriesFromTransactions(sortedTxns)})
                     this.setState({ transactions: sortedTxns });
                     this.setState({ VISIBLE_TXNS: sortedTxns });
     
-                    if (this.state.year !== "" && this.state.month !== "") {
-                        this.filterTransactionsToYearMonth(this.state.year, this.state.month);
+                    if (year !== "" && month !== "") {
+                        this.filterTransactions(year, month, category);
                     }
     
                 }).catch((err) => {
@@ -179,14 +165,12 @@ class Transactions extends Component {
                 console.log(err);
             })
 
-
-
         }).catch((err) => {
             window.alert("Encountered error fetching your username: \n", err);
         });
     }
 
-    filterTransactionsToYearMonth(fyear, fmonth) {
+    filterTransactions(fyear, fmonth, category) {
         var filteredTxns = [];
 
         for (var txn of this.state.transactions) {
@@ -195,7 +179,7 @@ class Transactions extends Component {
             var month = dateParts[1];
             if (year === fyear && month === fmonth) {
 
-                if (this.state.category !== "") {
+                if (this.state.category !== "" && this.state.category !== "ALL" ) {
                     if (txn.category === this.state.category) {
                         filteredTxns.push(txn);
                     }
@@ -208,40 +192,8 @@ class Transactions extends Component {
         this.setState({ VISIBLE_TXNS: filteredTxns });
     }
 
-    async filterTransactions(e) {
-        // if (this.state.year === "") {
-        //     if (localStorage.getItem("year") != null) {
-        //         this.state.year = localStorage.getItem("year");
-        //     } else {
-        //         window.alert("Must input value for year. (YYYY)");
-        //         return;
-        //     }
-        // } else {
-        //     if (localStorage.getItem("year") == null || (localStorage.getItem("year") != null && localStorage.getItem("year") != this.state.year)) {
-        //         localStorage.setItem("year", this.state.year);
-        //     }
-        // }
-
-        // if (this.state.month === "") {
-        //     if (localStorage.getItem("month") != null) {
-        //         this.state.month = localStorage.getItem("month");
-        //     } else {
-        //         window.alert("Must input value for month. (MM)");
-        //         return;
-        //     }
-        // } else {
-        //     if (localStorage.getItem("month") == null || (localStorage.getItem("month") != null && localStorage.getItem("month") != this.state.month)) {
-        //         localStorage.setItem("month", this.state.month);
-        //     }
-        // }
-
-
-        // if (localStorage.getItem("category") == null || (localStorage.getItem("category") != null && localStorage.getItem("category") != this.state.category)) {
-        //     console.log("updaing category");
-        //     localStorage.setItem("category", this.state.category);
-        // }
-
-        this.loadTxns();
+    async filterTransactionsButton() {
+        this.loadTxns(this.state.year, this.state.month, this.state.category);
     }
 
     handleChange(event) {
@@ -281,6 +233,14 @@ class Transactions extends Component {
             ret.push(<p>{key}: ${categoryAgg[key]}</p>);
         }
         return ret;
+    }
+
+    renderOptions() {
+        var catOptions = [<option value="ALL">{"ALL"}</option>];
+        for (var cat of this.state.categories) {
+          catOptions.push(<option value={cat}>{cat}</option>)
+        }
+        return (catOptions);
     }
 
     renderCategoryTableData() {
@@ -361,7 +321,6 @@ class Transactions extends Component {
     }
 
     renderMain() {
-
         if (this.state.transactions.length === 0) {
             return (
                 <div class="indent">
@@ -426,14 +385,22 @@ class Transactions extends Component {
                         value={this.state.month}
                         onChange={this.handleChange} />
 
-                    <b>&nbsp;Category</b> (optional):
+
+                    <label>
+                        <b>Category:</b><br />
+                        <select name="category" value={this.state.category} onChange={this.handleChange}>
+                            {this.renderOptions()} 
+                        </select> 
+                    </label>
+
+                    {/* <b>&nbsp;Category</b> (optional):
                     <input
                         className="roundedOutline"
                         name="category"
                         type="text"
                         value={this.state.category}
-                        onChange={this.handleChange} />
-                    <button class="filter" onClick={this.filterTransactions}><b>filter transactions</b></button>
+                        onChange={this.handleChange} /> */}
+                    <button class="filter" onClick={this.filterTransactionsButton}><b>filter transactions</b></button>
                 </div>
 
                 {this.renderMain()}

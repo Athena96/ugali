@@ -34,3 +34,13 @@ export function graphqlDateFromJSDate(date) {
     var formattedString = year + '-' + month + '-' + day + 'T' + hour + ':' + min + ':' + sec + '.000Z';
     return formattedString;
 }
+
+export function getCategoriesFromTransactions(transactions) {
+    var cats = [];
+    for (var txn of transactions) {
+        if (!cats.includes(txn.category)) {
+            cats.push(txn.category);
+        }
+    }
+    return cats;
+}

@@ -296,6 +296,17 @@
 
   border-radius: 8px;
 }
+
+.premiumFeatureBackground {
+  background-color:rgb(189, 189, 189);
+  border-radius: 8px;
+  padding: 10px;
+  display: inline-block;
+
+  width: 100%;
+  margin-top: 16px;
+  border-radius: 8px;
+}
 .right{
   float:right;
 }
@@ -432,7 +443,7 @@
 .login {
   background-color:rgb(255, 255, 255);
   border: none;
-  color: rgb(255, 124, 123);;
+  color: rgb(255, 124, 123);
   padding: 5px;
   text-align: center;
   text-decoration: none;
