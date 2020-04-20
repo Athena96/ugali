@@ -363,7 +363,8 @@ class AddTransaction extends Component {
       transaction.description = transaction.description.trim();
     }
     transaction.payment_method = transaction.payment_method.trim();
-
+    transaction.is_recurring = transaction.is_recurring.toString();
+    console.log(transaction);
     // submit
     try {
 
@@ -427,9 +428,6 @@ class AddTransaction extends Component {
                 value={this.state.amount}
                 onChange={this.handleChange} />
             </label><br />
-
-    
-
               <label>
                 <b>*Category:</b><br />
                   Choose from previously used categories: 

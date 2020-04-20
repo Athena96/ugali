@@ -264,6 +264,8 @@ class Transactions extends Component {
             const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
             var dayOfWeek = days[dayIdx.getDay()];
             var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
+            
+            console.log(IS_PREMIUM_USER);
             var recurring = IS_PREMIUM_USER ? <><b>Is Recurring Transaction: </b> {is_recurring ? "yes" : "no"}</> : "";
 
             return (

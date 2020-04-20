@@ -101,3 +101,37 @@ export const transactionsByUserDate = `query TransactionsByUserDate(
   }
 }
 `;
+export const transactionsByUserRecurring = `query TransactionsByUserRecurring(
+  $user: String
+  $is_recurring: ModelStringKeyConditionInput
+  $sortDirection: ModelSortDirection
+  $filter: ModelTransactionFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  transactionsByUserRecurring(
+    user: $user
+    is_recurring: $is_recurring
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      title
+      amount
+      category
+      date
+      description
+      payment_method
+      type
+      createdAt
+      user
+      is_recurring
+      is_recurring_period
+    }
+    nextToken
+  }
+}
+`;

@@ -1,5 +1,6 @@
 type Transaction @model 
-@key(name: "ByUserDate", fields: ["user", "createdAt"], queryField: "transactionsByUserDate") {
+@key(name: "ByUserDate", fields: ["user", "createdAt"], queryField: "transactionsByUserDate") 
+@key(name: "ByUserRecurring", fields: ["user", "is_recurring"], queryField: "transactionsByUserRecurring") {
   id: ID!
   title: String!
   amount: Float
@@ -10,7 +11,7 @@ type Transaction @model
   type: Int
   createdAt: AWSDateTime!
   user: String!
-  is_recurring: Boolean
+  is_recurring: String!
   is_recurring_period: Boolean
 }
 
