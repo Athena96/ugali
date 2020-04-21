@@ -52,8 +52,9 @@ class TimeTravel extends Component {
             cpyTxn.is_recurring_period = false;
             var d = convertDateStrToGraphqlDate(currentDay.getFullYear() + "-" + getDoubleDigitFormat(currentDay.getUTCMonth() + 1) + "-" + getDoubleDigitFormat(currentDay.getUTCDate()));
             cpyTxn.date = d;
-            const res = API.graphql(graphqlOperation(createTransaction, { input: cpyTxn }));
+            cpyTxn.createdAt = d;
 
+            API.graphql(graphqlOperation(createTransaction, { input: cpyTxn }));
             window.alert("Successfully AUTO added your transaction: " + cpyTxn.title);
         } catch (err) {
             window.alert("Encountered error AUTO adding your transaction.");
@@ -152,6 +153,23 @@ class TimeTravel extends Component {
             var recurringIncomes = [];
             var recurringExpenses = [];
             var numRecurrTxns = this.state.recurring_txns.length;
+
+            if (localStorage.getItem("last_auto_add_date") != null) {
+                const lastAutoAddDt = localStorage.getItem("last_auto_add_date");
+                var y = lastAutoAddDt.split('-')[0];
+                var m = lastAutoAddDt.split('-')[1];
+                var d = lastAutoAddDt.split('-')[2];
+
+                // curr day
+                var yc = currentDay.getFullYear();
+                var mc = getDoubleDigitFormat(currentDay.getUTCMonth() + 1);
+                var dc = getDoubleDigitFormat(currentDay.getUTCDate());
+                if ((y == yc || m == mc || d == dc)) {
+                    numRecurrTxns = 0;
+                }
+            }
+            console.log(numRecurrTxns);
+
             for (var recurrTxn of this.state.recurring_txns) {
                 var recurrTxnDay = parseInt(recurrTxn.date.split('-')[2].split('T')[0]);
                 var recurrTxnMonth = parseInt(recurrTxn.date.split('-')[1]);
@@ -193,8 +211,12 @@ class TimeTravel extends Component {
                                 // if the saved date is different than the current date, then we upate our storage and auto add
                                 localStorage.setItem("last_auto_add_date", yc + "-" + mc + "-" + dc);
                                 this.autoAdd(recurrTxn, currentDay);
+                                numRecurrTxns -= 1;
+                            } else if ((y == yc || m == mc || d == dc) && numRecurrTxns !== 0) {
+                                this.autoAdd(recurrTxn, currentDay);
+                                numRecurrTxns -= 1;
                             }
-                        } else {
+                        } else if ( numRecurrTxns !== 0) {
                             var yc = currentDay.getFullYear();
                             var mc = getDoubleDigitFormat(currentDay.getUTCMonth() + 1);
                             var dc = getDoubleDigitFormat(currentDay.getUTCDate());

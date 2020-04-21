@@ -211,27 +211,27 @@ class AddTransaction extends Component {
   renderPremiumFeatures() {
     if (IS_PREMIUM_USER) {
       return (
-        <div>
-          <label>
-            <b>Place on 'Time Travel'?:</b>
-            <input
-              name="is_recurring"
-              type="checkbox"
-              checked={this.state.is_recurring}
-              onChange={this.handleChange} />
-          </label><small>*The transaction will appear on your 'Time Travel' page.*</small><br />
+        <div className="premiumFeatureBackground">
+          <div>
+            <label>
+              <b>Place on 'Time Travel'?:</b>
+              <input
+                name="is_recurring"
+                type="checkbox"
+                checked={this.state.is_recurring}
+                onChange={this.handleChange} />
+            </label><small>*The transaction will appear on your 'Time Travel' page.*</small><br />
 
-          <label>
-            <i>- Make recurring?:</i>
-            <input
-              name="is_recurring_period"
-              type="checkbox"
-              checked={this.state.is_recurring_period}
-              onChange={this.handleChange} />
-          </label><small>*A recurring transaction will appear on your 'Time Travel' page, each month, on the chosen date.*</small><br />
+            <label>
+              <i>- Make recurring?:</i>
+              <input
+                name="is_recurring_period"
+                type="checkbox"
+                checked={this.state.is_recurring_period}
+                onChange={this.handleChange} />
+            </label><small>*A recurring transaction will appear on your 'Time Travel' page, each month, on the chosen date.*</small><br />
+          </div>
         </div>
-
-
       )
     } else {
 
@@ -407,7 +407,7 @@ class AddTransaction extends Component {
     return (
       <div>
         <div className="addTransactionBackground">
-        <small>* required fields</small>
+          <small>* required fields</small>
 
           <form onSubmit={this.handleSubmit}>
             <label>
@@ -428,34 +428,34 @@ class AddTransaction extends Component {
                 value={this.state.amount}
                 onChange={this.handleChange} />
             </label><br />
-              <label>
-                <b>*Category:</b><br />
-                  Choose from previously used categories: 
-                  <select name="full_category" value={this.state.category + ((this.state.sub_category !== "") ? ("-"+this.state.sub_category): "")} onChange={this.handleChange}>
-                    {this.renderOptions()} 
-                  </select> 
-                  {" "} (*or enter a new category below)
+            <label>
+              <b>*Category:</b><br />
+                  Choose from previously used categories:
+                  <select name="full_category" value={this.state.category + ((this.state.sub_category !== "") ? ("-" + this.state.sub_category) : "")} onChange={this.handleChange}>
+                {this.renderOptions()}
+              </select>
+              {" "} (*or enter a new category below)
                 </label>
 
-                <label>
-                  <input
-                    className="rounded"
-                    name="category"
-                    type="text"
-                    placeholder="category"
-                    value={this.state.category}
-                    onChange={this.handleChange} />
-                </label>
+            <label>
+              <input
+                className="rounded"
+                name="category"
+                type="text"
+                placeholder="category"
+                value={this.state.category}
+                onChange={this.handleChange} />
+            </label>
 
-              <label>
-                <input
-                  className="rounded"
-                  name="sub_category"
-                  placeholder="(optional) sub category"
-                  type="text"
-                  value={this.state.sub_category}
-                  onChange={this.handleChange} />
-              </label><br />
+            <label>
+              <input
+                className="rounded"
+                name="sub_category"
+                placeholder="(optional) sub category"
+                type="text"
+                value={this.state.sub_category}
+                onChange={this.handleChange} />
+            </label><br />
 
             <label>
               <b>*Date:</b><br />
@@ -512,9 +512,7 @@ class AddTransaction extends Component {
           </label>
             </div>
 
-            <div className="premiumFeatureBackground">
-              {this.renderPremiumFeatures()}
-            </div>
+            {this.renderPremiumFeatures()}
 
             <br />
             {this.renderButton()}
