@@ -142,7 +142,7 @@ class AddTransaction extends Component {
               payment_method: txn.payment_method,
               type: txn.type,
               user: txn.user,
-              is_recurring: txn.is_recurring,
+              is_recurring: txn.is_recurring === "true" ? true : false,
               is_recurring_period: txn.is_recurring_period,
               updateTxnId: this.state.exampleTxnId
             });

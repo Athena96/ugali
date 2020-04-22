@@ -35,7 +35,8 @@ class Transactions extends Component {
             month: getDoubleDigitFormat(today.getMonth() + 1),
             category: '',
             VISIBLE_TXNS: [],
-            categories: []
+            categories: [],
+            IS_LOADING: true
         };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
@@ -130,7 +131,19 @@ class Transactions extends Component {
 
     // render / ui
     renderMain() {
-        if (this.state.transactions.length === 0) {
+        console.log(" ISLOADING", this.state.IS_LOADING);
+        console.log(" this.state.transactions.length: ", this.state.transactions.length);
+        if (this.state.IS_LOADING) {
+            console.log("IS_LOADING");
+
+            return (
+                <div class="indent">
+                    <h4>Loading...</h4>
+                </div>
+            )
+        } else if (!this.state.IS_LOADING && this.state.transactions.length === 0) {
+            console.log("IS_LOADING && this.state.transactions.length === 0");
+
             return (
                 <div class="indent">
                     <h4>You haven't added any transactions yet.</h4>
@@ -138,6 +151,8 @@ class Transactions extends Component {
                 </div>
             )
         } else {
+            console.log("SHOW");
+
             return (
                 <div class="row">
                     <div class="column1" >
@@ -291,6 +306,7 @@ class Transactions extends Component {
     // data
     fetchTransactionsUpdateState() {
         let currentComponent = this;
+        this.setState({IS_LOADING: true});
         fetchTransactions(this.state.year, this.state.month, this.state.category)
             .then(function (response) {
                 console.log(response);
@@ -298,13 +314,12 @@ class Transactions extends Component {
                 currentComponent.setState({ transactions: response.transactions });
                 currentComponent.setState({ VISIBLE_TXNS: response.VISIBLE_TXNS });
 
-                if (currentComponent.state.year !== "" && currentComponent.state.month !== "") {
-                    console.log("fileterr");
-                    currentComponent.filterTransactions(currentComponent.state.year, currentComponent.state.month, currentComponent.state.category);
-                } else {
-                    console.log("nooo");
+                currentComponent.setState({IS_LOADING: false});
 
+                if (currentComponent.state.year !== "" && currentComponent.state.month !== "") {
+                    currentComponent.filterTransactions(currentComponent.state.year, currentComponent.state.month, currentComponent.state.category);
                 }
+
             })
             .catch(function (response) {
                 // Handle error
