@@ -34,7 +34,18 @@ class TimeTravel extends Component {
     constructor(props) {
         super(props);
         this.shownRecorded = {};
-        this.state = { balance_rows: [], variable_exp_name: "Variably Monthly Spending (Credit Card)", variable_exp_amount: "0.0", recurring_txns: [], starting_balance: "0.0", user: "", isPremiumUser: false, subscriptionExpired: true, premiumUsers: {} };
+        this.state = {
+            balance_rows: [],
+            variable_exp_name: "Variably Monthly Spending (Credit Card)",
+            variable_exp_amount: "0.0",
+            recurring_txns: [],
+            starting_balance: "0.0",
+            user: "",
+            isPremiumUser: false,
+            subscriptionExpired: true,
+            premiumUsers: {},
+            IS_LOADING: true
+        };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.generateTimeline = this.generateTimeline.bind(this);
@@ -168,8 +179,6 @@ class TimeTravel extends Component {
                     numRecurrTxns = 0;
                 }
             }
-            console.log(numRecurrTxns);
-
             for (var recurrTxn of this.state.recurring_txns) {
                 var recurrTxnDay = parseInt(recurrTxn.date.split('-')[2].split('T')[0]);
                 var recurrTxnMonth = parseInt(recurrTxn.date.split('-')[1]);
@@ -216,7 +225,7 @@ class TimeTravel extends Component {
                                 this.autoAdd(recurrTxn, currentDay);
                                 numRecurrTxns -= 1;
                             }
-                        } else if ( numRecurrTxns !== 0) {
+                        } else if (numRecurrTxns !== 0) {
                             var yc = currentDay.getFullYear();
                             var mc = getDoubleDigitFormat(currentDay.getUTCMonth() + 1);
                             var dc = getDoubleDigitFormat(currentDay.getUTCDate());
@@ -348,7 +357,10 @@ class TimeTravel extends Component {
 
     // life cycle
     componentDidMount() {
+
         // get premium users list
+        this.setState({ IS_LOADING: true });
+
         Auth.currentAuthenticatedUser().then(user => {
             let email = user.attributes.email;
             API.graphql(graphqlOperation(listPremiumUserss, {
@@ -357,9 +369,8 @@ class TimeTravel extends Component {
                     user: { eq: email }
                 }
             })).then(data => {
-                console.log(email);
-                console.log(data);
                 const premiumUsers = data.data.listPremiumUserss.items;
+
                 if (premiumUsers.length === 0) {
                     this.setState({ isPremiumUser: false });
                     this.setState({ subscriptionExpired: true });
@@ -376,6 +387,9 @@ class TimeTravel extends Component {
                         this.setState({ subscriptionExpired: true });
                     }
                 }
+
+                this.setState({ IS_LOADING: false });
+
             }).catch((err) => {
                 console.log(err);
             })
@@ -395,7 +409,6 @@ class TimeTravel extends Component {
 
         fetchRecurringTransactions(this.state.year, this.state.month, this.state.category)
             .then(function (response) {
-                console.log(response);
                 currentComp.setState({ recurring_txns: response.recurring_txns })
 
                 if (currentComp.variable_exp_name !== "" && currentComp.variable_exp_amount !== "" && currentComp.starting_balance !== "") {
@@ -419,133 +432,147 @@ class TimeTravel extends Component {
         });
     }
 
-    render() {
-        if (this.state.isPremiumUser && !this.state.subscriptionExpired) {
-            return (
-                <div>
-                    <div class="filtersInput" >
-                        <b>Amount:</b><br />
-                        <input
-                            className="roundedOutline"
-                            name="variable_exp_amount"
-                            placeholder="variable expense amount"
-                            type="text"
-                            value={this.state.variable_exp_amount}
-                            onChange={this.handleChange} /><br />
+    renderPremiumUserPage() {
+
+        return (
+            <div>
+                <div class="filtersInput" >
+                    <b>Amount:</b><br />
+                    <input
+                        className="roundedOutline"
+                        name="variable_exp_amount"
+                        placeholder="variable expense amount"
+                        type="text"
+                        value={this.state.variable_exp_amount}
+                        onChange={this.handleChange} /><br />
 
 
-                        <b>Starting Balance:</b><br />
-                        <input
+                    <b>Starting Balance:</b><br />
+                    <input
 
-                            className="roundedOutline"
-                            name="starting_balance"
-                            placeholder="starting balance"
-                            type="text"
-                            value={this.state.starting_balance}
-                            onChange={this.handleChange} /><br />
+                        className="roundedOutline"
+                        name="starting_balance"
+                        placeholder="starting balance"
+                        type="text"
+                        value={this.state.starting_balance}
+                        onChange={this.handleChange} /><br />
 
-                        <button class="filterTimeline" onClick={this.generateTimeline}><b>generate timeline</b></button>
+                    <button class="filterTimeline" onClick={this.generateTimeline}><b>generate timeline</b></button>
 
-                        <LineChart
-                            margins={{ top: 0, right: 0, bottom: 0, left: 65 }}
-                            hidePoints={true}
-                            isDate={true}
-                            yMin={0}
-                            width={400}
-                            height={200}
-                            hideXLabel={false}
-                            yLabel={"Balance"}
-                            xLabel={"Time"}
+                    <LineChart
+                        margins={{ top: 0, right: 0, bottom: 0, left: 65 }}
+                        hidePoints={true}
+                        isDate={true}
+                        yMin={0}
+                        width={400}
+                        height={200}
+                        hideXLabel={false}
+                        yLabel={"Balance"}
+                        xLabel={"Time"}
 
-                            data={this.getGraphPoints()}
-                        />
-                    </div>
-                    <div>
-                        <table id='transactions' align="center" style={{ height: '90%', width: '98%' }}>
-                            <h4><b>Timeline</b></h4>
-                            <tbody>
-                                <tr>{this.renderTableHeader()}</tr>
-                                {this.renderTableData()}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            );
-
-        } else {
-            return (
-                <div className="indent">
-                    <h4><b>Time Travel</b> is a premium feature,
-                    <br />it costs $ to develop, maintain, and host an app ;)</h4>
-                    <h4>Purchase a <b>1 year subscription</b> for <b>$15.01</b></h4>
-                    <ul>
-                        <li><h5>After a year, you will <b>not</b> be auto re-subscribed.</h5></li>
-                        <li><h5>You can cancel your membership anytime, within the first month, and receive a full refund. Just email <b>zenspending.@gmail.com</b> asking for a refund.</h5></li>
-                    </ul>
-                    <PayPalButton
-                        amount="15.01"
-                        shippingPreference="NO_SHIPPING"
-                        style={{ color: "black" }}
-                        onSuccess={(details, data) => {
-
-                            Auth.currentAuthenticatedUser().then(user => {
-                                let email = user.attributes.email;
-                                this.setState({ user: email });
-
-                                // add user or update subscription?
-                                if (this.state.isPremiumUser && this.state.subscriptionExpired) {
-                                    // update 
-                                    console.log("UPDATE");
-
-                                    // construct premium user
-                                    const today = new Date();
-                                    var year = today.getFullYear();
-                                    var month = today.getMonth();
-                                    var day = today.getDate();
-                                    var newExpDate = new Date(year + 1, month, day);
-
-                                    const updatedUser = {
-                                        id: this.state.premiumUser.id,
-                                        user: email,
-                                        oderId: data.orderID,
-                                        expiryDate: graphqlDateFromJSDate(newExpDate)
-                                    }
-                                    console.log(updatedUser);
-                                    this.setState({ isPremiumUser: true });
-                                    this.setState({ subscriptionExpired: false });
-
-                                    // add user to premium user table.
-                                    this.updatePremiumUser(updatedUser);
-                                    alert("Transaction completed!\nWe here at ZenSpending thank you for renewing your membership!\nRefresh the page to start using Premium Features!");
-                                } else if (this.state.isPremiumUser == false) {
-                                    // construct premium user
-                                    const today = new Date();
-                                    var year = today.getFullYear();
-                                    var month = today.getMonth();
-                                    var day = today.getDate();
-                                    var expDate = new Date(year + 1, month, day);
-
-                                    const premiumUser = {
-                                        user: email,
-                                        oderId: data.orderID,
-                                        expiryDate: graphqlDateFromJSDate(expDate)
-                                    }
-                                    console.log(premiumUser);
-                                    this.setState({ isPremiumUser: true });
-                                    // add user to premium user table.
-                                    this.addNewPremiumUser(premiumUser);
-                                    alert("Transaction completed!\nWe here at ZenSpending thank you!\nRefresh the page to start using Premium Features!");
-                                }
-                            }).catch((err) => {
-                                console.log(err);
-                            });
-                        }}
-                        options={{
-                            disableFunding: ["credit", "card"],
-                            clientId: "AUn2TFaV5cB3lVtq0Q3yOlPTMNaU7kGqN8s1togkHH78v3NUsGPvvBkhxApFkCubpYUk3QhZh8xfGbOX"
-                        }}
+                        data={this.getGraphPoints()}
                     />
                 </div>
+                <div>
+                    <table id='transactions' align="center" style={{ height: '90%', width: '98%' }}>
+                        <h4><b>Timeline</b></h4>
+                        <tbody>
+                            <tr>{this.renderTableHeader()}</tr>
+                            {this.renderTableData()}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        );
+    }
+
+    renderBuyPage() {
+        return (
+            <div className="indent">
+                <h4><b>Time Travel</b> is a premium feature,
+                <br />it costs $ to develop, maintain, and host an app ;)</h4>
+                <h4>Purchase a <b>1 year subscription</b> for <b>$15.01</b></h4>
+                <ul>
+                    <li><h5>After a year, you will <b>not</b> be auto re-subscribed.</h5></li>
+                    <li><h5>You can cancel your membership anytime, within the first month, and receive a full refund. Just email <b>zenspending.@gmail.com</b> asking for a refund.</h5></li>
+                </ul>
+                <PayPalButton
+                    amount="15.01"
+                    shippingPreference="NO_SHIPPING"
+                    style={{ color: "black" }}
+                    onSuccess={(details, data) => {
+
+                        Auth.currentAuthenticatedUser().then(user => {
+                            let email = user.attributes.email;
+                            this.setState({ user: email });
+
+                            // add user or update subscription?
+                            if (this.state.isPremiumUser && this.state.subscriptionExpired) {
+                                // construct premium user
+                                const today = new Date();
+                                var year = today.getFullYear();
+                                var month = today.getMonth();
+                                var day = today.getDate();
+                                var newExpDate = new Date(year + 1, month, day);
+
+                                const updatedUser = {
+                                    id: this.state.premiumUser.id,
+                                    user: email,
+                                    oderId: data.orderID,
+                                    expiryDate: graphqlDateFromJSDate(newExpDate)
+                                }
+                                this.setState({ isPremiumUser: true });
+                                this.setState({ subscriptionExpired: false });
+
+                                // add user to premium user table.
+                                this.updatePremiumUser(updatedUser);
+                                alert("Transaction completed!\nWe here at ZenSpending thank you for renewing your membership!\nRefresh the page to start using Premium Features!");
+                            } else if (this.state.isPremiumUser == false) {
+                                // construct premium user
+                                const today = new Date();
+                                var year = today.getFullYear();
+                                var month = today.getMonth();
+                                var day = today.getDate();
+                                var expDate = new Date(year + 1, month, day);
+
+                                const premiumUser = {
+                                    user: email,
+                                    oderId: data.orderID,
+                                    expiryDate: graphqlDateFromJSDate(expDate)
+                                }
+                                this.setState({ isPremiumUser: true });
+                                // add user to premium user table.
+                                this.addNewPremiumUser(premiumUser);
+                                alert("Transaction completed!\nWe here at ZenSpending thank you!\nRefresh the page to start using Premium Features!");
+                            }
+                        }).catch((err) => {
+                            console.log(err);
+                        });
+                    }}
+                    options={{
+                        disableFunding: ["credit", "card"],
+                        clientId: "AUn2TFaV5cB3lVtq0Q3yOlPTMNaU7kGqN8s1togkHH78v3NUsGPvvBkhxApFkCubpYUk3QhZh8xfGbOX"
+                    }}
+                />
+            </div>
+        );
+    }
+
+    render() {
+        if (this.state.IS_LOADING) {
+            return (
+                <div class="indent">
+                    <h4>Loading...</h4>
+                </div>
+            );
+        } else if (!this.state.IS_LOADING && (this.state.isPremiumUser && !this.state.subscriptionExpired)) {
+            return (
+                this.renderPremiumUserPage()
+            );
+
+        } else if (!this.state.IS_LOADING && (!this.state.isPremiumUser || this.state.subscriptionExpired)) {
+            return (
+                this.renderBuyPage()
             );
         }
     }

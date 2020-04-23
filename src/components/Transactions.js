@@ -111,7 +111,6 @@ class Transactions extends Component {
         const monthNames = ["January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
         ];
-        console.log(this.state.month)
         return monthNames[parseInt(this.state.month) - 1];
     }
 
@@ -131,19 +130,13 @@ class Transactions extends Component {
 
     // render / ui
     renderMain() {
-        console.log(" ISLOADING", this.state.IS_LOADING);
-        console.log(" this.state.transactions.length: ", this.state.transactions.length);
         if (this.state.IS_LOADING) {
-            console.log("IS_LOADING");
-
             return (
                 <div class="indent">
                     <h4>Loading...</h4>
                 </div>
             )
         } else if (!this.state.IS_LOADING && this.state.transactions.length === 0) {
-            console.log("IS_LOADING && this.state.transactions.length === 0");
-
             return (
                 <div class="indent">
                     <h4>You haven't added any transactions yet.</h4>
@@ -151,8 +144,6 @@ class Transactions extends Component {
                 </div>
             )
         } else {
-            console.log("SHOW");
-
             return (
                 <div class="row">
                     <div class="column1" >
@@ -279,8 +270,6 @@ class Transactions extends Component {
             const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
             var dayOfWeek = days[dayIdx.getDay()];
             var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
-            
-            console.log(IS_PREMIUM_USER);
             var recurring = IS_PREMIUM_USER ? <><b>Is Recurring Transaction: </b> {is_recurring ? "yes" : "no"}</> : "";
 
             return (
@@ -306,23 +295,18 @@ class Transactions extends Component {
     // data
     fetchTransactionsUpdateState() {
         let currentComponent = this;
-        this.setState({IS_LOADING: true});
+        this.setState({ IS_LOADING: true });
         fetchTransactions(this.state.year, this.state.month, this.state.category)
             .then(function (response) {
-                console.log(response);
                 currentComponent.setState({ categories: response.categories })
                 currentComponent.setState({ transactions: response.transactions });
                 currentComponent.setState({ VISIBLE_TXNS: response.VISIBLE_TXNS });
-
-                currentComponent.setState({IS_LOADING: false});
-
+                currentComponent.setState({ IS_LOADING: false });
                 if (currentComponent.state.year !== "" && currentComponent.state.month !== "") {
                     currentComponent.filterTransactions(currentComponent.state.year, currentComponent.state.month, currentComponent.state.category);
                 }
-
             })
             .catch(function (response) {
-                // Handle error
                 console.log(response);
             });
     }
