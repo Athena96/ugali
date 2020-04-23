@@ -165,9 +165,10 @@ class AddTransaction extends Component {
 
     if (name === "type") {
       value = parseInt(value);
-    }
-
-    else if (name === "full_category") {
+      this.setState({
+        [name]: value
+      });
+    } else if (name === "full_category") {
       this.setState({
         category: value.split('-')[0],
         sub_category: ""
