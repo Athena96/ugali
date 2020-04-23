@@ -30,12 +30,8 @@ class AddTransaction extends Component {
     IS_DUPLICATE = props.history.location.pathname.split('/')[2] === "duplicate";
     IS_UPDATE = props.history.location.pathname.split('/')[2] === "update";
 
-    console.log("IS_DUPLICATE: ", IS_DUPLICATE);
-    console.log("IS_UPDATE: ", IS_UPDATE);
-
     if (IS_UPDATE || IS_DUPLICATE) {
       txnId = props.history.location.pathname.split('/')[3];
-      console.log("UPDATE OR DUPLICATE: ", txnId)
     }
 
     var strDate = formatDate(new Date());
@@ -81,7 +77,6 @@ class AddTransaction extends Component {
 
         this.setState({ usersLatestCateogories: cats });
 
-        console.log(this.state.usersLatestCateogories);
       }).catch((err) => {
         console.log(err);
       })
@@ -99,7 +94,6 @@ class AddTransaction extends Component {
           user: { eq: email }
         }
       })).then(data => {
-        console.log(data);
         const premiumUsers = data.data.listPremiumUserss.items;
         var email = user.attributes.email;
         if (premiumUsers.length === 0) {
@@ -107,9 +101,6 @@ class AddTransaction extends Component {
         } else {
           IS_PREMIUM_USER = true;
         }
-
-        console.log({ "IS_PREMIUM_USER": IS_PREMIUM_USER });
-        console.log({ "email": email });
 
         if (IS_UPDATE || IS_DUPLICATE) {
 
@@ -120,7 +111,6 @@ class AddTransaction extends Component {
               return;
             }
             const txn = data.data.getTransaction;
-            console.log(txn);
             var dt = txn.date.split('-')[0] + "-" + txn.date.split('-')[1] + "-" + txn.date.split('-')[2].split('T')[0];
             ORIGINAL_DATE = txn.date;
 
@@ -162,6 +152,7 @@ class AddTransaction extends Component {
         console.log(err);
       })
     }).catch((err) => {
+      console.log(err);
       window.alert("Encountered error fetching your username: \n", err);
     });
 
@@ -171,8 +162,6 @@ class AddTransaction extends Component {
     var target = event.target;
     var value = target.type === 'checkbox' ? target.checked : target.value;
     var name = target.name;
-    console.log(value);
-    console.log(name);
 
     if (name === "type") {
       value = parseInt(value);
@@ -364,28 +353,21 @@ class AddTransaction extends Component {
     }
     transaction.payment_method = transaction.payment_method.trim();
     transaction.is_recurring = transaction.is_recurring.toString();
-    console.log(transaction);
     // submit
     try {
 
       if (IS_UPDATE) {
-        console.log("UPDATE TXN...");
         const res = await API.graphql(graphqlOperation(updateTransaction, { input: transaction }));
-        console.log("SUCCESS! \n", res);
         window.alert("Successfully updated your transaction!");
       } else {
-        console.log("ADD TXN...");
-        console.log(transaction);
         transaction.createdAt = transaction.date;
 
         const res = await API.graphql(graphqlOperation(createTransaction, { input: transaction }));
-        console.log("SUCCESS! \n", res);
         window.alert("Successfully added your transaction!");
       }
       this.resetState();
 
     } catch (err) {
-      console.log("FAILURE! \n", err);
       var errorMessages = [];
       for (var error of err.errors) {
         errorMessages.push(error.message);
