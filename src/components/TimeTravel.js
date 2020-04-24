@@ -19,7 +19,7 @@ import { updatePremiumUsers } from '../graphql/mutations';
 
 // Data Access
 import { fetchRecurringTransactions } from '../dataAccess/TransactionAccess';
-import { fetchPremiumUsers } from '../dataAccess/PremiumUserAccess';
+import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 
 // Common
 import { getDoubleDigitFormat, convertDateStrToGraphqlDate, graphqlDateFromJSDate } from '../common/Utilities';
@@ -359,7 +359,7 @@ class TimeTravel extends Component {
     componentDidMount() {
         let currentComponent = this;
         this.setState({ IS_LOADING: true });
-        fetchPremiumUsers()
+        checkIfPremiumUser()
             .then(function (response) {
                 currentComponent.setState({ isPremiumUser: response.isPremiumUser })
                 currentComponent.setState({ subscriptionExpired: response.subscriptionExpired })

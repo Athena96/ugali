@@ -14,6 +14,7 @@ import { getDoubleDigitFormat } from '../common/Utilities';
 
 // Data Access
 import { fetchTransactions } from '../dataAccess/TransactionAccess';
+import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
@@ -311,6 +312,16 @@ class Transactions extends Component {
             });
     }
 
+    checkPremiumUser() {
+        checkIfPremiumUser()
+        .then(function (response) {
+            IS_PREMIUM_USER = response.isPremiumUser
+        })
+        .catch(function (response) {
+            console.log(response);
+        }); 
+    }
+
     // life cycle
     handleChange(event) {
         var target = event.target;
@@ -322,6 +333,7 @@ class Transactions extends Component {
     }
 
     componentDidMount() {
+        this.checkPremiumUser()
         this.fetchTransactionsUpdateState()
     }
 

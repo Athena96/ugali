@@ -14,7 +14,7 @@ import { formatDate, convertDateStrToGraphqlDate } from '../common/Utilities';
 
 // Data Access
 import { fetchTransactionsForUserBetween, fetchTransactionBy } from '../dataAccess/TransactionAccess';
-import { fetchPremiumUsers } from '../dataAccess/PremiumUserAccess';
+import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 
 // Global
 var ORIGINAL_DATE = "";
@@ -117,7 +117,7 @@ class AddTransaction extends Component {
     }
 
     // get premium users
-    fetchPremiumUsers()
+    checkIfPremiumUser()
       .then(function (response) {
         IS_PREMIUM_USER = response.isPremiumUser;
       })
