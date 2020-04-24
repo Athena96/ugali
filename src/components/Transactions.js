@@ -5,14 +5,14 @@ import React, { Component } from 'react';
 import API, { graphqlOperation } from '@aws-amplify/api';
 import PubSub from '@aws-amplify/pubsub';
 import awsconfig from '../aws-exports';
-import { Auth } from 'aws-amplify';
+
+// GraphQl Mutations
 import { deleteTransaction } from '../graphql/mutations';
 
-// graphql
-import { transactionsByUserDate } from '../graphql/queries';
-import { listPremiumUserss } from '../graphql/queries';
+// Utilities
 import { getDoubleDigitFormat } from '../common/Utilities';
 
+// Data Access
 import { fetchTransactions } from '../dataAccess/TransactionAccess';
 
 API.configure(awsconfig);

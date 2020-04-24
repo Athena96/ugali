@@ -298,12 +298,14 @@
 }
 
 .premiumFeatureBackground {
-  background-color:rgb(189, 189, 189);
+  background-color: rgb(255, 124, 123);
   border-radius: 8px;
   padding: 10px;
   display: inline-block;
-  width: 100%;
   margin-top: 8px;
+  margin-bottom: 20px;
+
+  color: white;
   border-radius: 8px;
 }
 .right{
@@ -513,4 +515,19 @@
   .column1  {
     width: 100%;
   }
+}
+
+
+.payPalButton {
+  color:rgb(255, 255, 255);
+  border: none;
+  background-color: rgb(255, 124, 123);
+  padding: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 8px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+
 }

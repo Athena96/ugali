@@ -1,6 +1,5 @@
 // React
 import React, { Component } from 'react';
-
 import LineChart from 'react-linechart';
 import '../../node_modules/react-linechart/dist/styles.css';
 
@@ -13,21 +12,22 @@ import { Auth } from 'aws-amplify';
 // PayPal
 import { PayPalButton } from "react-paypal-button-v2";
 
-// graphql
+// GraphQl Mutations
 import { createTransaction } from '../graphql/mutations';
 import { createPremiumUsers } from '../graphql/mutations';
-import { listPremiumUserss } from '../graphql/queries';
 import { updatePremiumUsers } from '../graphql/mutations';
 
+// Data Access
 import { fetchRecurringTransactions } from '../dataAccess/TransactionAccess';
+import { fetchPremiumUsers } from '../dataAccess/PremiumUserAccess';
 
+// Common
 import { getDoubleDigitFormat, convertDateStrToGraphqlDate, graphqlDateFromJSDate } from '../common/Utilities';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
 
 // Constants
-const TXN_LIMIT = 200;
 const PREMIUM_USER_LIMIT = 200;
 
 class TimeTravel extends Component {
@@ -357,45 +357,18 @@ class TimeTravel extends Component {
 
     // life cycle
     componentDidMount() {
-
-        // get premium users list
+        let currentComponent = this;
         this.setState({ IS_LOADING: true });
-
-        Auth.currentAuthenticatedUser().then(user => {
-            let email = user.attributes.email;
-            API.graphql(graphqlOperation(listPremiumUserss, {
-                limit: PREMIUM_USER_LIMIT,
-                filter: {
-                    user: { eq: email }
-                }
-            })).then(data => {
-                const premiumUsers = data.data.listPremiumUserss.items;
-
-                if (premiumUsers.length === 0) {
-                    this.setState({ isPremiumUser: false });
-                    this.setState({ subscriptionExpired: true });
-
-                } else {
-                    this.setState({ premiumUser: premiumUsers[0] });
-                    const today = new Date();
-                    const expDate = new Date(premiumUsers[0].expiryDate);
-                    if (today < expDate) {
-                        this.setState({ isPremiumUser: true });
-                        this.setState({ subscriptionExpired: false });
-                    } else {
-                        this.setState({ isPremiumUser: true });
-                        this.setState({ subscriptionExpired: true });
-                    }
-                }
-
-                this.setState({ IS_LOADING: false });
-
-            }).catch((err) => {
-                console.log(err);
+        fetchPremiumUsers()
+            .then(function (response) {
+                currentComponent.setState({ isPremiumUser: response.isPremiumUser })
+                currentComponent.setState({ subscriptionExpired: response.subscriptionExpired })
+                currentComponent.setState({ premiumUser: response.premiumUser })
+                currentComponent.setState({ IS_LOADING: false });
             })
-        }).catch((err) => {
-            window.alert("Encountered error fetching your username: \n", err);
-        });
+            .catch(function (response) {
+                console.log(response);
+            });
 
         // check local storage for saved values, if have some, populate the fields with it.
         if (localStorage.getItem("variable_exp_amount") != null) {
@@ -486,74 +459,147 @@ class TimeTravel extends Component {
         );
     }
 
+    payPalButton() {
+        return (
+        <PayPalButton
+        amount="15.01"
+        align="center"
+        shippingPreference="NO_SHIPPING"
+        style={{ color: "black", align: "center;" }}
+        onSuccess={(details, data) => {
+
+            Auth.currentAuthenticatedUser().then(user => {
+                let email = user.attributes.email;
+                this.setState({ user: email });
+
+                // add user or update subscription?
+                if (this.state.isPremiumUser && this.state.subscriptionExpired) {
+                    // construct premium user
+                    const today = new Date();
+                    var year = today.getFullYear();
+                    var month = today.getMonth();
+                    var day = today.getDate();
+                    var newExpDate = new Date(year + 1, month, day);
+
+                    const updatedUser = {
+                        id: this.state.premiumUser.id,
+                        user: email,
+                        oderId: data.orderID,
+                        expiryDate: graphqlDateFromJSDate(newExpDate)
+                    }
+                    this.setState({ isPremiumUser: true });
+                    this.setState({ subscriptionExpired: false });
+
+                    // add user to premium user table.
+                    this.updatePremiumUser(updatedUser);
+                    alert("Transaction completed!\nWe here at ZenSpending thank you for renewing your membership!\nRefresh the page to start using Premium Features!");
+                } else if (this.state.isPremiumUser == false) {
+                    // construct premium user
+                    const today = new Date();
+                    var year = today.getFullYear();
+                    var month = today.getMonth();
+                    var day = today.getDate();
+                    var expDate = new Date(year + 1, month, day);
+
+                    const premiumUser = {
+                        user: email,
+                        oderId: data.orderID,
+                        expiryDate: graphqlDateFromJSDate(expDate)
+                    }
+                    this.setState({ isPremiumUser: true });
+                    // add user to premium user table.
+                    this.addNewPremiumUser(premiumUser);
+                    alert("Transaction completed!\nWe here at ZenSpending thank you!\nRefresh the page to start using Premium Features!");
+                }
+            }).catch((err) => {
+                console.log(err);
+            });
+        }}
+        options={{
+            disableFunding: ["credit", "card"],
+            clientId: "AUn2TFaV5cB3lVtq0Q3yOlPTMNaU7kGqN8s1togkHH78v3NUsGPvvBkhxApFkCubpYUk3QhZh8xfGbOX"
+        }}
+    />);
+    }
+
     renderBuyPage() {
         return (
             <div className="indent">
-                <h4><b>Time Travel</b> is a premium feature,
-                <br />it costs $ to develop, maintain, and host an app ;)</h4>
-                <h4>Purchase a <b>1 year subscription</b> for <b>$15.01</b></h4>
-                <ul>
-                    <li><h5>After a year, you will <b>not</b> be auto re-subscribed.</h5></li>
-                    <li><h5>You can cancel your membership anytime, within the first month, and receive a full refund. Just email <b>zenspending.@gmail.com</b> asking for a refund.</h5></li>
-                </ul>
-                <PayPalButton
-                    amount="15.01"
-                    shippingPreference="NO_SHIPPING"
-                    style={{ color: "black" }}
-                    onSuccess={(details, data) => {
+                 <div align="center">
+                <div>
+                    <h4><b>ZenSpending</b> Premium</h4>
+                </div>
+                <div className="premiumFeatureBackground">
+                    <h4>Upgrade Now</h4>
+                    <h5>$15.99 for 1 year</h5>
+                    <PayPalButton
+                        amount="15.99"
+                        align="center"
+                        shippingPreference="NO_SHIPPING"
+                        style={{ color: "black", align: "center;" }}
+                        onSuccess={(details, data) => {
 
-                        Auth.currentAuthenticatedUser().then(user => {
-                            let email = user.attributes.email;
-                            this.setState({ user: email });
+                            Auth.currentAuthenticatedUser().then(user => {
+                                let email = user.attributes.email;
+                                this.setState({ user: email });
 
-                            // add user or update subscription?
-                            if (this.state.isPremiumUser && this.state.subscriptionExpired) {
-                                // construct premium user
-                                const today = new Date();
-                                var year = today.getFullYear();
-                                var month = today.getMonth();
-                                var day = today.getDate();
-                                var newExpDate = new Date(year + 1, month, day);
+                                // add user or update subscription?
+                                if (this.state.isPremiumUser && this.state.subscriptionExpired) {
+                                    // construct premium user
+                                    const today = new Date();
+                                    var year = today.getFullYear();
+                                    var month = today.getMonth();
+                                    var day = today.getDate();
+                                    var newExpDate = new Date(year + 1, month, day);
 
-                                const updatedUser = {
-                                    id: this.state.premiumUser.id,
-                                    user: email,
-                                    oderId: data.orderID,
-                                    expiryDate: graphqlDateFromJSDate(newExpDate)
+                                    const updatedUser = {
+                                        id: this.state.premiumUser.id,
+                                        user: email,
+                                        oderId: data.orderID,
+                                        expiryDate: graphqlDateFromJSDate(newExpDate)
+                                    }
+                                    this.setState({ isPremiumUser: true });
+                                    this.setState({ subscriptionExpired: false });
+
+                                    // add user to premium user table.
+                                    this.updatePremiumUser(updatedUser);
+                                    alert("Transaction completed!\nWe here at ZenSpending thank you for renewing your membership!\nRefresh the page to start using Premium Features!");
+                                } else if (this.state.isPremiumUser == false) {
+                                    // construct premium user
+                                    const today = new Date();
+                                    var year = today.getFullYear();
+                                    var month = today.getMonth();
+                                    var day = today.getDate();
+                                    var expDate = new Date(year + 1, month, day);
+
+                                    const premiumUser = {
+                                        user: email,
+                                        oderId: data.orderID,
+                                        expiryDate: graphqlDateFromJSDate(expDate)
+                                    }
+                                    this.setState({ isPremiumUser: true });
+                                    // add user to premium user table.
+                                    this.addNewPremiumUser(premiumUser);
+                                    alert("Transaction completed!\nWe here at ZenSpending thank you!\nRefresh the page to start using Premium Features!");
                                 }
-                                this.setState({ isPremiumUser: true });
-                                this.setState({ subscriptionExpired: false });
-
-                                // add user to premium user table.
-                                this.updatePremiumUser(updatedUser);
-                                alert("Transaction completed!\nWe here at ZenSpending thank you for renewing your membership!\nRefresh the page to start using Premium Features!");
-                            } else if (this.state.isPremiumUser == false) {
-                                // construct premium user
-                                const today = new Date();
-                                var year = today.getFullYear();
-                                var month = today.getMonth();
-                                var day = today.getDate();
-                                var expDate = new Date(year + 1, month, day);
-
-                                const premiumUser = {
-                                    user: email,
-                                    oderId: data.orderID,
-                                    expiryDate: graphqlDateFromJSDate(expDate)
-                                }
-                                this.setState({ isPremiumUser: true });
-                                // add user to premium user table.
-                                this.addNewPremiumUser(premiumUser);
-                                alert("Transaction completed!\nWe here at ZenSpending thank you!\nRefresh the page to start using Premium Features!");
-                            }
-                        }).catch((err) => {
-                            console.log(err);
-                        });
-                    }}
-                    options={{
-                        disableFunding: ["credit", "card"],
-                        clientId: "AUn2TFaV5cB3lVtq0Q3yOlPTMNaU7kGqN8s1togkHH78v3NUsGPvvBkhxApFkCubpYUk3QhZh8xfGbOX"
-                    }}
-                />
+                            }).catch((err) => {
+                                console.log(err);
+                            });
+                        }}
+                        options={{
+                            disableFunding: ["credit", "card"],
+                            clientId: "AUn2TFaV5cB3lVtq0Q3yOlPTMNaU7kGqN8s1togkHH78v3NUsGPvvBkhxApFkCubpYUk3QhZh8xfGbOX"
+                        }}
+                    />
+                </div>
+                <div align="left">
+                    <ul>
+                        <li><h5>After 1 year, you will <b>not</b> be auto re-subscribed.</h5></li>
+                        <li><h5>You can cancel your membership anytime, within the first month, and receive a full refund. Just email <b>zenspending.@gmail.com</b> asking for a refund.</h5></li>
+                    </ul>
+                </div>
+            
+                </div>
             </div>
         );
     }

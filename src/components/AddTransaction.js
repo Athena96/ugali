@@ -1,17 +1,22 @@
+// React
 import React, { Component } from "react";
 
+// Amplify
 import { Auth } from 'aws-amplify';
 import API, { graphqlOperation } from '@aws-amplify/api';
-import { createTransaction } from '../graphql/mutations';
-import { getTransaction } from '../graphql/queries';
-import { updateTransaction } from '../graphql/mutations';
-import { listPremiumUserss } from '../graphql/queries';
-import { transactionsByUserDate } from '../graphql/queries';
 
+// GraphQl Mutations
+import { createTransaction } from '../graphql/mutations';
+import { updateTransaction } from '../graphql/mutations';
+
+// Common
 import { formatDate, convertDateStrToGraphqlDate } from '../common/Utilities';
 
-// Global
+// Data Access
+import { fetchTransactionsForUserBetween, fetchTransactionBy } from '../dataAccess/TransactionAccess';
+import { fetchPremiumUsers } from '../dataAccess/PremiumUserAccess';
 
+// Global
 var ORIGINAL_DATE = "";
 var IS_DUPLICATE = false;
 var IS_UPDATE = false;
@@ -58,104 +63,67 @@ class AddTransaction extends Component {
   }
 
   componentDidMount() {
-    Auth.currentAuthenticatedUser().then(user => {
-      let email = user.attributes.email;
+    let currentComponent = this;
 
-      var today = new Date();
-      var catLookBack = (new Date()).setDate(today.getDate() - CATEGORY_LOOKBACK_DAYS);
+    var today = new Date();
+    var catLookBack = (new Date()).setDate(today.getDate() - CATEGORY_LOOKBACK_DAYS);
 
-      API.graphql(graphqlOperation(transactionsByUserDate, {
-        limit: TXN_LIMIT,
-        user: email, createdAt: { between: [catLookBack, today] }
-      })).then(data => {
-        var cats = [];
-        for (var txn of data.data.transactionsByUserDate.items) {
-          if (!cats.includes(txn.category)) {
-            cats.push(txn.category);
-          }
-        }
-
-        this.setState({ usersLatestCateogories: cats });
-
-      }).catch((err) => {
-        console.log(err);
+    fetchTransactionsForUserBetween(catLookBack, today)
+      .then(function (response) {
+        currentComponent.setState({ usersLatestCateogories: response.usersLatestCateogories });
       })
-    }).catch((err) => {
-      console.log(err);
-    });
+      .catch(function (response) {
+        console.log(response);
+      });
 
-    // get premium users list
-    Auth.currentAuthenticatedUser().then(user => {
-      let email = user.attributes.email;
-
-      API.graphql(graphqlOperation(listPremiumUserss, {
-        limit: PREMIUM_USER_LIMIT,
-        filter: {
-          user: { eq: email }
-        }
-      })).then(data => {
-        const premiumUsers = data.data.listPremiumUserss.items;
-        var email = user.attributes.email;
-        if (premiumUsers.length === 0) {
-          IS_PREMIUM_USER = false;
-        } else {
-          IS_PREMIUM_USER = true;
-        }
-
-        if (IS_UPDATE || IS_DUPLICATE) {
-
-          API.graphql(graphqlOperation(getTransaction, { id: this.state.exampleTxnId })).then(data => {
-
-            if (data.data.getTransaction.user !== email) {
-              window.alert("Couldn't find the transaction.");
-              return;
-            }
-            const txn = data.data.getTransaction;
-            var dt = txn.date.split('-')[0] + "-" + txn.date.split('-')[1] + "-" + txn.date.split('-')[2].split('T')[0];
-            ORIGINAL_DATE = txn.date;
-
-            var cat = txn.category;
-            var subCat = "";
-
-            if (cat.includes('-')) {
-              cat = txn.category.split('-')[0];
-              subCat = txn.category.split('-')[1];
-            }
-
-            this.setState({
-              title: txn.title,
-              amount: txn.amount,
-              category: cat,
-              sub_category: subCat,
-              date: dt,
-              description: txn.description === null ? "" : txn.description,
-              payment_method: txn.payment_method,
-              type: txn.type,
-              user: txn.user,
-              is_recurring: txn.is_recurring === "true" ? true : false,
-              is_recurring_period: txn.is_recurring_period,
-              updateTxnId: this.state.exampleTxnId
-            });
-
-          }).catch((err) => {
-            window.alert("Encountered error fetching your transactions: \n", err);
-          })
-
-        } else {
-          // new TXN.. so populate the payment method
-          if (localStorage.getItem("payment_method") != null) {
-            this.setState({ payment_method: localStorage.getItem("payment_method") });
+    if (IS_UPDATE || IS_DUPLICATE) {
+      fetchTransactionBy(this.state.exampleTxnId)
+        .then(function (response) {
+          if (response.errorMessage) {
+            window.alert(response.errorMessage);
+            return;
           }
-        }
+          const txn = response.transaction;
+          var dt = txn.date.split('-')[0] + "-" + txn.date.split('-')[1] + "-" + txn.date.split('-')[2].split('T')[0];
+          ORIGINAL_DATE = txn.date;
 
-      }).catch((err) => {
-        console.log(err);
+          var cat = txn.category;
+          var subCat = "";
+
+          if (cat.includes('-')) {
+            cat = txn.category.split('-')[0];
+            subCat = txn.category.split('-')[1];
+          }
+
+          currentComponent.setState({
+            title: txn.title,
+            amount: txn.amount,
+            category: cat,
+            sub_category: subCat,
+            date: dt,
+            description: txn.description === null ? "" : txn.description,
+            payment_method: txn.payment_method,
+            type: txn.type,
+            user: txn.user,
+            is_recurring: txn.is_recurring === "true" ? true : false,
+            is_recurring_period: txn.is_recurring_period,
+            updateTxnId: currentComponent.exampleTxnId
+          });
+        })
+        .catch(function (response) {
+          console.log(response);
+        });
+
+    }
+
+    // get premium users
+    fetchPremiumUsers()
+      .then(function (response) {
+        IS_PREMIUM_USER = response.isPremiumUser;
       })
-    }).catch((err) => {
-      console.log(err);
-      window.alert("Encountered error fetching your username: \n", err);
-    });
-
+      .catch(function (response) {
+        console.log(response);
+      });
   }
 
   handleChange(event) {
@@ -265,13 +233,9 @@ class AddTransaction extends Component {
       return;
     }
 
-    if (this.state.payment_method === "") {
+    if (this.state.payment_method === undefined || this.state.payment_method === null || this.state.payment_method === "") {
       window.alert("Please add a 'Payment Method'");
       return;
-    } else {
-      if (localStorage.getItem("payment_method") == null || (localStorage.getItem("payment_method") != null && localStorage.getItem("payment_method") != this.state.payment_method)) {
-        localStorage.setItem("payment_method", this.state.payment_method);
-      }
     }
 
     // get current user and set state
