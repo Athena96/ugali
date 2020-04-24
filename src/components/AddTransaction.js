@@ -169,7 +169,7 @@ class AddTransaction extends Component {
   renderPremiumFeatures() {
     if (IS_PREMIUM_USER) {
       return (
-        <div className="premiumFeatureBackground">
+        <div className="premiumFeatureAddTxnBackground">
           <div>
             <label>
               <b>Place on 'Time Travel'?:</b>

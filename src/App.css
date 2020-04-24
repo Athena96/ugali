@@ -308,6 +308,16 @@
   color: white;
   border-radius: 8px;
 }
+
+.premiumFeatureAddTxnBackground {
+  background-color:rgb(189, 189, 189);
+  border-radius: 8px;
+  padding: 10px;
+  display: inline-block;
+  width: 100%;
+  margin-top: 8px;
+  border-radius: 8px;
+}
 .right{
   float:right;
 }
