@@ -2,6 +2,7 @@ import { Auth } from 'aws-amplify';
 import API, { graphqlOperation } from '@aws-amplify/api';
 import { transactionsByUserDate, transactionsByUserRecurring } from '../graphql/queries';
 import { getDoubleDigitFormat, getCategoriesFromTransactions } from '../common/Utilities';
+import { getTransaction } from '../graphql/queries';
 
 // Constants
 const TXN_LIMIT = 200;
@@ -76,5 +77,41 @@ export async function fetchRecurringTransactions() {
 
     var response = {};
     response.recurring_txns = sortedTxns;
+    return response;
+}
+
+export async function fetchTransactionsForUserBetween(startDate, endDate) {
+    var user = await Auth.currentAuthenticatedUser();
+    var data = await API.graphql(graphqlOperation(transactionsByUserDate, {
+        limit: TXN_LIMIT,
+        user: user.attributes.email, createdAt: { between: [startDate, endDate] }
+    }));
+
+    var categories = [];
+    for (var txn of data.data.transactionsByUserDate.items) {
+        if (!categories.includes(txn.category)) {
+            categories.push(txn.category);
+        }
+    }
+
+    var response = {};
+    response.usersLatestCateogories = categories;
+    return response;
+}
+
+export async function fetchTransactionBy(id) {
+    var user = await Auth.currentAuthenticatedUser();
+    var transactionData = await API.graphql(graphqlOperation(getTransaction, { 
+        id: id 
+    }));
+
+    var response = {};
+    if (transactionData.data.getTransaction.user !== user.attributes.email) {
+        response.errorMessage = "Couldn't find the transaction.";
+        return response;
+    }
+
+    response.user = user.attributes.email;
+    response.transaction = transactionData.data.getTransaction;
     return response;
 }
