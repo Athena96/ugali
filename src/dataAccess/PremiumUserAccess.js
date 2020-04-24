@@ -5,7 +5,7 @@ import { listPremiumUserss } from '../graphql/queries';
 // Constants
 const PREMIUM_USER_LIMIT = 200;
 
-export async function fetchPremiumUsers() {
+export async function checkIfPremiumUser() {
     var user = await Auth.currentAuthenticatedUser();
     var data = await API.graphql(graphqlOperation(listPremiumUserss, {
         limit: PREMIUM_USER_LIMIT,

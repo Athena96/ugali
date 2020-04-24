@@ -14,15 +14,16 @@ import { getDoubleDigitFormat } from '../common/Utilities';
 
 // Data Access
 import { fetchTransactions } from '../dataAccess/TransactionAccess';
+import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
 
 // Constants
-const TXN_LIMIT = 200;
 var IS_PREMIUM_USER = false;
-const PREMIUM_USER_LIMIT = 200;
-
+const monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+];
 class Transactions extends Component {
     constructor(props) {
         super(props);
@@ -32,7 +33,7 @@ class Transactions extends Component {
         this.state = {
             transactions: [],
             year: today.getFullYear().toString(),
-            month: getDoubleDigitFormat(today.getMonth() + 1),
+            month: monthNames[today.getMonth()],
             category: '',
             VISIBLE_TXNS: [],
             categories: [],
@@ -108,9 +109,6 @@ class Transactions extends Component {
     }
 
     getMonth() {
-        const monthNames = ["January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-        ];
         return monthNames[parseInt(this.state.month) - 1];
     }
 
@@ -288,6 +286,22 @@ class Transactions extends Component {
         })
     }
 
+    renderYearDropdown() {
+        var yearOptions = [];
+        for (var year = 1967; year <= 2096; year += 1) {
+            yearOptions.push(<option value={year.toString()}>{year}</option>)
+        }
+        return (yearOptions);
+    }
+
+    renderMonthDropdown() {
+        var monthOptions = [];
+        for (var monthIdx = 0; monthIdx < monthNames.length; monthIdx += 1) {
+            monthOptions.push(<option value={monthNames[monthIdx]}>{monthNames[monthIdx]}</option>)
+        }
+        return (monthOptions);
+    }
+
     filterTransactionsButton() {
         this.fetchTransactionsUpdateState()
     }
@@ -296,15 +310,29 @@ class Transactions extends Component {
     fetchTransactionsUpdateState() {
         let currentComponent = this;
         this.setState({ IS_LOADING: true });
-        fetchTransactions(this.state.year, this.state.month, this.state.category)
+
+        console.log(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1));
+        fetchTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1), this.state.category)
             .then(function (response) {
+                console.log(response);
                 currentComponent.setState({ categories: response.categories })
                 currentComponent.setState({ transactions: response.transactions });
                 currentComponent.setState({ VISIBLE_TXNS: response.VISIBLE_TXNS });
                 currentComponent.setState({ IS_LOADING: false });
                 if (currentComponent.state.year !== "" && currentComponent.state.month !== "") {
-                    currentComponent.filterTransactions(currentComponent.state.year, currentComponent.state.month, currentComponent.state.category);
+                    console.log(currentComponent.state.year, getDoubleDigitFormat(monthNames.indexOf(currentComponent.state.month) + 1))
+                    currentComponent.filterTransactions(currentComponent.state.year, getDoubleDigitFormat(monthNames.indexOf(currentComponent.state.month) + 1), currentComponent.state.category);
                 }
+            })
+            .catch(function (response) {
+                console.log(response);
+            });
+    }
+
+    checkPremiumUser() {
+        checkIfPremiumUser()
+            .then(function (response) {
+                IS_PREMIUM_USER = response.isPremiumUser
             })
             .catch(function (response) {
                 console.log(response);
@@ -322,6 +350,7 @@ class Transactions extends Component {
     }
 
     componentDidMount() {
+        this.checkPremiumUser()
         this.fetchTransactionsUpdateState()
     }
 
@@ -329,22 +358,19 @@ class Transactions extends Component {
         return (
             <div>
                 <div class="filtersInput">
-                    <b>Year</b> (format: YYYY):
-                    <input
-                        className="roundedOutline"
-                        name="year"
-                        type="text"
-                        value={this.state.year}
-                        onChange={this.handleChange} />
+                    <label>
+                        <b>Year:</b><br />
+                        <select name="year" value={this.state.year} onChange={this.handleChange}>
+                            {this.renderYearDropdown()}
+                        </select>
+                    </label><br />
 
-                    <b>&nbsp;Month</b> (format: MM):
-                    <input
-                        className="roundedOutline"
-                        name="month"
-                        type="text"
-                        value={this.state.month}
-                        onChange={this.handleChange} />
-
+                    <label>
+                        <b>Month:</b><br />
+                        <select name="month" value={this.state.month} onChange={this.handleChange}>
+                            {this.renderMonthDropdown()}
+                        </select>
+                    </label><br />
 
                     <label>
                         <b>Category:</b><br />
