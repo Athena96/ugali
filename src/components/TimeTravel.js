@@ -27,9 +27,6 @@ import { getDoubleDigitFormat, convertDateStrToGraphqlDate, graphqlDateFromJSDat
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
 
-// Constants
-const PREMIUM_USER_LIMIT = 200;
-
 class TimeTravel extends Component {
     constructor(props) {
         super(props);
@@ -460,69 +457,6 @@ class TimeTravel extends Component {
         );
     }
 
-    payPalButton() {
-        return (
-        <PayPalButton
-        amount="15.01"
-        align="center"
-        shippingPreference="NO_SHIPPING"
-        style={{ color: "black", align: "center;" }}
-        onSuccess={(details, data) => {
-
-            Auth.currentAuthenticatedUser().then(user => {
-                let email = user.attributes.email;
-                this.setState({ user: email });
-
-                // add user or update subscription?
-                if (this.state.isPremiumUser && this.state.subscriptionExpired) {
-                    // construct premium user
-                    const today = new Date();
-                    var year = today.getFullYear();
-                    var month = today.getMonth();
-                    var day = today.getDate();
-                    var newExpDate = new Date(year + 1, month, day);
-
-                    const updatedUser = {
-                        id: this.state.premiumUser.id,
-                        user: email,
-                        oderId: data.orderID,
-                        expiryDate: graphqlDateFromJSDate(newExpDate)
-                    }
-                    this.setState({ isPremiumUser: true });
-                    this.setState({ subscriptionExpired: false });
-
-                    // add user to premium user table.
-                    this.updatePremiumUser(updatedUser);
-                    alert("Transaction completed!\nWe here at ZenSpending thank you for renewing your membership!\nRefresh the page to start using Premium Features!");
-                } else if (this.state.isPremiumUser == false) {
-                    // construct premium user
-                    const today = new Date();
-                    var year = today.getFullYear();
-                    var month = today.getMonth();
-                    var day = today.getDate();
-                    var expDate = new Date(year + 1, month, day);
-
-                    const premiumUser = {
-                        user: email,
-                        oderId: data.orderID,
-                        expiryDate: graphqlDateFromJSDate(expDate)
-                    }
-                    this.setState({ isPremiumUser: true });
-                    // add user to premium user table.
-                    this.addNewPremiumUser(premiumUser);
-                    alert("Transaction completed!\nWe here at ZenSpending thank you!\nRefresh the page to start using Premium Features!");
-                }
-            }).catch((err) => {
-                console.log(err);
-            });
-        }}
-        options={{
-            disableFunding: ["credit", "card"],
-            clientId: "AUn2TFaV5cB3lVtq0Q3yOlPTMNaU7kGqN8s1togkHH78v3NUsGPvvBkhxApFkCubpYUk3QhZh8xfGbOX"
-        }}
-    />);
-    }
-
     renderBuyPage() {
         return (
             <div className="indent">
@@ -594,9 +528,17 @@ class TimeTravel extends Component {
                     />
                 </div>
                 <div align="left">
+                    <h5>Features</h5>
                     <ul>
-                        <li><h5>After 1 year, you will <b>not</b> be auto re-subscribed.</h5></li>
-                        <li><h5>You can cancel your membership anytime, within the first month, and receive a full refund. Just email <b>zenspending.@gmail.com</b> asking for a refund.</h5></li>
+                        <li><h6>Create <b>recurring transactions</b> that get created <b>automatically</b> every month. (bills, subscriptions, paycheck, ...)</h6></li>
+                        <li><h6><b>"Time Travel"</b> to see what you future liquidity will be based on your current account balance, recurring transactions, and estimated variable spending (credit card spending).</h6></li>
+                    </ul>
+                </div>
+                <div align="left">
+                <h5>Terms and Conditions</h5>
+                    <ul>
+                        <li><h6>After 1 year, you will <b>not</b> be auto re-subscribed.</h6></li>
+                        <li><h6>You can cancel your membership anytime, within the first month, and receive a full refund. Just email <b>zenspending.@gmail.com</b> asking for a refund.</h6></li>
                     </ul>
                 </div>
             

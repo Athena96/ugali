@@ -20,9 +20,7 @@ import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 var ORIGINAL_DATE = "";
 var IS_DUPLICATE = false;
 var IS_UPDATE = false;
-const PREMIUM_USER_LIMIT = 200;
 var IS_PREMIUM_USER = false;
-const TXN_LIMIT = 100;
 const CATEGORY_LOOKBACK_DAYS = 30;
 
 class AddTransaction extends Component {
