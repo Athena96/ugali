@@ -6,15 +6,15 @@ import API, { graphqlOperation } from '@aws-amplify/api';
 import PubSub from '@aws-amplify/pubsub';
 import awsconfig from '../aws-exports';
 
-// GraphQl Mutations
-import { deleteTransaction } from '../graphql/mutations';
-
 // Utilities
 import { getDoubleDigitFormat } from '../common/Utilities';
 
 // Data Access
 import { fetchTransactions } from '../dataAccess/TransactionAccess';
 import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
+
+// Data Mutation
+import { deleteTransactionWithId } from '../dataMutation/TransactionMutation';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
@@ -29,7 +29,6 @@ class Transactions extends Component {
         super(props);
 
         const today = new Date();
-
         this.state = {
             transactions: [],
             year: today.getFullYear().toString(),
@@ -41,40 +40,41 @@ class Transactions extends Component {
         };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
-        this.deleteTransaction = this.deleteTransaction.bind(this);
+        this.deleteTransactionButton = this.deleteTransactionButton.bind(this);
         this.filterTransactionsButton = this.filterTransactionsButton.bind(this);
         this.updateTransaction = this.updateTransaction.bind(this);
         this.duplicateTransaction = this.duplicateTransaction.bind(this);
     }
 
     // operations
-    async deleteTransaction(event) {
-        try {
-            var txnId = event.target.id;
-            await API.graphql(graphqlOperation(deleteTransaction, { input: { id: txnId } }))
-            window.alert("Successfully deleted your transaction!");
-
-            var newTxns = [];
-            for (var txn of this.state.transactions) {
-                if (txn.id !== txnId) {
-                    newTxns.push(txn);
+    deleteTransactionButton(event) {
+        let currentComponent = this;
+        const txnId = event.target.id;
+        deleteTransactionWithId(txnId)
+            .then(function (response) {
+                window.alert("Successfully deleted your transaction!");
+                var newTxns = [];
+                for (var txn of currentComponent.state.transactions) {
+                    if (txn.id !== txnId) {
+                        newTxns.push(txn);
+                    }
                 }
-            }
-
-            var VISIBLETxns = [];
-            for (var vtxn of this.state.VISIBLE_TXNS) {
-                if (vtxn.id !== txnId) {
-                    VISIBLETxns.push(vtxn);
+    
+                var VISIBLETxns = [];
+                for (var vtxn of currentComponent.state.VISIBLE_TXNS) {
+                    if (vtxn.id !== txnId) {
+                        VISIBLETxns.push(vtxn);
+                    }
                 }
-            }
-
-            this.setState({
-                transactions: newTxns,
-                VISIBLE_TXNS: VISIBLETxns,
+                currentComponent.setState({
+                    transactions: newTxns,
+                    VISIBLE_TXNS: VISIBLETxns,
+                });
+            })
+            .catch(function (response) {
+                console.log(response);
+                window.alert(response);
             });
-        } catch (err) {
-            window.alert(err);
-        }
     }
 
     updateTransaction(event) {
@@ -278,7 +278,7 @@ class Transactions extends Component {
                         <b>Payment Method:</b> {payment_method}<br />
                         {recurring}
                         {description === null ? "" : desc}</p>
-                    <button id={id} className="deleteTxnButton" onClick={this.deleteTransaction} >delete</button>
+                    <button id={id} className="deleteTxnButton" onClick={this.deleteTransactionButton} >delete</button>
                     <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
                     <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
                 </div>
@@ -310,17 +310,13 @@ class Transactions extends Component {
     fetchTransactionsUpdateState() {
         let currentComponent = this;
         this.setState({ IS_LOADING: true });
-
-        console.log(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1));
         fetchTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1), this.state.category)
             .then(function (response) {
-                console.log(response);
                 currentComponent.setState({ categories: response.categories })
                 currentComponent.setState({ transactions: response.transactions });
                 currentComponent.setState({ VISIBLE_TXNS: response.VISIBLE_TXNS });
                 currentComponent.setState({ IS_LOADING: false });
                 if (currentComponent.state.year !== "" && currentComponent.state.month !== "") {
-                    console.log(currentComponent.state.year, getDoubleDigitFormat(monthNames.indexOf(currentComponent.state.month) + 1))
                     currentComponent.filterTransactions(currentComponent.state.year, getDoubleDigitFormat(monthNames.indexOf(currentComponent.state.month) + 1), currentComponent.state.category);
                 }
             })
