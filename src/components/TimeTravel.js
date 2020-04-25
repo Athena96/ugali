@@ -530,7 +530,7 @@ class TimeTravel extends Component {
                 <div align="left">
                     <h5>Features</h5>
                     <ul>
-                        <li><h6>Create <b>recurring transactions</b> that get created <b>automatically</b> every month. (bills, subscriptions, paycheck, ...)</h6></li>
+                        <li><h6>Make your transactions <b>recurring</b> so that they get created <b>automatically</b> every month. (bills, subscriptions, paycheck, ...)</h6></li>
                         <li><h6><b>"Time Travel"</b> to see what you future liquidity will be based on your current account balance, recurring transactions, and estimated variable spending (credit card spending).</h6></li>
                     </ul>
                 </div>
