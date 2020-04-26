@@ -430,11 +430,11 @@ class TimeTravel extends Component {
 
                     <div align="center">
                         <LineChart
-                            margins={{ top: 0, right: 0, bottom: 0, left: 65 }}
+                            margins={{ top: 0, right: 0, bottom: 0, left: 0 }}
                             hidePoints={true}
                             isDate={true}
                             yMin={0}
-                            width={400}
+                            width={450}
                             height={200}
                             hideXLabel={false}
                             yLabel={"Balance"}

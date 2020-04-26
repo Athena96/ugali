@@ -41,9 +41,11 @@ class Transactions extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.deleteTransactionButton = this.deleteTransactionButton.bind(this);
-        this.filterTransactionsButton = this.filterTransactionsButton.bind(this);
+        // this.filterTransactionsButton = this.filterTransactionsButton.bind(this);
         this.updateTransaction = this.updateTransaction.bind(this);
         this.duplicateTransaction = this.duplicateTransaction.bind(this);
+        this.fetchTransactionsUpdateState = this.fetchTransactionsUpdateState.bind(this);
+
     }
 
     // operations
@@ -96,8 +98,18 @@ class Transactions extends Component {
 
             if (year === fyear && month === fmonth) {
                 if (category !== "" && category !== "ALL") {
-                    if (txn.category === category) {
-                        filteredTxns.push(txn);
+                    // is category a sub or not?
+                    if (category.includes("-")) {
+                        // use exact match if filtering to sub cat level
+                        if (txn.category === category) {
+                            filteredTxns.push(txn);
+                        }
+                    } else {
+                        // get the primary cat
+                        const txnPrimaryCat = txn.category.split("-")[0];
+                        if (txnPrimaryCat === category) {
+                            filteredTxns.push(txn);   
+                        }
                     }
                 } else {
                     filteredTxns.push(txn);
@@ -144,6 +156,7 @@ class Transactions extends Component {
         } else {
             return (
                 <div class="row">
+                    
                     <div class="column1" >
                         <div className="ccBillBox">
                             <h4>{this.getMonth()} <b>Credit Card Bill:</b> ${this.getCCSpending()}</h4>
@@ -252,8 +265,16 @@ class Transactions extends Component {
         return ret;
     }
 
-    renderOptions() {
+    renderCategoryOptions() {
         var catOptions = [<option value="ALL">{"ALL"}</option>];
+        var cpArr = this.state.categories;
+        console.log({"b4":cpArr});
+
+        cpArr.sort((a, b) => {
+            return (a > b) ? 1 : -1;
+        });
+        console.log({"after":cpArr});
+
         for (var cat of this.state.categories) {
             catOptions.push(<option value={cat}>{cat}</option>)
         }
@@ -261,7 +282,12 @@ class Transactions extends Component {
     }
 
     renderTransactionData() {
-        return this.state.VISIBLE_TXNS.map((transaction, index) => {
+        var txnsArr = [];
+        var displayDate;
+        var currDay = ""
+        var previousCurrDay = "diff"
+        for (var transaction of this.state.VISIBLE_TXNS) {
+
             const { id, title, amount, category, date, type, payment_method, description, is_recurring } = transaction;
             var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
             const dayIdx = new Date(date);
@@ -270,7 +296,17 @@ class Transactions extends Component {
             var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
             var recurring = IS_PREMIUM_USER ? <><b>Is Recurring Transaction: </b> {is_recurring ? "yes" : "no"}</> : "";
 
-            return (
+            currDay = date.split('-')[0]-date.split('-')[1]-date.split('-')[2].split('T')[0] + " " + dayOfWeek;
+            displayDate = <h5><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
+
+            function update() {
+                previousCurrDay = currDay;
+                return displayDate
+            }
+
+            txnsArr.push(
+                <div>
+                <>{currDay !== previousCurrDay ? update() : ""}</>
                 <div className={classname}>
                     <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
                     <font size="4.5">{title} - ${amount}<br /></font>
@@ -282,8 +318,12 @@ class Transactions extends Component {
                     <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
                     <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
                 </div>
-            )
-        })
+                </div>
+
+            );
+        }
+
+        return txnsArr;
     }
 
     renderYearDropdown() {
@@ -302,16 +342,20 @@ class Transactions extends Component {
         return (monthOptions);
     }
 
-    filterTransactionsButton() {
-        this.fetchTransactionsUpdateState()
-    }
+    // filterTransactionsButton() {
+    //     this.fetchTransactionsUpdateState()
+    // }
 
     // data
     fetchTransactionsUpdateState() {
         let currentComponent = this;
-        this.setState({ IS_LOADING: true });
-        fetchTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1), this.state.category)
+        currentComponent.setState({ IS_LOADING: true });
+        console.log("fetching...")
+        console.log(currentComponent.state);
+        console.log(currentComponent.state.year, getDoubleDigitFormat(monthNames.indexOf(currentComponent.state.month) + 1), currentComponent.state.category)
+        fetchTransactions(currentComponent.state.year, getDoubleDigitFormat(monthNames.indexOf(currentComponent.state.month) + 1), currentComponent.state.category)
             .then(function (response) {
+                console.log(response);
                 currentComponent.setState({ categories: response.categories })
                 currentComponent.setState({ transactions: response.transactions });
                 currentComponent.setState({ VISIBLE_TXNS: response.VISIBLE_TXNS });
@@ -340,9 +384,9 @@ class Transactions extends Component {
         var target = event.target;
         var value = target.value;
         var name = target.name;
-        this.setState({
-            [name]: value
-        });
+        this.setState({ [name]: value }, () => {
+            this.fetchTransactionsUpdateState();
+          }); 
     }
 
     componentDidMount() {
@@ -354,31 +398,39 @@ class Transactions extends Component {
         return (
             <div>
                 <div class="filtersInput">
+                
+                    <div class="barStack">
                     <label>
                         <b>Year:</b><br />
                         <select name="year" value={this.state.year} onChange={this.handleChange}>
                             {this.renderYearDropdown()}
                         </select>
-                    </label><br />
+                    </label>
+                    </div>
 
+                    <div class="barStack">
                     <label>
                         <b>Month:</b><br />
                         <select name="month" value={this.state.month} onChange={this.handleChange}>
                             {this.renderMonthDropdown()}
                         </select>
-                    </label><br />
+                    </label>
+                    </div>
 
+                    <div class="barStack">
                     <label>
                         <b>Category:</b><br />
                         <select name="category" value={this.state.category} onChange={this.handleChange}>
-                            {this.renderOptions()}
+                            {this.renderCategoryOptions()}
                         </select>
                     </label>
-
-                    <button class="filter" onClick={this.filterTransactionsButton}><b>filter transactions</b></button>
+                    </div>
+                    <br clear="all" />
+                                    
                 </div>
-
-                {this.renderMain()}
+                <div className="fl">
+                    {this.renderMain()}
+                </div>
 
             </div>
 
