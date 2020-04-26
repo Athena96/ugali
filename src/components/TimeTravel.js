@@ -430,11 +430,11 @@ class TimeTravel extends Component {
 
                     <div align="center">
                         <LineChart
-                            margins={{ top: 0, right: 0, bottom: 0, left: 65 }}
+                            margins={{ top: 0, right: 0, bottom: 0, left: 0 }}
                             hidePoints={true}
                             isDate={true}
                             yMin={0}
-                            width={400}
+                            width={450}
                             height={200}
                             hideXLabel={false}
                             yLabel={"Balance"}
@@ -530,7 +530,7 @@ class TimeTravel extends Component {
                 <div align="left">
                     <h5>Features</h5>
                     <ul>
-                        <li><h6>Create <b>recurring transactions</b> that get created <b>automatically</b> every month. (bills, subscriptions, paycheck, ...)</h6></li>
+                        <li><h6>Make your transactions <b>recurring</b> so that they get created <b>automatically</b> every month. (bills, subscriptions, paycheck, ...)</h6></li>
                         <li><h6><b>"Time Travel"</b> to see what you future liquidity will be based on your current account balance, recurring transactions, and estimated variable spending (credit card spending).</h6></li>
                     </ul>
                 </div>
