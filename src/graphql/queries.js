@@ -14,7 +14,7 @@ export const getTransaction = `query GetTransaction($id: ID!) {
     createdAt
     user
     is_recurring
-    is_recurring_period
+    recurring_frequency
   }
 }
 `;
@@ -36,7 +36,7 @@ export const listTransactions = `query ListTransactions(
       createdAt
       user
       is_recurring
-      is_recurring_period
+      recurring_frequency
     }
     nextToken
   }
@@ -95,7 +95,7 @@ export const transactionsByUserDate = `query TransactionsByUserDate(
       createdAt
       user
       is_recurring
-      is_recurring_period
+      recurring_frequency
     }
     nextToken
   }
@@ -129,7 +129,7 @@ export const transactionsByUserRecurring = `query TransactionsByUserRecurring(
       createdAt
       user
       is_recurring
-      is_recurring_period
+      recurring_frequency
     }
     nextToken
   }

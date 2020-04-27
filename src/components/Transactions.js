@@ -268,12 +268,9 @@ class Transactions extends Component {
     renderCategoryOptions() {
         var catOptions = [<option value="ALL">{"ALL"}</option>];
         var cpArr = this.state.categories;
-        console.log({"b4":cpArr});
-
         cpArr.sort((a, b) => {
             return (a > b) ? 1 : -1;
         });
-        console.log({"after":cpArr});
 
         for (var cat of this.state.categories) {
             catOptions.push(<option value={cat}>{cat}</option>)
@@ -350,12 +347,8 @@ class Transactions extends Component {
     fetchTransactionsUpdateState() {
         let currentComponent = this;
         currentComponent.setState({ IS_LOADING: true });
-        console.log("fetching...")
-        console.log(currentComponent.state);
-        console.log(currentComponent.state.year, getDoubleDigitFormat(monthNames.indexOf(currentComponent.state.month) + 1), currentComponent.state.category)
         fetchTransactions(currentComponent.state.year, getDoubleDigitFormat(monthNames.indexOf(currentComponent.state.month) + 1), currentComponent.state.category)
             .then(function (response) {
-                console.log(response);
                 currentComponent.setState({ categories: response.categories })
                 currentComponent.setState({ transactions: response.transactions });
                 currentComponent.setState({ VISIBLE_TXNS: response.VISIBLE_TXNS });

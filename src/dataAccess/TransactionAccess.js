@@ -38,9 +38,6 @@ export async function fetchTransactions(year, month, category) {
             return -1;
         return 0;
     });
-
-    console.log(sortedTxns);
-
     var response = {};
     response.categories = getCategoriesFromTransactions(sortedTxns);
     response.transactions = sortedTxns;
@@ -56,10 +53,8 @@ export async function fetchRecurringTransactions() {
         is_recurring: { eq: "true" }
     }));
 
-    console.log(data);
     var txns = [];
     for (var t of data.data.transactionsByUserRecurring.items) {
-        console.log(t.is_recurring);
         t.is_recurring = t.is_recurring === "true" ? true : false;
         txns.push(t);
     }

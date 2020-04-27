@@ -14,7 +14,7 @@ export const onCreateTransaction = `subscription OnCreateTransaction {
     createdAt
     user
     is_recurring
-    is_recurring_period
+    recurring_frequency
   }
 }
 `;
@@ -31,7 +31,7 @@ export const onUpdateTransaction = `subscription OnUpdateTransaction {
     createdAt
     user
     is_recurring
-    is_recurring_period
+    recurring_frequency
   }
 }
 `;
@@ -48,7 +48,7 @@ export const onDeleteTransaction = `subscription OnDeleteTransaction {
     createdAt
     user
     is_recurring
-    is_recurring_period
+    recurring_frequency
   }
 }
 `;

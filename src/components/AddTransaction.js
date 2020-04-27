@@ -20,8 +20,8 @@ import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 var ORIGINAL_DATE = "";
 var IS_DUPLICATE = false;
 var IS_UPDATE = false;
-var IS_PREMIUM_USER = false;
 const CATEGORY_LOOKBACK_DAYS = 30;
+var Frequencies = {NA: "NA", ONCE: "ONCE", MONTHLY: "MONTHLY"};
 
 class AddTransaction extends Component {
 
@@ -48,10 +48,12 @@ class AddTransaction extends Component {
       payment_method: "credit",
       type: 2,
       is_recurring: false,
-      is_recurring_period: false,
+      recurring_frequency: Frequencies.NA,
       user: "",
       exampleTxnId: txnId,
       usersLatestCateogories: [],
+      showRecurrDropdown: false,
+      IS_PREMIUM_USER: false
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
@@ -104,9 +106,10 @@ class AddTransaction extends Component {
             type: txn.type,
             user: txn.user,
             is_recurring: txn.is_recurring === "true" ? true : false,
-            is_recurring_period: txn.is_recurring_period,
-            updateTxnId: currentComponent.exampleTxnId
-          });
+            recurring_frequency: txn.recurring_frequency || Frequencies.NA,
+            updateTxnId: currentComponent.exampleTxnId,
+            showRecurrDropdown: txn.is_recurring === "true" ? true : false
+          });  
         })
         .catch(function (response) {
           console.log(response);
@@ -117,7 +120,7 @@ class AddTransaction extends Component {
     // get premium users
     checkIfPremiumUser()
       .then(function (response) {
-        IS_PREMIUM_USER = response.isPremiumUser;
+        currentComponent.setState({IS_PREMIUM_USER: response.isPremiumUser});
       })
       .catch(function (response) {
         console.log(response);
@@ -146,10 +149,18 @@ class AddTransaction extends Component {
         });
       }
     } else {
-      this.setState({
-        [name]: value
-      });
+      this.setState({ [name]: value });
+
+      if (name === "is_recurring") {
+        this.setState({ "showRecurrDropdown": value});
+        if (value) {
+          this.setState({"recurring_frequency": this.state.recurring_frequency})
+        } else {
+          this.setState({"recurring_frequency": Frequencies.NA})
+        }
+      }
     }
+    console.log(this.state)
   }
 
   renderButton() {
@@ -164,8 +175,21 @@ class AddTransaction extends Component {
     }
   }
 
+  renderShowPeriodDropDown() {
+    if (this.state.showRecurrDropdown) {
+      return (
+        <div>
+          <b>Frequency: </b>
+          <select name="recurring_frequency" value={this.state.recurring_frequency} onChange={this.handleChange}>
+          <option value={Frequencies.ONCE}>{Frequencies.ONCE}</option>
+          <option value={Frequencies.MONTHLY}>{Frequencies.MONTHLY}</option>
+          </select>
+        </div>
+      );
+    }
+  }
   renderPremiumFeatures() {
-    if (IS_PREMIUM_USER) {
+    if (this.state.IS_PREMIUM_USER) {
       return (
         <div className="premiumFeatureAddTxnBackground">
           <div>
@@ -178,14 +202,8 @@ class AddTransaction extends Component {
                 onChange={this.handleChange} />
             </label><small>*The transaction will appear on your 'Time Travel' page.*</small><br />
 
-            <label>
-              <i>- Make recurring?:</i>
-              <input
-                name="is_recurring_period"
-                type="checkbox"
-                checked={this.state.is_recurring_period}
-                onChange={this.handleChange} />
-            </label><small>*A recurring transaction will appear on your 'Time Travel' page, each month, on the chosen date.*</small><br />
+            {this.renderShowPeriodDropDown()}
+
           </div>
         </div>
       )
@@ -205,9 +223,10 @@ class AddTransaction extends Component {
       description: "",
       type: 2,
       is_recurring: false,
-      is_recurring_period: false,
+      recurring_frequency: Frequencies.NA,
       user: "",
-      updateTxnId: null
+      updateTxnId: null,
+      showRecurrDropdown: false
     });
   }
 
@@ -272,7 +291,7 @@ class AddTransaction extends Component {
         payment_method: this.state.payment_method,
         type: this.state.type,
         is_recurring: this.state.is_recurring,
-        is_recurring_period: this.state.is_recurring_period,
+        recurring_frequency: this.state.recurring_frequency,
         user: this.state.user
       }
 
@@ -286,7 +305,7 @@ class AddTransaction extends Component {
         payment_method: this.state.payment_method,
         type: this.state.type,
         is_recurring: this.state.is_recurring,
-        is_recurring_period: this.state.is_recurring_period,
+        recurring_frequency: this.state.recurring_frequency,
         user: this.state.user
       }
 
