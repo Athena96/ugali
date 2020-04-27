@@ -17,7 +17,7 @@ export const createTransaction = `mutation CreateTransaction(
     createdAt
     user
     is_recurring
-    is_recurring_period
+    recurring_frequency
   }
 }
 `;
@@ -37,7 +37,7 @@ export const updateTransaction = `mutation UpdateTransaction(
     createdAt
     user
     is_recurring
-    is_recurring_period
+    recurring_frequency
   }
 }
 `;
@@ -57,7 +57,7 @@ export const deleteTransaction = `mutation DeleteTransaction(
     createdAt
     user
     is_recurring
-    is_recurring_period
+    recurring_frequency
   }
 }
 `;

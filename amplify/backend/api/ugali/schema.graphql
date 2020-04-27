@@ -12,7 +12,13 @@ type Transaction @model
   createdAt: AWSDateTime!
   user: String!
   is_recurring: String!
-  is_recurring_period: Boolean
+  recurring_frequency: Frequency
+}
+
+enum Frequency {
+  NA
+  ONCE
+  MONTHLY
 }
 
 type PremiumUsers @model {

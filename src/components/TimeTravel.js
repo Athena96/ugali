@@ -57,7 +57,7 @@ class TimeTravel extends Component {
             delete cpyTxn.id;
             delete cpyTxn.createdAt;
             cpyTxn.is_recurring = "false";
-            cpyTxn.is_recurring_period = false;
+            cpyTxn.recurring_period = "NA";
             var d = convertDateStrToGraphqlDate(currentDay.getFullYear() + "-" + getDoubleDigitFormat(currentDay.getUTCMonth() + 1) + "-" + getDoubleDigitFormat(currentDay.getUTCDate()));
             cpyTxn.date = d;
             cpyTxn.createdAt = d;
@@ -181,7 +181,7 @@ class TimeTravel extends Component {
                 var recurrTxnMonth = parseInt(recurrTxn.date.split('-')[1]);
 
                 if (recurrTxnDay === currentDay.getDate()) {
-                    if (recurrTxn.is_recurring_period === false) {
+                    if (recurrTxn.recurring_frequency === "ONCE") {
                         if (this.shownRecorded[recurrTxn.title] === undefined) {
                             if (recurrTxnMonth === (currentDay.getMonth() + 1)) {
                                 if (recurrTxn.type === 2) {

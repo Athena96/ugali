@@ -35,7 +35,7 @@ class App extends Component {
       this.window.open('/');
       this.props.rerender()
     } catch (err) {
-      console.log('error signing out...', err)
+      console.log(err)
     }
   }
 
