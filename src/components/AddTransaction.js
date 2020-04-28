@@ -360,9 +360,14 @@ class AddTransaction extends Component {
     }
   }
 
-  renderOptions() {
+  renderCategoryOptions() {
     var catOptions = [<option value="">{""}</option>];
-    for (var cat of this.state.usersLatestCateogories) {
+
+    var cpArr = this.state.usersLatestCateogories
+    cpArr.sort((a, b) => {
+        return (a > b) ? 1 : -1;
+    });
+    for (var cat of cpArr) {
       catOptions.push(<option value={cat}>{cat}</option>)
     }
     return (catOptions);
@@ -397,7 +402,7 @@ class AddTransaction extends Component {
               <b>*Category:</b><br />
                   Choose from previously used categories:
                   <select name="full_category" value={this.state.category + ((this.state.sub_category !== "") ? ("-" + this.state.sub_category) : "")} onChange={this.handleChange}>
-                {this.renderOptions()}
+                {this.renderCategoryOptions()}
               </select>
               {" "} (*or enter a new category below)
                 </label>

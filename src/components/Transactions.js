@@ -41,7 +41,6 @@ class Transactions extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.deleteTransactionButton = this.deleteTransactionButton.bind(this);
-        // this.filterTransactionsButton = this.filterTransactionsButton.bind(this);
         this.updateTransaction = this.updateTransaction.bind(this);
         this.duplicateTransaction = this.duplicateTransaction.bind(this);
         this.fetchTransactionsUpdateState = this.fetchTransactionsUpdateState.bind(this);
@@ -265,15 +264,27 @@ class Transactions extends Component {
         return ret;
     }
 
-    renderCategoryOptions() {
+    renderCategoryDropdown() {
         var catOptions = [<option value="ALL">{"ALL"}</option>];
         var cpArr = this.state.categories;
         cpArr.sort((a, b) => {
             return (a > b) ? 1 : -1;
         });
 
-        for (var cat of this.state.categories) {
+        console.log(cpArr);
+        var primaryCategories = []
+        for (var cat of cpArr) {
             catOptions.push(<option value={cat}>{cat}</option>)
+            
+            if (cat.split('-').length > 1) {
+                const primaryCategory = cat.split('-')[0];
+                if (!primaryCategories.includes(primaryCategory)) {
+                    catOptions.push(<option value={primaryCategory}>{primaryCategory}</option>);
+                    primaryCategories.push(primaryCategory);
+                }
+            } else {
+                primaryCategories.push(cat);
+            }
         }
         return (catOptions);
     }
@@ -338,10 +349,6 @@ class Transactions extends Component {
         }
         return (monthOptions);
     }
-
-    // filterTransactionsButton() {
-    //     this.fetchTransactionsUpdateState()
-    // }
 
     // data
     fetchTransactionsUpdateState() {
@@ -414,7 +421,7 @@ class Transactions extends Component {
                     <label>
                         <b>Category:</b><br />
                         <select name="category" value={this.state.category} onChange={this.handleChange}>
-                            {this.renderCategoryOptions()}
+                            {this.renderCategoryDropdown()}
                         </select>
                     </label>
                     </div>
