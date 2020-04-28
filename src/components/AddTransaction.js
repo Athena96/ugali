@@ -11,6 +11,7 @@ import { updateTransaction } from '../graphql/mutations';
 
 // Common
 import { formatDate, convertDateStrToGraphqlDate } from '../common/Utilities';
+import { Frequencies } from '../common/Utilities';
 
 // Data Access
 import { fetchTransactionsForUserBetween, fetchTransactionBy } from '../dataAccess/TransactionAccess';
@@ -21,7 +22,6 @@ var ORIGINAL_DATE = "";
 var IS_DUPLICATE = false;
 var IS_UPDATE = false;
 const CATEGORY_LOOKBACK_DAYS = 30;
-var Frequencies = {NA: "NA", ONCE: "ONCE", MONTHLY: "MONTHLY"};
 
 class AddTransaction extends Component {
 
@@ -183,6 +183,7 @@ class AddTransaction extends Component {
           <select name="recurring_frequency" value={this.state.recurring_frequency} onChange={this.handleChange}>
           <option value={Frequencies.ONCE}>{Frequencies.ONCE}</option>
           <option value={Frequencies.MONTHLY}>{Frequencies.MONTHLY}</option>
+          <option value={Frequencies.YEARLY}>{Frequencies.YEARLY}</option>
           </select>
         </div>
       );

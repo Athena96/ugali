@@ -19,6 +19,7 @@ enum Frequency {
   NA
   ONCE
   MONTHLY
+  YEARLY
 }
 
 type PremiumUsers @model {
