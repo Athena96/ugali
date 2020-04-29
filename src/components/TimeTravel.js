@@ -52,26 +52,6 @@ class TimeTravel extends Component {
     }
 
     // operation
-    async autoAdd(recurrTxn, currentDay) {
-        var cpyTxn = JSON.parse(JSON.stringify(recurrTxn));
-
-        try {
-            cpyTxn.title = "[AUTO ADD]: " + cpyTxn.title;
-            delete cpyTxn.id;
-            delete cpyTxn.createdAt;
-            cpyTxn.is_recurring = "false";
-            cpyTxn.recurring_period = "NA";
-            var d = convertDateStrToGraphqlDate(currentDay.getFullYear() + "-" + getDoubleDigitFormat(currentDay.getUTCMonth() + 1) + "-" + getDoubleDigitFormat(currentDay.getUTCDate()));
-            cpyTxn.date = d;
-            cpyTxn.createdAt = d;
-
-            API.graphql(graphqlOperation(createTransaction, { input: cpyTxn }));
-            window.alert("Successfully AUTO added your transaction: " + cpyTxn.title);
-        } catch (err) {
-            window.alert("Encountered error AUTO adding your transaction.");
-        }
-    }
-
     async addNewPremiumUser(premiumUser) {
         // submit
         try {
@@ -164,27 +144,6 @@ class TimeTravel extends Component {
                 expenseDesc: ""
             }
 
-            // check if user has already had their transactions auto added
-            var numRecurrTxnsToAutoAdd = this.state.recurring_txns.length;
-            if (localStorage.getItem("last_auto_add_date") != null) {
-                // last auto add day.
-                const lastAutoAddDt = localStorage.getItem("last_auto_add_date");
-                var y = lastAutoAddDt.split('-')[0];
-                var m = lastAutoAddDt.split('-')[1];
-                var d = lastAutoAddDt.split('-')[2];
-
-                // curr day
-                var yc = currentDay.getFullYear();
-                var mc = getDoubleDigitFormat(currentDay.getUTCMonth() + 1);
-                var dc = getDoubleDigitFormat(currentDay.getUTCDate());
-
-                // if we've already auto added today, then there are no more
-                //  recurring transactions to auto add.
-                if ((y == yc || m == mc || d == dc)) {
-                    numRecurrTxnsToAutoAdd = 0;
-                }
-            }
-
             // get any recurring transactions for current day of while loop.
             var recurringIncomes = [];
             var recurringExpenses = [];
@@ -215,44 +174,6 @@ class TimeTravel extends Component {
                         // day same, month same, year diff
                         if (recurrTxnMonth === (currentDay.getMonth() + 1)) {
                             (recurrTxn.type === 2) ? recurringExpenses.push(recurrTxn) : recurringIncomes.push(recurrTxn);
-                        }
-                    }
-
-                    /* if the recurring txn occoures on the real current day (not current day of the while loop)
-                        then AUTO ADD it */
-                    if (idx === 0) {
-                        // if I have a value stored in storage, and I still need to auto add
-                        if (localStorage.getItem("last_auto_add_date") != null && numRecurrTxnsToAutoAdd !== 0) {
-                            // date of last auto add
-                            const lastAutoAddDt = localStorage.getItem("last_auto_add_date");
-                            var y = lastAutoAddDt.split('-')[0];
-                            var m = lastAutoAddDt.split('-')[1];
-                            var d = lastAutoAddDt.split('-')[2];
-
-                            // curr day
-                            var yc = currentDay.getFullYear();
-                            var mc = getDoubleDigitFormat(currentDay.getUTCMonth() + 1);
-                            var dc = getDoubleDigitFormat(currentDay.getUTCDate());
-
-                            // if the last auto add day is diff, update it to be today, since we're auto adding now.
-                            // then go ahead and auto add, and decriment the auto add counter.
-                            if (y != yc || m != mc || d != dc) {
-                                localStorage.setItem("last_auto_add_date", yc + "-" + mc + "-" + dc);
-                                this.autoAdd(recurrTxn, currentDay);
-                                numRecurrTxnsToAutoAdd -= 1;
-                            } else if ((y == yc || m == mc || d == dc) && numRecurrTxnsToAutoAdd !== 0) {
-                                this.autoAdd(recurrTxn, currentDay);
-                                numRecurrTxnsToAutoAdd -= 1;
-                            }
-                        } else if (numRecurrTxnsToAutoAdd !== 0) {
-                            // don't have value in storage, but need to auto add, then 
-                            //  update the local storage... and auto add the txn.
-                            var yc = currentDay.getFullYear();
-                            var mc = getDoubleDigitFormat(currentDay.getUTCMonth() + 1);
-                            var dc = getDoubleDigitFormat(currentDay.getUTCDate());
-                            localStorage.setItem("last_auto_add_date", yc + "-" + mc + "-" + dc);
-                            this.autoAdd(recurrTxn, currentDay);
-                            numRecurrTxnsToAutoAdd -= 1;
                         }
                     }
                 }
@@ -555,7 +476,7 @@ class TimeTravel extends Component {
                     <div align="left">
                         <h5>Features</h5>
                         <ul>
-                            <li><h6>Make your transactions <b>recurring</b> so that they get created <b>automatically</b> every month. (bills, subscriptions, paycheck, ...)</h6></li>
+                            <li><h6>Make your transactions <b>recurring</b> so that they get created <b>automatically</b> every month, year, ...etc. (bills, subscriptions, paycheck, ...)</h6></li>
                             <li><h6><b>"Time Travel"</b> to see what you future liquidity will be based on your current account balance, recurring transactions, and estimated variable spending (credit card spending).</h6></li>
                         </ul>
                     </div>
