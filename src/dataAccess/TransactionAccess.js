@@ -8,11 +8,17 @@ import { getTransaction } from '../graphql/queries';
 const TXN_LIMIT = 200;
 
 export async function fetchTransactions(year, month, category) {
+    console.log(year, month)
     var lastDay = new Date(year, month, 0);
     var firstDay = new Date(year, month - 1, 1)
 
-    var start = firstDay.getFullYear() + "-" + getDoubleDigitFormat(firstDay.getMonth() + 1) + "-" + getDoubleDigitFormat(firstDay.getDate() + 1) + "T00:00:00.000Z"
-    var end = lastDay.getFullYear() + "-" + getDoubleDigitFormat(lastDay.getMonth() + 1) + "-" + getDoubleDigitFormat(lastDay.getDate() + 1) + "T23:59:59.000Z"
+
+
+    var start = firstDay.getFullYear() + "-" + getDoubleDigitFormat(firstDay.getMonth() + 1) + "-" + getDoubleDigitFormat(firstDay.getDate()) + "T00:00:00.000Z"
+    var end = lastDay.getFullYear() + "-" + getDoubleDigitFormat(lastDay.getMonth() + 1) + "-" + getDoubleDigitFormat(lastDay.getDate()) + "T23:59:59.000Z"
+
+    console.log(start)
+    console.log(end)
 
     var user = await Auth.currentAuthenticatedUser();
     var data = await API.graphql(graphqlOperation(transactionsByUserDate, {

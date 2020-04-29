@@ -89,13 +89,17 @@ class Transactions extends Component {
     // helper
     filterTransactions(fyear, fmonth, category) {
         var filteredTxns = [];
+        console.log("filterTransactions")
 
         for (var txn of this.state.transactions) {
             var dateParts = txn.createdAt.split("-");
             var year = dateParts[0];
             var month = dateParts[1];
+            console.log(txn);
 
             if (year === fyear && month === fmonth) {
+                console.log(year , fyear)
+                console.log(month , fmonth)
                 if (category !== "" && category !== "ALL") {
                     // is category a sub or not?
                     if (category.includes("-")) {
@@ -117,10 +121,6 @@ class Transactions extends Component {
         }
 
         this.setState({ VISIBLE_TXNS: filteredTxns });
-    }
-
-    getMonth() {
-        return monthNames[parseInt(this.state.month) - 1];
     }
 
     getCCSpending() {
@@ -158,7 +158,7 @@ class Transactions extends Component {
                     
                     <div class="column1" >
                         <div className="ccBillBox">
-                            <h4>{this.getMonth()} <b>Credit Card Bill:</b> ${this.getCCSpending()}</h4>
+                            <h4>{this.state.month} <b>Credit Card Bill:</b> ${this.getCCSpending()}</h4>
                         </div>
 
                         <div className="ccBillBox">
@@ -356,13 +356,15 @@ class Transactions extends Component {
         currentComponent.setState({ IS_LOADING: true });
         fetchTransactions(currentComponent.state.year, getDoubleDigitFormat(monthNames.indexOf(currentComponent.state.month) + 1), currentComponent.state.category)
             .then(function (response) {
-                currentComponent.setState({ categories: response.categories })
-                currentComponent.setState({ transactions: response.transactions });
-                currentComponent.setState({ VISIBLE_TXNS: response.VISIBLE_TXNS });
-                currentComponent.setState({ IS_LOADING: false });
-                if (currentComponent.state.year !== "" && currentComponent.state.month !== "") {
+                currentComponent.setState({ 
+                    categories: response.categories,
+                    transactions: response.transactions,
+                    VISIBLE_TXNS: response.VISIBLE_TXNS,
+                    IS_LOADING: false
+                }, () => {
+                    console.log(response.transactions)
                     currentComponent.filterTransactions(currentComponent.state.year, getDoubleDigitFormat(monthNames.indexOf(currentComponent.state.month) + 1), currentComponent.state.category);
-                }
+                })
             })
             .catch(function (response) {
                 console.log(response);
