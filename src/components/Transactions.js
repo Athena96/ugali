@@ -89,17 +89,13 @@ class Transactions extends Component {
     // helper
     filterTransactions(fyear, fmonth, category) {
         var filteredTxns = [];
-        console.log("filterTransactions")
 
         for (var txn of this.state.transactions) {
             var dateParts = txn.createdAt.split("-");
             var year = dateParts[0];
             var month = dateParts[1];
-            console.log(txn);
 
             if (year === fyear && month === fmonth) {
-                console.log(year , fyear)
-                console.log(month , fmonth)
                 if (category !== "" && category !== "ALL") {
                     // is category a sub or not?
                     if (category.includes("-")) {
@@ -271,7 +267,6 @@ class Transactions extends Component {
             return (a > b) ? 1 : -1;
         });
 
-        console.log(cpArr);
         var primaryCategories = []
         for (var cat of cpArr) {
             catOptions.push(<option value={cat}>{cat}</option>)
@@ -362,7 +357,6 @@ class Transactions extends Component {
                     VISIBLE_TXNS: response.VISIBLE_TXNS,
                     IS_LOADING: false
                 }, () => {
-                    console.log(response.transactions)
                     currentComponent.filterTransactions(currentComponent.state.year, getDoubleDigitFormat(monthNames.indexOf(currentComponent.state.month) + 1), currentComponent.state.category);
                 })
             })
