@@ -154,11 +154,9 @@ class TimeTravel extends Component {
                 var recurrTxnMonth = parseInt(recurrTxn.date.split('-')[1]);
                 var recurrTxnYear = parseInt(recurrTxn.date.split('-')[0]);
 
-                // if the recurring txn happens today.
-                if (recurrTxnDay === currentDay.getDate()) {
-
-                    // add the recurring txn to our list
-                    if (Frequencies.ONCE === recurrTxn.recurring_frequency) {
+                // add the recurring txn to our list
+                if (Frequencies.ONCE === recurrTxn.recurring_frequency) {
+                    if (recurrTxnDay === currentDay.getDate()) {
                         // if we haven't accounted for the 1x recurring txn yet, then add it
                         if (this.shownRecorded[recurrTxn.title] === undefined) {
                             // month has to match for a 1x recurring txn
@@ -168,13 +166,32 @@ class TimeTravel extends Component {
                                 this.shownRecorded[recurrTxn.title] = true;
                             }
                         }
-                    } else if (Frequencies.MONTHLY === recurrTxn.recurring_frequency) {
+                    }
+                } else if (Frequencies.MONTHLY === recurrTxn.recurring_frequency) {
+                    if (recurrTxnDay === currentDay.getDate()) {
+
                         (recurrTxn.type === 2) ? recurringExpenses.push(recurrTxn) : recurringIncomes.push(recurrTxn);
-                    } else if (Frequencies.YEARLY === recurrTxn.recurring_frequency) {
+                    }
+                } else if (Frequencies.YEARLY === recurrTxn.recurring_frequency) {
+                    if (recurrTxnDay === currentDay.getDate()) {
+
                         // day same, month same, year diff
-                        if (recurrTxnMonth === (currentDay.getMonth() + 1)) {
+                        if (recurrTxnMonth === (currentDay.getMonth() + 1) && recurrTxnYear !== currentDay.getFullYear()) {
                             (recurrTxn.type === 2) ? recurringExpenses.push(recurrTxn) : recurringIncomes.push(recurrTxn);
                         }
+                    }
+                } else if (Frequencies.WEEKLY === recurrTxn.recurring_frequency) {
+                    var dtObj = new Date(recurrTxn.date);
+                    if (dtObj.getDay() === currentDay.getDay()) {
+                        (recurrTxn.type === 2) ? recurringExpenses.push(recurrTxn) : recurringIncomes.push(recurrTxn);
+                    }
+                } else if (Frequencies.BIWEEKLY === recurrTxn.recurring_frequency) {
+                    function datediff(first, second) {
+                        return Math.round((second - first) / (1000 * 60 * 60 * 24));
+                    }
+                    var dtObj = new Date(recurrTxn.date);
+                    if (dtObj.getDay() === currentDay.getDay() && (datediff(dtObj, currentDay) % 14 === 0)) {
+                        (recurrTxn.type === 2) ? recurringExpenses.push(recurrTxn) : recurringIncomes.push(recurrTxn);
                     }
                 }
             }

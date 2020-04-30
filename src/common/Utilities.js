@@ -1,5 +1,5 @@
 
-export var Frequencies = {NA: "NA", ONCE: "ONCE", MONTHLY: "MONTHLY", YEARLY:"YEARLY"};
+export var Frequencies = {NA: "NA", ONCE: "ONCE", MONTHLY: "MONTHLY", YEARLY:"YEARLY", WEEKLY:"WEEKLY", BIWEEKLY:"BIWEEKLY"};
 
 export function getDoubleDigitFormat(number) {
     return (number < 10) ? "0" + number : number;

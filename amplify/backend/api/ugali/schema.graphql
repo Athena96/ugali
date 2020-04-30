@@ -20,6 +20,8 @@ enum Frequency {
   ONCE
   MONTHLY
   YEARLY
+  WEEKLY
+  BIWEEKLY
 }
 
 type PremiumUsers @model {
