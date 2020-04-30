@@ -382,7 +382,7 @@ class Transactions extends Component {
         var name = target.name;
         this.setState({ [name]: value }, () => {
             this.fetchTransactionsUpdateState();
-          }); 
+        }); 
     }
 
     componentDidMount() {

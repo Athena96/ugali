@@ -176,14 +176,17 @@ class AddTransaction extends Component {
   }
 
   renderShowPeriodDropDown() {
+    var freqOptions = [];
+
+    for (const freq in Frequencies) {
+      freqOptions.push(<option value={Frequencies[freq]}>{Frequencies[freq]}</option>)
+    }
     if (this.state.showRecurrDropdown) {
       return (
         <div>
           <b>Frequency: </b>
           <select name="recurring_frequency" value={this.state.recurring_frequency} onChange={this.handleChange}>
-          <option value={Frequencies.ONCE}>{Frequencies.ONCE}</option>
-          <option value={Frequencies.MONTHLY}>{Frequencies.MONTHLY}</option>
-          <option value={Frequencies.YEARLY}>{Frequencies.YEARLY}</option>
+          {freqOptions}
           </select>
         </div>
       );
