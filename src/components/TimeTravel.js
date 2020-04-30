@@ -44,11 +44,14 @@ class TimeTravel extends Component {
             isPremiumUser: false,
             subscriptionExpired: true,
             premiumUsers: {},
-            IS_LOADING: true
+            IS_LOADING: true,
+            showTimeline: false
         };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.generateTimeline = this.generateTimeline.bind(this);
+        this.toggleState = this.toggleState.bind(this);
+
     }
 
     // operation
@@ -399,7 +402,7 @@ class TimeTravel extends Component {
                             yMin={0}
                             width={450}
                             height={200}
-                            hideXLabel={false}
+                            hideXLabel={true}
                             yLabel={"Balance"}
                             xLabel={"Time"}
 
@@ -407,17 +410,39 @@ class TimeTravel extends Component {
                         />
                     </div>
                 </div>
+
+                <div class="filtersInput" >
+                    <button class="filterTimeline" onClick={this.toggleState}><b>hide/show timeline</b></button>
+                </div>
+                
                 <div>
-                    <table id='transactions' align="center" style={{ height: '90%', width: '98%' }}>
-                        <h4><b>Timeline</b></h4>
-                        <tbody>
-                            <tr>{this.renderTableHeader()}</tr>
-                            {this.renderTableData()}
-                        </tbody>
-                    </table>
+                    {this.renderTimeline()}
                 </div>
             </div>
         );
+    }
+
+    toggleState() {
+        if (this.state.showTimeline) {
+            this.setState({showTimeline: false})
+        } else {
+            this.setState({showTimeline: true})
+        }
+    }
+    renderTimeline() {
+        if (this.state.showTimeline) {
+            return (
+                <table id='transactions' align="center" style={{ height: '90%', width: '98%' }}>
+                <h4><b>Timeline</b></h4>
+                <tbody>
+                    <tr>{this.renderTableHeader()}</tr>
+                    {this.renderTableData()}
+                </tbody>
+            </table>
+            );
+        } else {
+            return (<></>);
+        }
     }
 
     renderBuyPage() {
