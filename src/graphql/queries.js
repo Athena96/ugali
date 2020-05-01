@@ -12,6 +12,7 @@ export const getTransaction = `query GetTransaction($id: ID!) {
     payment_method
     type
     createdAt
+    updatedAt
     user
     is_recurring
     recurring_frequency
@@ -34,6 +35,7 @@ export const listTransactions = `query ListTransactions(
       payment_method
       type
       createdAt
+      updatedAt
       user
       is_recurring
       recurring_frequency
@@ -93,6 +95,7 @@ export const transactionsByUserDate = `query TransactionsByUserDate(
       payment_method
       type
       createdAt
+      updatedAt
       user
       is_recurring
       recurring_frequency
@@ -127,6 +130,7 @@ export const transactionsByUserRecurring = `query TransactionsByUserRecurring(
       payment_method
       type
       createdAt
+      updatedAt
       user
       is_recurring
       recurring_frequency

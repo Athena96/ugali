@@ -12,6 +12,7 @@ export const onCreateTransaction = `subscription OnCreateTransaction {
     payment_method
     type
     createdAt
+    updatedAt
     user
     is_recurring
     recurring_frequency
@@ -29,6 +30,7 @@ export const onUpdateTransaction = `subscription OnUpdateTransaction {
     payment_method
     type
     createdAt
+    updatedAt
     user
     is_recurring
     recurring_frequency
@@ -46,6 +48,7 @@ export const onDeleteTransaction = `subscription OnDeleteTransaction {
     payment_method
     type
     createdAt
+    updatedAt
     user
     is_recurring
     recurring_frequency

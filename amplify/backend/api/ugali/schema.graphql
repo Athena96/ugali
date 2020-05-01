@@ -10,6 +10,7 @@ type Transaction @model
   payment_method: String 
   type: Int
   createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
   user: String!
   is_recurring: String!
   recurring_frequency: Frequency
