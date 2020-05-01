@@ -518,15 +518,19 @@ class TimeTravel extends Component {
                     <div align="left">
                         <h5>Features</h5>
                         <ul>
-                            <li><h6>Make your transactions <b>recurring</b> so that they get created <b>automatically</b> every month, year, ...etc. (bills, subscriptions, paycheck, ...)</h6></li>
-                            <li><h6><b>"Time Travel"</b> to see what you future liquidity will be based on your current account balance, recurring transactions, and estimated variable spending (credit card spending).</h6></li>
+                            <li><h6><b>Recurring Transactions</b>: Manually inputing data is <b>boring</b> and a <b>waste of your time</b>, let a computer do it for you automatically! 
+                            With Premium, you can make your transactions recurring, and they'll be <b>automatically created</b> on a frequency basis you choose.</h6></li>
+                            
+                            <li><h6><b>Time Travel</b>: <b>Budgets aren't realistic</b>, because life is full of unexpected events. 
+                            This feature gives you the freedom to not stress about budgets, by showing you visually (using your <b>recurring transactions</b> + your estimated amount of variable spending) 
+                            if your current level of spending is sustainable for the long term.</h6></li>
                         </ul>
                     </div>
                     <div align="left">
                         <h5>Terms and Conditions</h5>
                         <ul>
                             <li><h6>After 1 year, you will <b>not</b> be auto re-subscribed.</h6></li>
-                            <li><h6>You can cancel your membership anytime, within the first month, and receive a full refund. Just email <b>zenspending.@gmail.com</b> asking for a refund.</h6></li>
+                            <li><h6>You can cancel your membership anytime, within the first month, and receive a full refund. Just email <b>zenspending@gmail.com</b> asking for a refund.</h6></li>
                         </ul>
                     </div>
 
