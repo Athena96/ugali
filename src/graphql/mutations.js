@@ -15,6 +15,7 @@ export const createTransaction = `mutation CreateTransaction(
     payment_method
     type
     createdAt
+    updatedAt
     user
     is_recurring
     recurring_frequency
@@ -35,6 +36,7 @@ export const updateTransaction = `mutation UpdateTransaction(
     payment_method
     type
     createdAt
+    updatedAt
     user
     is_recurring
     recurring_frequency
@@ -55,6 +57,7 @@ export const deleteTransaction = `mutation DeleteTransaction(
     payment_method
     type
     createdAt
+    updatedAt
     user
     is_recurring
     recurring_frequency

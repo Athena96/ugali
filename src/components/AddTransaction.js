@@ -18,7 +18,7 @@ import { fetchTransactionsForUserBetween, fetchTransactionBy } from '../dataAcce
 import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 
 // Global
-var ORIGINAL_DATE = "";
+var ORIGINAL_DATE = {fullStr: "", month:"", day:"", year:""};
 var IS_DUPLICATE = false;
 var IS_UPDATE = false;
 const CATEGORY_LOOKBACK_DAYS = 30;
@@ -84,12 +84,17 @@ class AddTransaction extends Component {
             return;
           }
           const txn = response.transaction;
-          var dt = txn.date.split('-')[0] + "-" + txn.date.split('-')[1] + "-" + txn.date.split('-')[2].split('T')[0];
-          ORIGINAL_DATE = txn.date;
+          ORIGINAL_DATE.fullStr = txn.date;
+          const year =  txn.date.split('-')[0];
+          const month = txn.date.split('-')[1];
+          const day =  txn.date.split('-')[2].split('T')[0];
+          const formattedDateForUI = year + "-" + month + "-" + day;
+          ORIGINAL_DATE.year = year;
+          ORIGINAL_DATE.month = month;
+          ORIGINAL_DATE.day = day;
 
           var cat = txn.category;
           var subCat = "";
-
           if (cat.includes('-')) {
             cat = txn.category.split('-')[0];
             subCat = txn.category.split('-')[1];
@@ -100,7 +105,7 @@ class AddTransaction extends Component {
             amount: txn.amount,
             category: cat,
             sub_category: subCat,
-            date: dt,
+            date: formattedDateForUI,
             description: txn.description === null ? "" : txn.description,
             payment_method: txn.payment_method,
             type: txn.type,
@@ -284,12 +289,12 @@ class AddTransaction extends Component {
     var transaction = {};
     if (IS_UPDATE) {
       var d = "";
-      if (ORIGINAL_DATE.split('-')[2].split('T')[0] == this.state.date.split('-')[2]
-        && ORIGINAL_DATE.split('-')[1] == this.state.date.split('-')[1]
-        && ORIGINAL_DATE.split('-')[0] == this.state.date.split('-')[0]) {
-        d = ORIGINAL_DATE;
+      if (ORIGINAL_DATE.year == this.state.date.split('-')[0]
+        && ORIGINAL_DATE.month == this.state.date.split('-')[1]
+        && ORIGINAL_DATE.day == this.state.date.split('-')[2]) {
+        d = ORIGINAL_DATE.fullStr;
       } else {
-        d = convertDateStrToGraphqlDate(this.state.date);
+        d = formattedDate;
       }
 
       transaction = {
@@ -298,6 +303,7 @@ class AddTransaction extends Component {
         amount: this.state.amount,
         category: fullCat,
         date: d,
+        updatedAt: formattedDate,
         description: this.state.description,
         payment_method: this.state.payment_method,
         type: this.state.type,
@@ -311,7 +317,9 @@ class AddTransaction extends Component {
         title: this.state.title,
         amount: this.state.amount,
         category: fullCat,
-        date: this.state.date,
+        date: formattedDate,
+        createdAt: convertDateStrToGraphqlDate(formatDate(new Date())),
+        updatedAt: convertDateStrToGraphqlDate(formatDate(new Date())),
         description: this.state.description,
         payment_method: this.state.payment_method,
         type: this.state.type,
@@ -320,7 +328,6 @@ class AddTransaction extends Component {
         user: this.state.user
       }
 
-      transaction.date = formattedDate;
     }
 
     // fill in description
@@ -353,8 +360,6 @@ class AddTransaction extends Component {
         const res = await API.graphql(graphqlOperation(updateTransaction, { input: transaction }));
         window.alert("Successfully updated your transaction!");
       } else {
-        transaction.createdAt = transaction.date;
-
         const res = await API.graphql(graphqlOperation(createTransaction, { input: transaction }));
         window.alert("Successfully added your transaction!");
       }
