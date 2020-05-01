@@ -132,7 +132,10 @@ class AddTransaction extends Component {
     var value = target.type === 'checkbox' ? target.checked : target.value;
     var name = target.name;
 
-    if (name === "type") {
+    if (name === "is_recurring" && !this.state.IS_PREMIUM_USER) {
+      this.props.history.push('/timeTravel')
+
+    } else if (name === "type") {
       value = parseInt(value);
       this.setState({
         [name]: value
@@ -179,41 +182,45 @@ class AddTransaction extends Component {
     var freqOptions = [];
 
     for (const freq in Frequencies) {
-      freqOptions.push(<option value={Frequencies[freq]}>{Frequencies[freq]}</option>)
+      if (freq !== Frequencies.NA) {
+        freqOptions.push(<option value={Frequencies[freq]}>{Frequencies[freq]}</option>)
+      }
     }
     if (this.state.showRecurrDropdown) {
       return (
         <div>
           <b>Frequency: </b>
           <select name="recurring_frequency" value={this.state.recurring_frequency} onChange={this.handleChange}>
-          {freqOptions}
-          </select>
+          {freqOptions} 
+          </select><br/>
+          <ul>
+          <small><b>*A recurring transaction will:*</b></small>
+
+            <li><small>Be automatically created after each frequency period.</small></li>
+            <li><small>Be placed on your TimeTravel timeline.</small></li>
+          </ul>
         </div>
       );
     }
   }
   renderPremiumFeatures() {
-    if (this.state.IS_PREMIUM_USER) {
       return (
         <div className="premiumFeatureAddTxnBackground">
           <div>
             <label>
-              <b>Place on 'Time Travel'?:</b>
+              <b>Recurring Transaction?</b> (e.g. bill, subscription, paycheck):
               <input
                 name="is_recurring"
                 type="checkbox"
                 checked={this.state.is_recurring}
                 onChange={this.handleChange} />
-            </label><small>*The transaction will appear on your 'Time Travel' page.*</small><br />
+            </label><br />
 
             {this.renderShowPeriodDropDown()}
 
           </div>
         </div>
       )
-    } else {
-
-    }
   }
 
   resetState() {
