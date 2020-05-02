@@ -24,6 +24,8 @@ enum Frequency {
   YEARLY
   WEEKLY
   BIWEEKLY
+  FIRST_DAY_OF_MONTH
+  LAST_DAY_OF_MONTH
 }
 
 type PremiumUsers @model {
