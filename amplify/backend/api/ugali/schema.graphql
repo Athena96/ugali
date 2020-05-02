@@ -1,5 +1,5 @@
-type Transaction @model 
-@key(name: "ByUserDate", fields: ["user", "createdAt"], queryField: "transactionsByUserDate") 
+type Transaction @model
+@key(name: "ByUserActualDate", fields: ["user", "date"], queryField: "transactionsByUserDate") 
 @key(name: "ByUserRecurring", fields: ["user", "is_recurring"], queryField: "transactionsByUserRecurring") {
   id: ID!
   title: String!
