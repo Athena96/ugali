@@ -17,7 +17,8 @@ export async function fetchTransactions(year, month, category) {
     var user = await Auth.currentAuthenticatedUser();
     var data = await API.graphql(graphqlOperation(transactionsByUserDate, {
         limit: TXN_LIMIT,
-        user: user.attributes.email, createdAt: { between: [start, end] }
+        user: user.attributes.email,
+        date: { between: [start, end] }
     }));
 
     var txns = [];
@@ -79,7 +80,8 @@ export async function fetchTransactionsForUserBetween(startDate, endDate) {
     var user = await Auth.currentAuthenticatedUser();
     var data = await API.graphql(graphqlOperation(transactionsByUserDate, {
         limit: TXN_LIMIT,
-        user: user.attributes.email, createdAt: { between: [startDate, endDate] }
+        user: user.attributes.email,
+        date: { between: [startDate, endDate] }
     }));
 
     var categories = [];
@@ -96,8 +98,8 @@ export async function fetchTransactionsForUserBetween(startDate, endDate) {
 
 export async function fetchTransactionBy(id) {
     var user = await Auth.currentAuthenticatedUser();
-    var transactionData = await API.graphql(graphqlOperation(getTransaction, { 
-        id: id 
+    var transactionData = await API.graphql(graphqlOperation(getTransaction, {
+        id: id
     }));
 
     var response = {};
