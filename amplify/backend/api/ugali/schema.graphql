@@ -14,6 +14,7 @@ type Transaction @model
   user: String!
   is_recurring: String!
   recurring_frequency: Frequency
+  base_recurring_transaction: String
 }
 
 enum Frequency {

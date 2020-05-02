@@ -91,7 +91,7 @@ class Transactions extends Component {
         var filteredTxns = [];
 
         for (var txn of this.state.transactions) {
-            var dateParts = txn.createdAt.split("-");
+            var dateParts = txn.date.split("-");
             var year = dateParts[0];
             var month = dateParts[1];
 

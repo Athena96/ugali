@@ -17,6 +17,7 @@ export const getTransaction = /* GraphQL */ `
       user
       is_recurring
       recurring_frequency
+      base_recurring_transaction
     }
   }
 `;
@@ -41,6 +42,7 @@ export const listTransactions = /* GraphQL */ `
         user
         is_recurring
         recurring_frequency
+        base_recurring_transaction
       }
       nextToken
     }
@@ -104,6 +106,7 @@ export const transactionsByUserDate = /* GraphQL */ `
         user
         is_recurring
         recurring_frequency
+        base_recurring_transaction
       }
       nextToken
     }
@@ -140,6 +143,7 @@ export const transactionsByUserRecurring = /* GraphQL */ `
         user
         is_recurring
         recurring_frequency
+        base_recurring_transaction
       }
       nextToken
     }

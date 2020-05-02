@@ -51,15 +51,18 @@ class AddTransaction extends Component {
       recurring_frequency: Frequencies.NA,
       user: "",
       exampleTxnId: txnId,
+      base_recurring_transaction: null,
       usersLatestCateogories: [],
       showRecurrDropdown: false,
-      IS_PREMIUM_USER: false
+      IS_PREMIUM_USER: false,
+      wasAutoAdded: false
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.renderButton = this.renderButton.bind(this);
+    this.updateParentRecurringTransaction = this.updateParentRecurringTransaction.bind(this);
   }
 
   componentDidMount() {
@@ -113,8 +116,13 @@ class AddTransaction extends Component {
             is_recurring: txn.is_recurring === "true" ? true : false,
             recurring_frequency: txn.recurring_frequency || Frequencies.NA,
             updateTxnId: currentComponent.exampleTxnId,
-            showRecurrDropdown: txn.is_recurring === "true" ? true : false
-          });  
+            showRecurrDropdown: txn.is_recurring === "true" ? true : false,
+            wasAutoAdded: txn.base_recurring_transaction !== undefined && txn.base_recurring_transaction !== null,
+            base_recurring_transaction: txn.base_recurring_transaction
+          }); 
+          
+          console.log(currentComponent.state)
+
         })
         .catch(function (response) {
           console.log(response);
@@ -173,12 +181,26 @@ class AddTransaction extends Component {
 
   renderButton() {
     if (IS_UPDATE) {
-      return (
-        <input class="updateButton" type="submit" value="Update" />
-      )
+
+      if (IS_UPDATE && this.state.wasAutoAdded) {
+        return (
+          <>
+          <button class="updateButton" onClick={this.handleSubmit}>Update</button>
+          <button className="updateButton" onClick={this.updateParentRecurringTransaction} >Update Original Recurring Tranaction</button>        
+          </>
+        )
+      } else {
+        return (
+          <>
+          <button class="updateButton" onClick={this.handleSubmit}>Update</button>
+        </>
+        )
+      }
+      
+
     } else {
       return (
-        <input class="addButton" type="submit" value="Submit" />
+        <button class="addButton" onClick={this.handleSubmit}>Submit</button>
       )
     }
   }
@@ -388,12 +410,17 @@ class AddTransaction extends Component {
     return (catOptions);
   }
 
+  updateParentRecurringTransaction() {
+    console.log(this.state.base_recurring_transaction)
+      this.props.history.push('/addTransaction/update/' + this.state.base_recurring_transaction)
+      window.location.reload(false)
+  }
+
   render() {
     return (
       <div>
         <div className="addTransactionBackground">
           <small>* required fields</small>
-
           <form onSubmit={this.handleSubmit}>
             <label>
               <b>*Title:</b><br />

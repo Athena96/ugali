@@ -20,6 +20,7 @@ export const createTransaction = /* GraphQL */ `
       user
       is_recurring
       recurring_frequency
+      base_recurring_transaction
     }
   }
 `;
@@ -42,6 +43,7 @@ export const updateTransaction = /* GraphQL */ `
       user
       is_recurring
       recurring_frequency
+      base_recurring_transaction
     }
   }
 `;
@@ -64,6 +66,7 @@ export const deleteTransaction = /* GraphQL */ `
       user
       is_recurring
       recurring_frequency
+      base_recurring_transaction
     }
   }
 `;
