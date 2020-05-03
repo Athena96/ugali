@@ -18,7 +18,7 @@ import { fetchTransactionsForUserBetween, fetchTransactionBy } from '../dataAcce
 import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 
 // Global
-var ORIGINAL_DATE = {fullStr: "", month:"", day:"", year:""};
+var ORIGINAL_DATE = { fullStr: "", month: "", day: "", year: "" };
 var IS_DUPLICATE = false;
 var IS_UPDATE = false;
 const CATEGORY_LOOKBACK_DAYS = 30;
@@ -88,9 +88,9 @@ class AddTransaction extends Component {
           }
           const txn = response.transaction;
           ORIGINAL_DATE.fullStr = txn.date;
-          const year =  txn.date.split('-')[0];
+          const year = txn.date.split('-')[0];
           const month = txn.date.split('-')[1];
-          const day =  txn.date.split('-')[2].split('T')[0];
+          const day = txn.date.split('-')[2].split('T')[0];
           const formattedDateForUI = year + "-" + month + "-" + day;
           ORIGINAL_DATE.year = year;
           ORIGINAL_DATE.month = month;
@@ -119,8 +119,8 @@ class AddTransaction extends Component {
             showRecurrDropdown: txn.is_recurring === "true" ? true : false,
             wasAutoAdded: txn.base_recurring_transaction !== undefined && txn.base_recurring_transaction !== null,
             base_recurring_transaction: txn.base_recurring_transaction
-          }); 
-          
+          });
+
           console.log(currentComponent.state)
 
         })
@@ -133,7 +133,7 @@ class AddTransaction extends Component {
     // get premium users
     checkIfPremiumUser()
       .then(function (response) {
-        currentComponent.setState({IS_PREMIUM_USER: response.isPremiumUser});
+        currentComponent.setState({ IS_PREMIUM_USER: response.isPremiumUser });
       })
       .catch(function (response) {
         console.log(response);
@@ -168,11 +168,11 @@ class AddTransaction extends Component {
       this.setState({ [name]: value });
 
       if (name === "is_recurring") {
-        this.setState({ "showRecurrDropdown": value});
+        this.setState({ "showRecurrDropdown": value });
         if (value) {
-          this.setState({"recurring_frequency": this.state.recurring_frequency})
+          this.setState({ "recurring_frequency": this.state.recurring_frequency })
         } else {
-          this.setState({"recurring_frequency": Frequencies.NA})
+          this.setState({ "recurring_frequency": Frequencies.NA })
         }
       }
     }
@@ -185,18 +185,18 @@ class AddTransaction extends Component {
       if (IS_UPDATE && this.state.wasAutoAdded) {
         return (
           <>
-          <button class="updateButton" onClick={this.handleSubmit}>Update</button>
-          <button className="updateButton" onClick={this.updateParentRecurringTransaction} >Update Original Recurring Tranaction</button>        
+            <button class="updateButton" onClick={this.handleSubmit}>Update</button>
+            <button className="updateButton" onClick={this.updateParentRecurringTransaction} >Update Original Recurring Tranaction</button>
           </>
         )
       } else {
         return (
           <>
-          <button class="updateButton" onClick={this.handleSubmit}>Update</button>
-        </>
+            <button class="updateButton" onClick={this.handleSubmit}>Update</button>
+          </>
         )
       }
-      
+
 
     } else {
       return (
@@ -218,10 +218,10 @@ class AddTransaction extends Component {
         <div>
           <b>Frequency: </b>
           <select name="recurring_frequency" value={this.state.recurring_frequency} onChange={this.handleChange}>
-          {freqOptions} 
-          </select><br/>
+            {freqOptions}
+          </select><br />
           <ul>
-          <small><b>*A recurring transaction will:*</b></small>
+            <small><b>*A recurring transaction will:*</b></small>
 
             <li><small>Be automatically created after each frequency period.</small></li>
             <li><small>Be placed on your TimeTravel timeline.</small></li>
@@ -231,23 +231,23 @@ class AddTransaction extends Component {
     }
   }
   renderPremiumFeatures() {
-      return (
-        <div className="premiumFeatureAddTxnBackground">
-          <div>
-            <label>
-              <b>Recurring Transaction?</b> (e.g. bill, subscription, paycheck):
+    return (
+      <div className="premiumFeatureAddTxnBackground">
+        <div>
+          <label>
+            <b>Recurring Transaction?</b> (e.g. bill, subscription, paycheck):
               <input
-                name="is_recurring"
-                type="checkbox"
-                checked={this.state.is_recurring}
-                onChange={this.handleChange} />
-            </label><br />
+              name="is_recurring"
+              type="checkbox"
+              checked={this.state.is_recurring}
+              onChange={this.handleChange} />
+          </label><br />
 
-            {this.renderShowPeriodDropDown()}
+          {this.renderShowPeriodDropDown()}
 
-          </div>
         </div>
-      )
+      </div>
+    )
   }
 
   resetState() {
@@ -402,7 +402,7 @@ class AddTransaction extends Component {
 
     var cpArr = this.state.usersLatestCateogories
     cpArr.sort((a, b) => {
-        return (a > b) ? 1 : -1;
+      return (a > b) ? 1 : -1;
     });
     for (var cat of cpArr) {
       catOptions.push(<option value={cat}>{cat}</option>)
@@ -412,8 +412,8 @@ class AddTransaction extends Component {
 
   updateParentRecurringTransaction() {
     console.log(this.state.base_recurring_transaction)
-      this.props.history.push('/addTransaction/update/' + this.state.base_recurring_transaction)
-      window.location.reload(false)
+    this.props.history.push('/addTransaction/update/' + this.state.base_recurring_transaction)
+    window.location.reload(false)
   }
 
   render() {

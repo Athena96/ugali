@@ -13,6 +13,11 @@ export function getDoubleDigitFormat(number) {
     return (number < 10) ? "0" + number : number;
 }
 
+export function getLastDayOfMonthFromDate(currentDay) {
+    var lastDateOfMonth = new Date(currentDay.getFullYear(), currentDay.getMonth() + 1, 0);
+    return lastDateOfMonth.getDate()
+}
+
 export function formatDate(date) {
     var month = getDoubleDigitFormat(date.getMonth() + 1);
     var day = getDoubleDigitFormat(date.getDate());

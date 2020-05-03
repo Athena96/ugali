@@ -7,7 +7,7 @@ import { Authenticator } from 'aws-amplify-react';
 import { Greetings } from 'aws-amplify-react';
 
 class AppWithAuth extends React.Component {
-  
+
   constructor(props, context) {
     super(props, context);
   }
