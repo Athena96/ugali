@@ -1,555 +1,558 @@
 .App {
-  text-align: left;
+    text-align: left;
 }
 
 .App-logo {
-  height: 40vmin;
-  pointer-events: none;
+    height: 40vmin;
+    pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
 }
 
 .App-link {
-  color: #61dafb;
+    color: #61dafb;
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 #title {
-  text-align: center;
-  font-family: arial, sans-serif;
+    text-align: center;
+    font-family: arial, sans-serif;
 }
 
 .links {
-  padding: 10px;
+    padding: 10px;
 }
 
 .transactions {
-  table-layout: fixed;
+    table-layout: fixed;
 }
 
-#transactions td, #transactions th {
-  border: 2px solid rgb(0, 0, 0);
-  word-wrap:break-word
-
-}
-
-
-#transactions tr {background-color: #f2f2f2;}
-#transactions tr:hover {background-color: #ddd;}
+#transactions td,
 #transactions th {
+    border: 2px solid rgb(0, 0, 0);
+    word-wrap: break-word
+}
 
-  text-align: center;
-  background-color: rgb(255, 124, 123);
-  color: white;
+#transactions tr {
+    background-color: #f2f2f2;
+}
+
+#transactions tr:hover {
+    background-color: #ddd;
+}
+
+#transactions th {
+    text-align: center;
+    background-color: rgb(255, 124, 123);
+    color: white;
 }
 
 #summary {
-  padding-top: 15px;
+    padding-top: 15px;
 }
 
-#summary td, #summary th {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-
-
-#summary tr:nth-child(even){background-color: #f2f2f2;}
-#summary tr:hover {background-color: #ddd;}
+#summary td,
 #summary th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: center;
-  background-color: #FFAC31;
-  color: white;
+    border: 1px solid #ddd;
+    padding: 8px;
 }
 
+#summary tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+#summary tr:hover {
+    background-color: #ddd;
+}
+
+#summary th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
+    background-color: #FFAC31;
+    color: white;
+}
 
 .rounded {
-  width: 96%;
-  color: black;
-  border-color: black;
-  border-width: 1px;
-
-  padding: 3px;
-  text-align: left;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 13px;
-  margin: 4px 2px;
+    width: 96%;
+    color: black;
+    border-color: black;
+    border-width: 1px;
+    padding: 3px;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
 }
 
 .roundedShare {
-  border: none;
-  color: black;
-  padding: 3px;
-  text-align: left;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 13px;
-  margin: 4px 2px;
+    border: none;
+    color: black;
+    padding: 3px;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
 }
 
 .roundedOutline {
-  color: black;
-  border-color: black;
-  border-width: 1px;
-  padding: 3px;
-  text-align: left;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 13px;
-  margin-top:4px;
-  margin-bottom: 4px;
-  width: 100%;
+    color: black;
+    border-color: black;
+    border-width: 1px;
+    padding: 3px;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    width: 100%;
 }
 
 .addButton {
-  background-color: rgb(3, 54, 6);
-  border: none;
-  color: white;
-  padding: 10px;
-  width: 100%;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 13px;
-  margin-top: 16px;
+    background-color: rgb(3, 54, 6);
+    border: none;
+    color: white;
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-top: 16px;
 }
 
 .updateButton {
-  background-color: rgb(11, 59, 87);
-  border: none;
-  color: white;
-  padding: 10px;
-  width: 100%;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 13px;
-  margin: 4px 2px;
+    background-color: rgb(11, 59, 87);
+    border: none;
+    color: white;
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
 }
 
 .filter {
-  background-color:rgb(199, 199, 199);
-  border: none;
-  color: black;
-  padding: 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 13px;
-  margin-top: 15px;
-  width: 100%;
-
+    background-color: rgb(199, 199, 199);
+    border: none;
+    color: black;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-top: 15px;
+    width: 100%;
 }
 
 .filterTimeline {
-  background-color:rgb(199, 199, 199);
-  border: none;
-  color: black;
-  padding: 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 13px;
-  margin-top: 4px;
-  width: 100%;
-  
+    background-color: rgb(199, 199, 199);
+    border: none;
+    color: black;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-top: 4px;
+    width: 100%;
 }
 
 .updateTxnButton {
-  background-color: rgb(131, 131, 134);
-  border: none;
-  color: white;
-  padding: 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 13px;
-  margin: 4px 2px;
+    background-color: rgb(131, 131, 134);
+    border: none;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
 }
+
 .deleteTxnButton {
-  background-color: rgb(151, 7, 7);
-  border: none;
-  color: white;
-  padding: 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 13px;
-  margin: 4px 2px;
+    background-color: rgb(151, 7, 7);
+    border: none;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
 }
+
 .duplicateTxnButton {
-  background-color: rgb(12, 100, 85);
-  border: none;
-  color: white;
-  padding: 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 13px;
-  margin: 4px 2px;
+    background-color: rgb(12, 100, 85);
+    border: none;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
 }
 
 .botRight {
-  position:absolute;
-  bottom:0;
-  right:0;
+    position: absolute;
+    bottom: 0;
+    right: 0;
 }
 
 .button {
-  background-color: #31465F;
-  border: none;
-  color: white;
-  padding: 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 13px;
-  margin: 4px 2px;
+    background-color: #31465F;
+    border: none;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
 }
 
 .ccBillBox {
-  background-color:rgb(255, 124, 123);
-  border: none;
-  color: rgb(255, 255, 255);
-  width: 100%;
-  padding: 10px;
-  text-align: left;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 13px;
-  margin: 4px 2px;
+    background-color: rgb(255, 124, 123);
+    border: none;
+    color: rgb(255, 255, 255);
+    width: 100%;
+    padding: 10px;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
 }
 
 .expenseTxn {
-  background-color:rgb(235, 235, 235);
-  border: none;
-  color: black;
-  width: 95%;
-  padding: 10px;
-  text-align: left;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 13px;
-  margin: 4px 2px;
+    background-color: rgb(235, 235, 235);
+    border: none;
+    color: black;
+    width: 95%;
+    padding: 10px;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
 }
+
 .incomeTxn {
-  background-color: rgb(3, 54, 6);
-  border: none;
-  color: white;
-  width: 95%;
-  padding: 10px;
-  text-align: left;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 13px;
-  margin: 4px 2px;
+    background-color: rgb(3, 54, 6);
+    border: none;
+    color: white;
+    width: 95%;
+    padding: 10px;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
 }
 
 .addTransactionBackground {
-  background-color:rgb(235, 235, 235);
-  border-radius: 8px;
-  padding: 10px;
-  display: inline-block;
-
-  margin-left: 16px;
-  margin-top: 16px;
-  margin-right: 16px;
-
-  border-radius: 8px;
+    background-color: rgb(235, 235, 235);
+    border-radius: 8px;
+    padding: 10px;
+    display: inline-block;
+    margin-left: 16px;
+    margin-top: 16px;
+    margin-right: 16px;
+    border-radius: 8px;
 }
 
 .premiumFeatureBackground {
-  background-color: rgb(255, 124, 123);
-  border-radius: 8px;
-  padding: 10px;
-  display: inline-block;
-  margin-top: 8px;
-  margin-bottom: 20px;
-
-  color: white;
-  border-radius: 8px;
+    background-color: rgb(255, 124, 123);
+    border-radius: 8px;
+    padding: 10px;
+    display: inline-block;
+    margin-top: 8px;
+    margin-bottom: 20px;
+    color: white;
+    border-radius: 8px;
 }
 
 .premiumFeatureAddTxnBackground {
-  background-color:rgb(189, 189, 189);
-  border-radius: 8px;
-  padding: 10px;
-  display: inline-block;
-  width: 100%;
-  margin-top: 8px;
-  border-radius: 8px;
-}
-.right{
-  float:right;
+    background-color: rgb(189, 189, 189);
+    border-radius: 8px;
+    padding: 10px;
+    display: inline-block;
+    width: 100%;
+    margin-top: 8px;
+    border-radius: 8px;
 }
 
-.left{
-  float:left;
+.right {
+    float: right;
 }
+
+.left {
+    float: left;
+}
+
 .signOut {
-  background-color: rgb(235, 235, 235);
-  border: none;
-  color: black;
-  padding: 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 13px;
-  margin: 4px 4px;
+    background-color: rgb(235, 235, 235);
+    border: none;
+    color: black;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 4px;
 }
-
 
 .Link {
-  border: none;
-  color: rgb(10, 99, 231);
-  padding: 15px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  font-size: 16px;
-  margin: 4px 2px;
+    border: none;
+    color: rgb(10, 99, 231);
+    padding: 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 16px;
+    margin: 4px 2px;
 }
 
 #container {
-  height: 100%;
-  width: 100%;
-  display: flex;
+    height: 100%;
+    width: 100%;
+    display: flex;
 }
+
 #leftThing {
-  width: 25%;
+    width: 25%;
 }
+
 #content {
-  width: 50%;
+    width: 50%;
 }
+
 #rightThing {
-  width: 25%;
+    width: 25%;
 }
 
 .bar {
-  /* width: 100px;
+    /* width: 100px;
   height: 100px; */
-  float: left;
-  padding-left: 16px;
-
+    float: left;
+    padding-left: 16px;
 }
-.barStack {
 
-  /* width: 100px;
+.barStack {
+    /* width: 100px;
   height: 100px; */
-  float: left;
-  padding: 6px 8px 6px 16px;
+    float: left;
+    padding: 6px 8px 6px 16px;
 }
 
 .barBig {
-  float: left;
-  padding-left: 16px;
+    float: left;
+    padding-left: 16px;
 }
 
-
-
 .barbooks {
-  padding-left: 16px;
-  padding-bottom: 16px;
-  padding-right: 16px;
-
-  /* width: 100px;
+    padding-left: 16px;
+    padding-bottom: 16px;
+    padding-right: 16px;
+    /* width: 100px;
   height: 100px; */
-  float: left;
+    float: left;
 }
 
 .searchInput {
-  width: 100%;
+    width: 100%;
 }
-.footer {  
-  background-color: rgb(255, 124, 123);
-  color: rgb(255, 124, 123);
-  text-align: center;
-  position: absolute;
-  bottom: 0;
-  align-items: center;
-  width: 100%;
-  /* height: 30px; */
-  /* padding-bottom: 0px;   */
-  position: relative;
-  /* min-height: 100vh; */
+
+.footer {
+    background-color: rgb(255, 124, 123);
+    color: rgb(255, 124, 123);
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    align-items: center;
+    width: 100%;
+    /* height: 30px; */
+    /* padding-bottom: 0px;   */
+    position: relative;
+    /* min-height: 100vh; */
 }
 
 .footerText {
-  padding-top: 8px;
-  text-align: center;
-  color: azure;
+    padding-top: 8px;
+    text-align: center;
+    color: azure;
 }
 
 .inputs {
-  margin-top: 8px;
-  margin-left: 8px;
-  margin-right: 8px;
-  border-radius: 8px;
+    margin-top: 8px;
+    margin-left: 8px;
+    margin-right: 8px;
+    border-radius: 8px;
 }
 
 .filtersInput {
-  margin-top: 8px;
-  margin-left: 12px;
-  margin-right: 12px;
+    margin-top: 8px;
+    margin-left: 12px;
+    margin-right: 12px;
 }
-.fl {
-  float: left;
 
+.fl {
+    float: left;
 }
 
 .desc {
-  width: 75%;
+    width: 75%;
 }
 
 .indent {
-  margin-left: 16px;
-  margin-top: 16px;
-  margin-right: 16px;
-
+    margin-left: 16px;
+    margin-top: 16px;
+    margin-right: 16px;
 }
 
 .signIn {
-  /* background-color:rgb(235, 235, 235); */
-  margin-left: 16px;
-  margin-top: 16px;
-  margin-right: 16px;
-
+    /* background-color:rgb(235, 235, 235); */
+    margin-left: 16px;
+    margin-top: 16px;
+    margin-right: 16px;
 }
 
 .onep {
-  width: 100%;
-
+    width: 100%;
 }
+
 .login {
-  background-color:rgb(255, 255, 255);
-  border: none;
-  color: rgb(255, 124, 123);
-  padding: 5px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-
-  width: 100%;
-
+    background-color: rgb(255, 255, 255);
+    border: none;
+    color: rgb(255, 124, 123);
+    padding: 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 100%;
 }
+
 
 /* https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_social_media_buttons */
+
 .create {
-  background-color:rgb(255, 255, 255);
-  border: none;
-  color: rgb(0, 135, 177);
-  padding: 5px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-
-  width: 100%;
-
+    background-color: rgb(255, 255, 255);
+    border: none;
+    color: rgb(0, 135, 177);
+    padding: 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 100%;
 }
 
 .outerCCBillBox {
-  padding-top: 35px;
+    padding-top: 35px;
 }
-
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
+
 /* Create four equal columns that floats next to each other */
+
 .column1 {
-  padding-top: 35px;
-
-  float: left;
-  width: 30%;
-  padding-left: 10px;
-  padding-right: 10px;
-
+    padding-top: 35px;
+    float: left;
+    width: 30%;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .column2 {
-  
-  float: left;
-  width: 70%;
-  padding-left: 10px;
-  padding-right: 10px;
+    float: left;
+    width: 70%;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 
 /* Clear floats after the columns */
+
 .row:after {
-  content: "";
-  display: table;
-  clear: both;
+    content: "";
+    display: table;
+    clear: both;
 }
+
 
 /* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+
 @media screen and (max-width: 900px) {
-  .column1  {
-    width: 100%;
-  }
-  .column2  {
-    width: 100%;
-  }
+    .column1 {
+        width: 100%;
+    }
+    .column2 {
+        width: 100%;
+    }
 }
 
-
 .payPalButton {
-  color:rgb(255, 255, 255);
-  border: none;
-  background-color: rgb(255, 124, 123);
-  padding: 5px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  border-radius: 8px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+    color: rgb(255, 255, 255);
+    border: none;
+    background-color: rgb(255, 124, 123);
+    padding: 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }

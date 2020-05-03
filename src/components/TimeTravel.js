@@ -13,7 +13,6 @@ import { Auth } from 'aws-amplify';
 import { PayPalButton } from "react-paypal-button-v2";
 
 // GraphQl Mutations
-import { createTransaction } from '../graphql/mutations';
 import { createPremiumUsers } from '../graphql/mutations';
 import { updatePremiumUsers } from '../graphql/mutations';
 
@@ -23,7 +22,7 @@ import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 
 // Common
 import { getDoubleDigitFormat, convertDateStrToGraphqlDate, graphqlDateFromJSDate } from '../common/Utilities';
-import { Frequencies } from '../common/Utilities';
+import { Frequencies, getLastDayOfMonthFromDate } from '../common/Utilities';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
@@ -196,6 +195,15 @@ class TimeTravel extends Component {
                     if (dtObj.getDay() === currentDay.getDay() && (datediff(dtObj, currentDay) % 14 === 0)) {
                         (recurrTxn.type === 2) ? recurringExpenses.push(recurrTxn) : recurringIncomes.push(recurrTxn);
                     }
+                } else if (Frequencies.FIRST_DAY_OF_MONTH === recurrTxn.recurring_frequency) {
+                    if (currentDay.getDate() === 1) {
+                        (recurrTxn.type === 2) ? recurringExpenses.push(recurrTxn) : recurringIncomes.push(recurrTxn);
+                    }
+                } else if (Frequencies.LAST_DAY_OF_MONTH === recurrTxn.recurring_frequency) {
+                    const lastDayOfCurrentMonth = getLastDayOfMonthFromDate(currentDay);
+                    if (currentDay.getDate() === lastDayOfCurrentMonth) {
+                        (recurrTxn.type === 2) ? recurringExpenses.push(recurrTxn) : recurringIncomes.push(recurrTxn);
+                    }
                 }
             }
 
@@ -222,28 +230,37 @@ class TimeTravel extends Component {
                 // update income
                 var incomeStr = ""
                 var incomeDescStr = ""
-                var incomeLinks = [];
+                var incomeLinks = [];               
+                var incomeDescriptions = [];
                 for (var incomeTxn of recurringIncomes) {
                     incomeStr += ("$" + incomeTxn.amount.toString() + ", ");
                     incomeDescStr += (incomeTxn.title + ", ");
                     incomeLinks.push(incomeTxn.id);
+                    incomeDescriptions.push(incomeTxn.title);
+
                 }
                 balanceRows[idx].income = incomeStr;
                 balanceRows[idx].incomeDesc = incomeDescStr;
                 balanceRows[idx].incomeLinks = incomeLinks;
+                balanceRows[idx].incomeDescriptions = incomeDescriptions;
 
                 // update expense
-                var expenseStr = ""
-                var expenseDescStr = ""
+                var expenseStr = "";
+                var expenseDescStr = "";
                 var expenseLinks = [];
+                var expenseDescriptions = [];
                 for (var expenseTxn of recurringExpenses) {
                     expenseStr += ("$" + expenseTxn.amount.toString() + ", ");
                     expenseDescStr += (expenseTxn.title + ", ");
                     expenseLinks.push(expenseTxn.id);
+                    expenseDescriptions.push(expenseTxn.title);
                 }
                 balanceRows[idx].expense = expenseStr;
                 balanceRows[idx].expenseDesc = expenseDescStr;
                 balanceRows[idx].expenseLinks = expenseLinks;
+                balanceRows[idx].expenseDescriptions = expenseDescriptions;
+
+                console.log(balanceRows[idx])
             }
 
             // update currentDay and idx for the while loop
@@ -263,6 +280,28 @@ class TimeTravel extends Component {
         return header.map((key, index) => {
             return <th key={index}>{key.toUpperCase()}</th>
         })
+    }
+
+    renderTxnLinks(balance_row, type) {
+        const { id, balanceDate, balance, income, incomeDesc, incomeDescriptions, expense, expenseDesc, expenseDescriptions, incomeLinks, expenseLinks } = balance_row;
+
+        if ("income" === type) {
+            var lks = []
+            for (var i = 0; i < incomeLinks.length; i += 1) {
+                const nl = "/addTransaction/update/"+incomeLinks[i];
+            lks.push(<><a style={{color: "black"}} href={nl}>{incomeDescriptions[i]}</a><>{" "}</></>)
+            }
+            return (lks);
+        } else {
+
+            var lks = []
+            for (var i = 0; i < expenseLinks.length; i += 1) {
+                const nl = "/addTransaction/update/"+expenseLinks[i];
+            lks.push(<><a style={{color: "black"}} href={nl}>{expenseDescriptions[i]}</a><>{" "}</></>)
+            }
+            return (lks);
+
+        }
     }
 
     renderTableData() {
@@ -285,7 +324,7 @@ class TimeTravel extends Component {
                     <tr key={id}>
                         {weekDay}
                         <td><font color={balColor}>${parseFloat(balance).toFixed(2)}</font></td>
-                        <td><font color="green">+{income}</font> ({incomeDesc})</td>
+                        <td><font color="green">+{income}</font> {this.renderTxnLinks(balance_row, "income")}</td>
                     </tr>
                 )
             } else if (incomeDesc === "" && expenseDesc !== "") {
@@ -293,7 +332,7 @@ class TimeTravel extends Component {
                     <tr key={id}>
                         {weekDay}
                         <td><font color={balColor}>${parseFloat(balance).toFixed(2)}</font></td>
-                        <td><font color="red">-{expense}</font> ({expenseDesc})</td>
+                        <td><font color="red">-{expense}</font> {this.renderTxnLinks(balance_row, "expense")} </td>
                     </tr>
                 )
             } else if (incomeDesc !== "" && expenseDesc !== "") {
@@ -301,7 +340,7 @@ class TimeTravel extends Component {
                     <tr key={id}>
                         {weekDay}
                         <td><font color={balColor}>${parseFloat(balance).toFixed(2)}</font></td>
-                        <td><font color="green">+{income}</font> ({incomeDesc}){<br />}<font color="red">-{expense}</font> ({expenseDesc})</td>
+                        <td><font color="green">+{income}</font> {this.renderTxnLinks(balance_row, "income")} {<br />}<font color="red">-{expense}</font> {this.renderTxnLinks(balance_row, "expense")}</td>
                     </tr>
                 )
             } else {
@@ -414,7 +453,7 @@ class TimeTravel extends Component {
                 <div class="filtersInput" >
                     <button class="filterTimeline" onClick={this.toggleState}><b>hide/show timeline</b></button>
                 </div>
-                
+
                 <div>
                     {this.renderTimeline()}
                 </div>
@@ -424,21 +463,21 @@ class TimeTravel extends Component {
 
     toggleState() {
         if (this.state.showTimeline) {
-            this.setState({showTimeline: false})
+            this.setState({ showTimeline: false })
         } else {
-            this.setState({showTimeline: true})
+            this.setState({ showTimeline: true })
         }
     }
     renderTimeline() {
         if (this.state.showTimeline) {
             return (
                 <table id='transactions' align="center" style={{ height: '90%', width: '98%' }}>
-                <h4><b>Timeline</b></h4>
-                <tbody>
-                    <tr>{this.renderTableHeader()}</tr>
-                    {this.renderTableData()}
-                </tbody>
-            </table>
+                    <h4><b>Timeline</b></h4>
+                    <tbody>
+                        <tr>{this.renderTableHeader()}</tr>
+                        {this.renderTableData()}
+                    </tbody>
+                </table>
             );
         } else {
             return (<></>);
@@ -518,11 +557,11 @@ class TimeTravel extends Component {
                     <div align="left">
                         <h5>Features</h5>
                         <ul>
-                            <li><h6><b>Recurring Transactions</b>: Manually inputing data is <b>boring</b> and a <b>waste of your time</b>, let a computer do it for you automatically! 
+                            <li><h6><b>Recurring Transactions</b>: Manually inputing data is <b>boring</b> and a <b>waste of your time</b>, let a computer do it for you automatically!
                             With Premium, you can make your transactions recurring, and they'll be <b>automatically created</b> on a frequency basis you choose.</h6></li>
-                            
-                            <li><h6><b>Time Travel</b>: <b>Budgets aren't realistic</b>, because life is full of unexpected events. 
-                            This feature gives you the freedom to not stress about budgets, by showing you visually (using your <b>recurring transactions</b> + your estimated amount of variable spending) 
+
+                            <li><h6><b>Time Travel</b>: <b>Budgets aren't realistic</b>, because life is full of unexpected events.
+                            This feature gives you the freedom to not stress about budgets, by showing you visually (using your <b>recurring transactions</b> + your estimated amount of variable spending)
                             if your current level of spending is sustainable for the long term.</h6></li>
                         </ul>
                     </div>

@@ -60,7 +60,7 @@ class Transactions extends Component {
                         newTxns.push(txn);
                     }
                 }
-    
+
                 var VISIBLETxns = [];
                 for (var vtxn of currentComponent.state.VISIBLE_TXNS) {
                     if (vtxn.id !== txnId) {
@@ -107,7 +107,7 @@ class Transactions extends Component {
                         // get the primary cat
                         const txnPrimaryCat = txn.category.split("-")[0];
                         if (txnPrimaryCat === category) {
-                            filteredTxns.push(txn);   
+                            filteredTxns.push(txn);
                         }
                     }
                 } else {
@@ -151,7 +151,7 @@ class Transactions extends Component {
         } else {
             return (
                 <div class="row">
-                    
+
                     <div class="column1" >
                         <div className="ccBillBox">
                             <h4>{this.state.month} <b>Credit Card Bill:</b> ${this.getCCSpending()}</h4>
@@ -270,7 +270,7 @@ class Transactions extends Component {
         var primaryCategories = []
         for (var cat of cpArr) {
             catOptions.push(<option value={cat}>{cat}</option>)
-            
+
             if (cat.split('-').length > 1) {
                 const primaryCategory = cat.split('-')[0];
                 if (!primaryCategories.includes(primaryCategory)) {
@@ -299,7 +299,7 @@ class Transactions extends Component {
             var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
             var recurring = IS_PREMIUM_USER ? <><b>Is Recurring Transaction: </b> {is_recurring ? "yes" : "no"}</> : "";
 
-            currDay = date.split('-')[0]-date.split('-')[1]-date.split('-')[2].split('T')[0] + " " + dayOfWeek;
+            currDay = date.split('-')[0] - date.split('-')[1] - date.split('-')[2].split('T')[0] + " " + dayOfWeek;
             displayDate = <h5><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
 
             function update() {
@@ -309,18 +309,18 @@ class Transactions extends Component {
 
             txnsArr.push(
                 <div>
-                <>{currDay !== previousCurrDay ? update() : ""}</>
-                <div className={classname}>
-                    <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
-                    <font size="4.5">{title} - ${amount}<br /></font>
-                    <p><b>Category:</b> {category}<br />
-                        <b>Payment Method:</b> {payment_method}<br />
-                        {recurring}
-                        {description === null ? "" : desc}</p>
-                    <button id={id} className="deleteTxnButton" onClick={this.deleteTransactionButton} >delete</button>
-                    <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
-                    <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
-                </div>
+                    <>{currDay !== previousCurrDay ? update() : ""}</>
+                    <div className={classname}>
+                        <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
+                        <font size="4.5">{title} - ${amount}<br /></font>
+                        <p><b>Category:</b> {category}<br />
+                            <b>Payment Method:</b> {payment_method}<br />
+                            {recurring}
+                            {description === null ? "" : desc}</p>
+                        <button id={id} className="deleteTxnButton" onClick={this.deleteTransactionButton} >delete</button>
+                        <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
+                        <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
+                    </div>
                 </div>
 
             );
@@ -351,7 +351,7 @@ class Transactions extends Component {
         currentComponent.setState({ IS_LOADING: true });
         fetchTransactions(currentComponent.state.year, getDoubleDigitFormat(monthNames.indexOf(currentComponent.state.month) + 1), currentComponent.state.category)
             .then(function (response) {
-                currentComponent.setState({ 
+                currentComponent.setState({
                     categories: response.categories,
                     transactions: response.transactions,
                     VISIBLE_TXNS: response.VISIBLE_TXNS,
@@ -382,7 +382,7 @@ class Transactions extends Component {
         var name = target.name;
         this.setState({ [name]: value }, () => {
             this.fetchTransactionsUpdateState();
-        }); 
+        });
     }
 
     componentDidMount() {
@@ -394,35 +394,35 @@ class Transactions extends Component {
         return (
             <div>
                 <div class="filtersInput">
-                
+
                     <div class="barStack">
-                    <label>
-                        <b>Year:</b><br />
-                        <select name="year" value={this.state.year} onChange={this.handleChange}>
-                            {this.renderYearDropdown()}
-                        </select>
-                    </label>
+                        <label>
+                            <b>Year:</b><br />
+                            <select name="year" value={this.state.year} onChange={this.handleChange}>
+                                {this.renderYearDropdown()}
+                            </select>
+                        </label>
                     </div>
 
                     <div class="barStack">
-                    <label>
-                        <b>Month:</b><br />
-                        <select name="month" value={this.state.month} onChange={this.handleChange}>
-                            {this.renderMonthDropdown()}
-                        </select>
-                    </label>
+                        <label>
+                            <b>Month:</b><br />
+                            <select name="month" value={this.state.month} onChange={this.handleChange}>
+                                {this.renderMonthDropdown()}
+                            </select>
+                        </label>
                     </div>
 
                     <div class="barStack">
-                    <label>
-                        <b>Category:</b><br />
-                        <select name="category" value={this.state.category} onChange={this.handleChange}>
-                            {this.renderCategoryDropdown()}
-                        </select>
-                    </label>
+                        <label>
+                            <b>Category:</b><br />
+                            <select name="category" value={this.state.category} onChange={this.handleChange}>
+                                {this.renderCategoryDropdown()}
+                            </select>
+                        </label>
                     </div>
                     <br clear="all" />
-                                    
+
                 </div>
                 <div className="fl">
                     {this.renderMain()}
