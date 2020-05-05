@@ -148,6 +148,18 @@ class AddTransaction extends Component {
     if (name === "is_recurring" && !this.state.IS_PREMIUM_USER) {
       this.props.history.push('/timeTravel')
 
+    } else if (name === "is_recurring" && this.state.IS_PREMIUM_USER) {
+      this.setState({ "showRecurrDropdown": value, "is_recurring": value});
+      
+      if (value) {
+        this.setState({
+          "recurring_frequency": Frequencies.ONCE
+        });
+      } else {
+        this.setState({
+          "recurring_frequency": Frequencies.NA
+        });
+      }
     } else if (name === "type") {
       value = parseInt(value);
       this.setState({
@@ -166,15 +178,6 @@ class AddTransaction extends Component {
       }
     } else {
       this.setState({ [name]: value });
-
-      if (name === "is_recurring") {
-        this.setState({ "showRecurrDropdown": value });
-        if (value) {
-          this.setState({ "recurring_frequency": this.state.recurring_frequency })
-        } else {
-          this.setState({ "recurring_frequency": Frequencies.NA })
-        }
-      }
     }
     console.log(this.state)
   }
