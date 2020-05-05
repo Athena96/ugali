@@ -259,8 +259,6 @@ class TimeTravel extends Component {
                 balanceRows[idx].expenseDesc = expenseDescStr;
                 balanceRows[idx].expenseLinks = expenseLinks;
                 balanceRows[idx].expenseDescriptions = expenseDescriptions;
-
-                console.log(balanceRows[idx])
             }
 
             // update currentDay and idx for the while loop
@@ -383,7 +381,6 @@ class TimeTravel extends Component {
 
         fetchRecurringTransactions(this.state.year, this.state.month, this.state.category)
             .then(function (response) {
-                console.log(response);
                 currentComp.setState({ recurring_txns: response.recurring_txns })
 
                 if (currentComp.variable_exp_name !== "" && currentComp.variable_exp_amount !== "" && currentComp.starting_balance !== "") {
