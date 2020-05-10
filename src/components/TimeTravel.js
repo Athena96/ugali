@@ -11,7 +11,7 @@ import {
     Line,
     ResponsiveContainer
 } from "recharts";
-import '../../node_modules/react-linechart/dist/styles.css';
+// import '../../node_modules/react-linechart/dist/styles.css';
 
 // Amplify
 import API, { graphqlOperation } from '@aws-amplify/api';
