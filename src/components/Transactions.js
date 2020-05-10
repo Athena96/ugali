@@ -144,8 +144,8 @@ class Transactions extends Component {
         } else if (!this.state.IS_LOADING && this.state.transactions.length === 0) {
             return (
                 <div class="indent">
-                    <h4>You haven't added any transactions yet.</h4>
-                    <h4>Click <b>'Add Transactions'</b> to add some!</h4>
+                    <h4>You haven't added any transactions for the month of <b>{this.state.month}</b> yet.</h4>
+                    <h4>Select <b>'Add Transaction'</b> from the menu to add some!</h4>
                 </div>
             )
         } else {
