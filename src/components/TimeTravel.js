@@ -1,6 +1,16 @@
 // React
-import React, { Component } from 'react';
-import LineChart from 'react-linechart';
+import React, { Component, PureComponent} from 'react';
+// import LineChart from 'react-linechart';
+import {
+    LineChart,
+    CartesianGrid,
+    XAxis,
+    YAxis,
+    Tooltip,
+    Legend,
+    Line,
+    ResponsiveContainer
+} from "recharts";
 import '../../node_modules/react-linechart/dist/styles.css';
 
 // Amplify
@@ -28,6 +38,20 @@ API.configure(awsconfig);
 PubSub.configure(awsconfig);
 
 const MONTHS_TO_CALCULATE = 6;
+
+class CustomizedAxisTick extends PureComponent {
+    render() {
+      const {
+        x, y, stroke, payload,
+      } = this.props;
+  
+      return (
+        <g transform={`translate(${x},${y})`}>
+          <text x={0} y={0} dy={16} textAnchor="end" fill="#666" transform="rotate(-35)">{payload.value}</text>
+        </g>
+      );
+    }
+  }
 
 class TimeTravel extends Component {
     constructor(props) {
@@ -77,22 +101,24 @@ class TimeTravel extends Component {
     // helper
     getGraphPoints() {
         // https://www.npmjs.com/package/react-linechart
+        // https://recharts.org/en-US/api
         var dp = [];
         var time = 1;
         for (var balanceRow of this.state.balance_rows) {
             var d = new Date(balanceRow.balanceDate);
             var dt = "" + d.getFullYear() + "-" + getDoubleDigitFormat(d.getMonth() + 1) + "-" + getDoubleDigitFormat(d.getDate() + 1);
-            const pt = { x: dt, y: balanceRow.balance };
+            console.log(typeof balanceRow.balance)
+            const pt = { "name": dt, "amt": time, "balance": parseFloat(balanceRow.balance) };
             dp.push(pt);
             time += 1;
         }
-        const data = [
-            {
-                color: "#FF7C7B",
-                points: dp
-            }
-        ];
-        return data;
+        // const data = [
+        //     {
+        //         color: "#FF7C7B",
+        //         points: dp
+        //     }
+        // ];
+        return dp;
     }
 
     checkTimelineInputFields() {
@@ -230,7 +256,7 @@ class TimeTravel extends Component {
                 // update income
                 var incomeStr = ""
                 var incomeDescStr = ""
-                var incomeLinks = [];               
+                var incomeLinks = [];
                 var incomeDescriptions = [];
                 for (var incomeTxn of recurringIncomes) {
                     incomeStr += ("$" + incomeTxn.amount.toString() + ", ");
@@ -286,16 +312,16 @@ class TimeTravel extends Component {
         if ("income" === type) {
             var lks = []
             for (var i = 0; i < incomeLinks.length; i += 1) {
-                const nl = "/addTransaction/update/"+incomeLinks[i];
-            lks.push(<><a style={{color: "black"}} href={nl}>{incomeDescriptions[i]}</a><>{" "}</></>)
+                const nl = "/addTransaction/update/" + incomeLinks[i];
+                lks.push(<><a style={{ color: "black" }} href={nl}>{incomeDescriptions[i]}</a><>{" "}</></>)
             }
             return (lks);
         } else {
 
             var lks = []
             for (var i = 0; i < expenseLinks.length; i += 1) {
-                const nl = "/addTransaction/update/"+expenseLinks[i];
-            lks.push(<><a style={{color: "black"}} href={nl}>{expenseDescriptions[i]}</a><>{" "}</></>)
+                const nl = "/addTransaction/update/" + expenseLinks[i];
+                lks.push(<><a style={{ color: "black" }} href={nl}>{expenseDescriptions[i]}</a><>{" "}</></>)
             }
             return (lks);
 
@@ -429,22 +455,22 @@ class TimeTravel extends Component {
                         onChange={this.handleChange} /><br />
 
                     <button class="filterTimeline" onClick={this.generateTimeline}><b>generate timeline</b></button>
-
-                    <div align="center">
+                </div>
+                <div >
+                    <ResponsiveContainer height={400} width='100%'>
                         <LineChart
-                            margins={{ top: 0, right: 0, bottom: 0, left: 0 }}
-                            hidePoints={true}
-                            isDate={true}
-                            yMin={0}
-                            width={450}
-                            height={200}
-                            hideXLabel={true}
-                            yLabel={"Balance"}
-                            xLabel={"Time"}
-
                             data={this.getGraphPoints()}
-                        />
-                    </div>
+                            margin={{ top: 20, right: 20, left: 0, bottom: 5 }}
+                        >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" height={60} tick={<CustomizedAxisTick />} />
+
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Line type="monotone" dataKey="balance" stroke="#8884d8" dot={false}  />
+
+                        </LineChart></ResponsiveContainer>
                 </div>
 
                 <div class="filtersInput" >
