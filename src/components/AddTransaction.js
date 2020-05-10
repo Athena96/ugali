@@ -146,6 +146,7 @@ class AddTransaction extends Component {
     var name = target.name;
 
     if (name === "is_recurring" && !this.state.IS_PREMIUM_USER) {
+      window.alert("Oops, 'Recurring Transactions' is a premium feature.");
       this.props.history.push('/timeTravel')
 
     } else if (name === "is_recurring" && this.state.IS_PREMIUM_USER) {
