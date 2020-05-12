@@ -162,7 +162,23 @@
     display: inline-block;
     border-radius: 8px;
     font-size: 13px;
-    margin: 4px 2px;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+.deleteButton {
+    background-color: rgb(151, 7, 7);
+    border: none;
+    color: white;
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-top: 4px;
+    margin-bottom: 2px;
 }
 
 .filter {

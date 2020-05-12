@@ -17,6 +17,11 @@ import { Frequencies } from '../common/Utilities';
 import { fetchTransactionsForUserBetween, fetchTransactionBy } from '../dataAccess/TransactionAccess';
 import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 
+// Data Mutation
+import { deleteTransactionWithId } from '../dataMutation/TransactionMutation';
+import { deleteTransaction } from '../graphql/mutations';
+
+
 // Global
 var ORIGINAL_DATE = { fullStr: "", month: "", day: "", year: "" };
 var IS_DUPLICATE = false;
@@ -63,6 +68,7 @@ class AddTransaction extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.renderButton = this.renderButton.bind(this);
     this.updateParentRecurringTransaction = this.updateParentRecurringTransaction.bind(this);
+    this.deleteTransaction = this.deleteTransaction.bind(this);
   }
 
   componentDidMount() {
@@ -188,23 +194,30 @@ class AddTransaction extends Component {
 
       if (IS_UPDATE && this.state.wasAutoAdded) {
         return (
-          <>
+          <div>
             <button class="updateButton" onClick={this.handleSubmit}>Update</button>
             <button className="updateButton" onClick={this.updateParentRecurringTransaction} >Update Original Recurring Tranaction</button>
-          </>
+            <button class="deleteButton" onClick={this.deleteTransaction}>Delete</button>
+          </div>
         )
       } else {
         return (
-          <>
+          <div>
             <button class="updateButton" onClick={this.handleSubmit}>Update</button>
-          </>
+            <button class="deleteButton" onClick={this.deleteTransaction}>Delete</button>
+          </div>
         )
       }
 
 
     } else {
       return (
+        <div>
+
         <button class="addButton" onClick={this.handleSubmit}>Submit</button>
+
+        </div>
+
       )
     }
   }
@@ -273,6 +286,7 @@ class AddTransaction extends Component {
   }
 
   async handleSubmit(e) {
+    console.log("HANDLE SUBMIT");
     // todo ?
     e.preventDefault();
 
@@ -420,12 +434,27 @@ class AddTransaction extends Component {
     window.location.reload(false)
   }
 
+  deleteTransaction() {
+let currcom = this;
+const txnId = this.state.exampleTxnId;
+
+deleteTransactionWithId(txnId)
+        .then(function (response) {
+          window.alert("Successfully deleted your transaction!");      
+          currcom.resetState();  
+
+        })
+        .catch(function (response) {
+            console.log(response);
+        });
+  }
+
   render() {
     return (
       <div>
         <div className="addTransactionBackground">
           <small>* required fields</small>
-          <form onSubmit={this.handleSubmit}>
+          <div>
             <label>
               <b>*Title:</b><br />
               <input
@@ -531,9 +560,10 @@ class AddTransaction extends Component {
             {this.renderPremiumFeatures()}
 
             <br />
+
             {this.renderButton()}
 
-          </form>
+          </div>
 
         </div>
       </div>
