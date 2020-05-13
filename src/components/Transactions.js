@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 // Amplify
-import API, { graphqlOperation } from '@aws-amplify/api';
+import API from '@aws-amplify/api';
 import PubSub from '@aws-amplify/pubsub';
 import awsconfig from '../aws-exports';
 
@@ -49,25 +49,24 @@ class Transactions extends Component {
 
     // operations
     deleteTransactionButton(event) {
-        let currentComponent = this;
         const txnId = event.target.id;
         deleteTransactionWithId(txnId)
-            .then(function (response) {
+            .then( (response) => {
                 window.alert("Successfully deleted your transaction!");
                 var newTxns = [];
-                for (var txn of currentComponent.state.transactions) {
+                for (var txn of this.state.transactions) {
                     if (txn.id !== txnId) {
                         newTxns.push(txn);
                     }
                 }
 
                 var VISIBLETxns = [];
-                for (var vtxn of currentComponent.state.VISIBLE_TXNS) {
+                for (var vtxn of this.state.VISIBLE_TXNS) {
                     if (vtxn.id !== txnId) {
                         VISIBLETxns.push(vtxn);
                     }
                 }
-                currentComponent.setState({
+                this.setState({
                     transactions: newTxns,
                     VISIBLE_TXNS: VISIBLETxns,
                 });
@@ -291,7 +290,7 @@ class Transactions extends Component {
         var previousCurrDay = "diff"
         for (var transaction of this.state.VISIBLE_TXNS) {
 
-            const { id, title, amount, category, date, recurring_frequency, type, payment_method, description, is_recurring, recurring_fre } = transaction;
+            const { id, title, amount, category, date, recurring_frequency, type, payment_method, description, is_recurring } = transaction;
             var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
             const dayIdx = new Date(date);
             const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -303,14 +302,15 @@ class Transactions extends Component {
             currDay = date.split('-')[0] - date.split('-')[1] - date.split('-')[2].split('T')[0] + " " + dayOfWeek;
             displayDate = <h5><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
 
-            function update() {
+            var dispDt = "";
+            if (currDay !== previousCurrDay) {
                 previousCurrDay = currDay;
-                return displayDate
+                dispDt = displayDate;
             }
-
+            
             txnsArr.push(
                 <div>
-                    <>{currDay !== previousCurrDay ? update() : ""}</>
+                    <>{dispDt}</>
                     <div className={classname}>
                         <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
                         <font size="4.5">{title} - ${amount}<br /></font>
@@ -348,17 +348,16 @@ class Transactions extends Component {
 
     // data
     fetchTransactionsUpdateState() {
-        let currentComponent = this;
-        currentComponent.setState({ IS_LOADING: true });
-        fetchTransactions(currentComponent.state.year, getDoubleDigitFormat(monthNames.indexOf(currentComponent.state.month) + 1), currentComponent.state.category)
-            .then(function (response) {
-                currentComponent.setState({
+        this.setState({ IS_LOADING: true });
+        fetchTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1), this.state.category)
+            .then( (response) => {
+                this.setState({
                     categories: response.categories,
                     transactions: response.transactions,
                     VISIBLE_TXNS: response.VISIBLE_TXNS,
                     IS_LOADING: false
                 }, () => {
-                    currentComponent.filterTransactions(currentComponent.state.year, getDoubleDigitFormat(monthNames.indexOf(currentComponent.state.month) + 1), currentComponent.state.category);
+                    this.filterTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1), this.state.category);
                 })
             })
             .catch(function (response) {

@@ -1,6 +1,5 @@
 // React
 import React, { Component, PureComponent} from 'react';
-// import LineChart from 'react-linechart';
 import {
     LineChart,
     CartesianGrid,
@@ -11,7 +10,6 @@ import {
     Line,
     ResponsiveContainer
 } from "recharts";
-// import '../../node_modules/react-linechart/dist/styles.css';
 
 // Amplify
 import API, { graphqlOperation } from '@aws-amplify/api';
@@ -31,7 +29,7 @@ import { fetchRecurringTransactions } from '../dataAccess/TransactionAccess';
 import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 
 // Common
-import { getDoubleDigitFormat, convertDateStrToGraphqlDate, graphqlDateFromJSDate } from '../common/Utilities';
+import { getDoubleDigitFormat, graphqlDateFromJSDate } from '../common/Utilities';
 import { Frequencies, getLastDayOfMonthFromDate } from '../common/Utilities';
 
 API.configure(awsconfig);
@@ -42,7 +40,7 @@ const MONTHS_TO_CALCULATE = 6;
 class CustomizedAxisTick extends PureComponent {
     render() {
       const {
-        x, y, stroke, payload,
+        x, y, payload,
       } = this.props;
   
       return (
@@ -81,7 +79,7 @@ class TimeTravel extends Component {
     async addNewPremiumUser(premiumUser) {
         // submit
         try {
-            const res = await API.graphql(graphqlOperation(createPremiumUsers, { input: premiumUser }));
+            await API.graphql(graphqlOperation(createPremiumUsers, { input: premiumUser }));
         } catch (err) {
             console.log(err);
             window.alert("Encountered error adding you to our premium user list.\nEmail: zenspending@gmail for support.");
@@ -91,7 +89,7 @@ class TimeTravel extends Component {
     async updatePremiumUser(premiumUser) {
         // submit
         try {
-            const res = await API.graphql(graphqlOperation(updatePremiumUsers, { input: premiumUser }));
+            await API.graphql(graphqlOperation(updatePremiumUsers, { input: premiumUser }));
         } catch (err) {
             console.log(err);
             window.alert("Encountered error updating your premium user subscription.\nEmail: zenspending@gmail for support.");
@@ -100,50 +98,43 @@ class TimeTravel extends Component {
 
     // helper
     getGraphPoints() {
-        // https://www.npmjs.com/package/react-linechart
         // https://recharts.org/en-US/api
         var dp = [];
         var time = 1;
         for (var balanceRow of this.state.balance_rows) {
             var d = new Date(balanceRow.balanceDate);
             var dt = "" + d.getFullYear() + "-" + getDoubleDigitFormat(d.getMonth() + 1) + "-" + getDoubleDigitFormat(d.getDate() + 1);
-            console.log(typeof balanceRow.balance)
-            const pt = { "name": dt, "amt": time, "balance": parseFloat(balanceRow.balance) };
+            const bal = parseFloat(parseFloat(balanceRow.balance).toFixed(2));
+            const pt = { "name": dt, "amt": time, "balance": bal };
             dp.push(pt);
             time += 1;
         }
-        // const data = [
-        //     {
-        //         color: "#FF7C7B",
-        //         points: dp
-        //     }
-        // ];
         return dp;
     }
 
     checkTimelineInputFields() {
-        if (this.state.variable_exp_amount == "") {
+        if (this.state.variable_exp_amount === "") {
             if (localStorage.getItem("variable_exp_amount") != null) {
-                this.state.variable_exp_amount = localStorage.getItem("variable_exp_amount");
+                this.setState({variable_exp_amount: localStorage.getItem("variable_exp_amount")})
             } else {
                 window.alert("Must input value for variable spending, name, value and initial balance.");
                 return;
             }
         } else {
-            if (localStorage.getItem("variable_exp_amount") == null || (localStorage.getItem("variable_exp_amount") != null && localStorage.getItem("variable_exp_amount") != this.state.variable_exp_amount)) {
+            if (localStorage.getItem("variable_exp_amount") == null || (localStorage.getItem("variable_exp_amount") != null && localStorage.getItem("variable_exp_amount") !== this.state.variable_exp_amount)) {
                 localStorage.setItem("variable_exp_amount", this.state.variable_exp_amount);
             }
         }
 
-        if (this.state.starting_balance == "") {
+        if (this.state.starting_balance === "") {
             if (localStorage.getItem("starting_balance") != null) {
-                this.state.starting_balance = localStorage.getItem("starting_balance");
+                this.setState({starting_balance: localStorage.getItem("starting_balance")})
             } else {
                 window.alert("Must input value for variable spending, name, value and initial balance.");
                 return;
             }
         } else {
-            if (localStorage.getItem("starting_balance") == null || (localStorage.getItem("starting_balance") != null && localStorage.getItem("starting_balance") != this.state.starting_balance)) {
+            if (localStorage.getItem("starting_balance") == null || (localStorage.getItem("starting_balance") != null && localStorage.getItem("starting_balance") !== this.state.starting_balance)) {
                 localStorage.setItem("starting_balance", this.state.starting_balance);
             }
         }
@@ -217,8 +208,8 @@ class TimeTravel extends Component {
                     function datediff(first, second) {
                         return Math.round((second - first) / (1000 * 60 * 60 * 24));
                     }
-                    var dtObj = new Date(recurrTxn.date);
-                    if (dtObj.getDay() === currentDay.getDay() && (datediff(dtObj, currentDay) % 14 === 0)) {
+                    var dtObjBiWeek = new Date(recurrTxn.date);
+                    if (dtObjBiWeek.getDay() === currentDay.getDay() && (datediff(dtObjBiWeek, currentDay) % 14 === 0)) {
                         (recurrTxn.type === 2) ? recurringExpenses.push(recurrTxn) : recurringIncomes.push(recurrTxn);
                     }
                 } else if (Frequencies.FIRST_DAY_OF_MONTH === recurrTxn.recurring_frequency) {
@@ -245,7 +236,7 @@ class TimeTravel extends Component {
             }
 
             // update the balance row object with our recurring txns that we found for today.
-            if (recurringIncomes.length != 0 || recurringExpenses.length != 0) {
+            if (recurringIncomes.length !== 0 || recurringExpenses.length !== 0) {
                 // update balance
                 var totalIncome = recurringIncomes.map(item => item.amount).reduce((prev, next) => prev + next, 0.0);
                 var totalExpense = recurringExpenses.map(item => item.amount).reduce((prev, next) => prev + next, 0.0);
@@ -307,24 +298,23 @@ class TimeTravel extends Component {
     }
 
     renderTxnLinks(balance_row, type) {
-        const { id, balanceDate, balance, income, incomeDesc, incomeDescriptions, expense, expenseDesc, expenseDescriptions, incomeLinks, expenseLinks } = balance_row;
+        const { incomeDescriptions, expenseDescriptions, incomeLinks, expenseLinks } = balance_row;
 
         if ("income" === type) {
-            var lks = []
+            var lksIncome = []
             for (var i = 0; i < incomeLinks.length; i += 1) {
                 const nl = "/addTransaction/update/" + incomeLinks[i];
-                lks.push(<><a style={{ color: "black" }} href={nl}>{incomeDescriptions[i]}</a><>{" "}</></>)
+                lksIncome.push(<><a style={{ color: "black" }} href={nl}>{incomeDescriptions[i]}</a><>{" "}</></>)
             }
-            return (lks);
+            return (lksIncome);
         } else {
 
-            var lks = []
-            for (var i = 0; i < expenseLinks.length; i += 1) {
-                const nl = "/addTransaction/update/" + expenseLinks[i];
-                lks.push(<><a style={{ color: "black" }} href={nl}>{expenseDescriptions[i]}</a><>{" "}</></>)
+            var lksExpense = []
+            for (var j = 0; j < expenseLinks.length; j += 1) {
+                const nl = "/addTransaction/update/" + expenseLinks[j];
+                lksExpense.push(<><a style={{ color: "black" }} href={nl}>{expenseDescriptions[j]}</a><>{" "}</></>)
             }
-            return (lks);
-
+            return (lksExpense);
         }
     }
 
@@ -382,14 +372,13 @@ class TimeTravel extends Component {
 
     // life cycle
     componentDidMount() {
-        let currentComponent = this;
         this.setState({ IS_LOADING: true });
         checkIfPremiumUser()
-            .then(function (response) {
-                currentComponent.setState({ isPremiumUser: response.isPremiumUser })
-                currentComponent.setState({ subscriptionExpired: response.subscriptionExpired })
-                currentComponent.setState({ premiumUser: response.premiumUser })
-                currentComponent.setState({ IS_LOADING: false });
+            .then( (response) => {
+                this.setState({ isPremiumUser: response.isPremiumUser })
+                this.setState({ subscriptionExpired: response.subscriptionExpired })
+                this.setState({ premiumUser: response.premiumUser })
+                this.setState({ IS_LOADING: false });
             })
             .catch(function (response) {
                 console.log(response);
@@ -403,14 +392,12 @@ class TimeTravel extends Component {
             this.setState({ starting_balance: localStorage.getItem("starting_balance") });
         }
 
-        var currentComp = this;
-
         fetchRecurringTransactions(this.state.year, this.state.month, this.state.category)
-            .then(function (response) {
-                currentComp.setState({ recurring_txns: response.recurring_txns })
+            .then( (response) => {
+                this.setState({ recurring_txns: response.recurring_txns })
 
-                if (currentComp.variable_exp_name !== "" && currentComp.variable_exp_amount !== "" && currentComp.starting_balance !== "") {
-                    currentComp.generateTimeline();
+                if (this.variable_exp_name !== "" && this.variable_exp_amount !== "" && this.starting_balance !== "") {
+                    this.generateTimeline();
                 }
 
             })
@@ -468,7 +455,7 @@ class TimeTravel extends Component {
                             <YAxis />
                             <Tooltip />
                             <Legend />
-                            <Line type="monotone" dataKey="balance" stroke="#8884d8" dot={false}  />
+                            <Line type="monotone" dataKey="balance" stroke="#ff7b7b" dot={false}  />
 
                         </LineChart></ResponsiveContainer>
                 </div>
@@ -532,10 +519,7 @@ class TimeTravel extends Component {
                                     if (this.state.isPremiumUser && this.state.subscriptionExpired) {
                                         // construct premium user
                                         const today = new Date();
-                                        var year = today.getFullYear();
-                                        var month = today.getMonth();
-                                        var day = today.getDate();
-                                        var newExpDate = new Date(year + 1, month, day);
+                                        var newExpDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
 
                                         const updatedUser = {
                                             id: this.state.premiumUser.id,
@@ -549,13 +533,10 @@ class TimeTravel extends Component {
                                         // add user to premium user table.
                                         this.updatePremiumUser(updatedUser);
                                         alert("Transaction completed!\nWe here at ZenSpending thank you for renewing your membership!\nRefresh the page to start using Premium Features!");
-                                    } else if (this.state.isPremiumUser == false) {
+                                    } else if (this.state.isPremiumUser === false) {
                                         // construct premium user
                                         const today = new Date();
-                                        var year = today.getFullYear();
-                                        var month = today.getMonth();
-                                        var day = today.getDate();
-                                        var expDate = new Date(year + 1, month, day);
+                                        var expDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
 
                                         const premiumUser = {
                                             user: email,
