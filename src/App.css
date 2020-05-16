@@ -295,6 +295,34 @@
     margin: 4px 2px;
 }
 
+.expenseRecurrTxn {
+    background-color: rgb(235, 235, 235);
+    border: none;
+    color: black;
+    width: 100%;
+    padding: 10px;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
+}
+
+.incomeRecurrTxn {
+    background-color: rgb(3, 54, 6);
+    border: none;
+    color: white;
+    width: 100%;
+    padding: 10px;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
+}
+
 .incomeTxn {
     background-color: rgb(3, 54, 6);
     border: none;
@@ -455,6 +483,12 @@
     margin-top: 8px;
     margin-left: 12px;
     margin-right: 12px;
+}
+
+.inset {
+    margin-top: 8px;
+    margin-left: 32px;
+    margin-right: 32px;
 }
 
 .fl {

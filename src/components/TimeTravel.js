@@ -1,5 +1,5 @@
 // React
-import React, { Component, PureComponent} from 'react';
+import React, { Component, PureComponent } from 'react';
 import {
     LineChart,
     CartesianGrid,
@@ -24,6 +24,9 @@ import { PayPalButton } from "react-paypal-button-v2";
 import { createPremiumUsers } from '../graphql/mutations';
 import { updatePremiumUsers } from '../graphql/mutations';
 
+// Data Mutation
+import { deleteTransactionWithId } from '../dataMutation/TransactionMutation';
+
 // Data Access
 import { fetchRecurringTransactions } from '../dataAccess/TransactionAccess';
 import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
@@ -39,17 +42,17 @@ const MONTHS_TO_CALCULATE = 6;
 
 class CustomizedAxisTick extends PureComponent {
     render() {
-      const {
-        x, y, payload,
-      } = this.props;
-  
-      return (
-        <g transform={`translate(${x},${y})`}>
-          <text x={0} y={0} dy={16} textAnchor="end" fill="#666" transform="rotate(-35)">{payload.value}</text>
-        </g>
-      );
+        const {
+            x, y, payload,
+        } = this.props;
+
+        return (
+            <g transform={`translate(${x},${y})`}>
+                <text x={0} y={0} dy={16} textAnchor="end" fill="#666" transform="rotate(-35)">{payload.value}</text>
+            </g>
+        );
     }
-  }
+}
 
 class TimeTravel extends Component {
     constructor(props) {
@@ -65,17 +68,47 @@ class TimeTravel extends Component {
             isPremiumUser: false,
             subscriptionExpired: true,
             premiumUsers: {},
-            IS_LOADING: true,
-            showTimeline: false
+            IS_LOADING: true
         };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.generateTimeline = this.generateTimeline.bind(this);
-        this.toggleState = this.toggleState.bind(this);
-
+        this.deleteTransactionButton = this.deleteTransactionButton.bind(this);
+        this.updateTransaction = this.updateTransaction.bind(this);
+        this.duplicateTransaction = this.duplicateTransaction.bind(this);
     }
 
-    // operation
+    // operations
+    deleteTransactionButton(event) {
+        const txnId = event.target.id;
+        deleteTransactionWithId(txnId)
+            .then((response) => {
+                window.alert("Successfully deleted your transaction!");
+                var newTxns = [];
+                for (var txn of this.state.recurring_txns) {
+                    if (txn.id !== txnId) {
+                        newTxns.push(txn);
+                    }
+                }
+
+                this.setState({
+                    recurring_txns: newTxns,
+                });
+            })
+            .catch(function (response) {
+                console.log(response);
+                window.alert(response);
+            });
+    }
+
+    updateTransaction(event) {
+        this.props.history.push('/addTransaction/update/' + event.target.id)
+    }
+
+    duplicateTransaction(event) {
+        this.props.history.push('/addTransaction/duplicate/' + event.target.id)
+    }
+
     async addNewPremiumUser(premiumUser) {
         // submit
         try {
@@ -115,7 +148,7 @@ class TimeTravel extends Component {
     checkTimelineInputFields() {
         if (this.state.variable_exp_amount === "") {
             if (localStorage.getItem("variable_exp_amount") != null) {
-                this.setState({variable_exp_amount: localStorage.getItem("variable_exp_amount")})
+                this.setState({ variable_exp_amount: localStorage.getItem("variable_exp_amount") })
             } else {
                 window.alert("Must input value for variable spending, name, value and initial balance.");
                 return;
@@ -128,7 +161,7 @@ class TimeTravel extends Component {
 
         if (this.state.starting_balance === "") {
             if (localStorage.getItem("starting_balance") != null) {
-                this.setState({starting_balance: localStorage.getItem("starting_balance")})
+                this.setState({ starting_balance: localStorage.getItem("starting_balance") })
             } else {
                 window.alert("Must input value for variable spending, name, value and initial balance.");
                 return;
@@ -139,6 +172,7 @@ class TimeTravel extends Component {
             }
         }
     }
+
     generateTimeline() {
         this.checkTimelineInputFields();
 
@@ -254,7 +288,6 @@ class TimeTravel extends Component {
                     incomeDescStr += (incomeTxn.title + ", ");
                     incomeLinks.push(incomeTxn.id);
                     incomeDescriptions.push(incomeTxn.title);
-
                 }
                 balanceRows[idx].income = incomeStr;
                 balanceRows[idx].incomeDesc = incomeDescStr;
@@ -289,92 +322,12 @@ class TimeTravel extends Component {
         });
     }
 
-    // render / ui
-    renderTableHeader() {
-        let header = ['date', 'balance', 'income-expense'];
-        return header.map((key, index) => {
-            return <th key={index}>{key.toUpperCase()}</th>
-        })
-    }
-
-    renderTxnLinks(balance_row, type) {
-        const { incomeDescriptions, expenseDescriptions, incomeLinks, expenseLinks } = balance_row;
-
-        if ("income" === type) {
-            var lksIncome = []
-            for (var i = 0; i < incomeLinks.length; i += 1) {
-                const nl = "/addTransaction/update/" + incomeLinks[i];
-                lksIncome.push(<><a style={{ color: "black" }} href={nl}>{incomeDescriptions[i]}</a><>{" "}</></>)
-            }
-            return (lksIncome);
-        } else {
-
-            var lksExpense = []
-            for (var j = 0; j < expenseLinks.length; j += 1) {
-                const nl = "/addTransaction/update/" + expenseLinks[j];
-                lksExpense.push(<><a style={{ color: "black" }} href={nl}>{expenseDescriptions[j]}</a><>{" "}</></>)
-            }
-            return (lksExpense);
-        }
-    }
-
-    renderTableData() {
-        return this.state.balance_rows.map((balance_row, index) => {
-            const { id, balanceDate, balance, income, incomeDesc, expense, expenseDesc } = balance_row;
-            var year = balanceDate.getFullYear();
-            var month = balanceDate.getMonth() + 1;
-            var day = balanceDate.getDate();
-            const dayIdx = balanceDate.getDay();
-            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-            var dayOfWeek = days[dayIdx];
-            var weekDay = <td>{year + "-" + month + "-" + day + " " + dayOfWeek}</td>;
-            if (dayIdx === 0 || dayIdx === 6) {
-                weekDay = <td><b>{year + "-" + month + "-" + day + " " + dayOfWeek}</b></td>;
-            }
-            var balColor = (balance <= 0.0) ? "red" : "black";
-
-            if (incomeDesc !== "" && expenseDesc === "") {
-                return (
-                    <tr key={id}>
-                        {weekDay}
-                        <td><font color={balColor}>${parseFloat(balance).toFixed(2)}</font></td>
-                        <td><font color="green">+{income}</font> {this.renderTxnLinks(balance_row, "income")}</td>
-                    </tr>
-                )
-            } else if (incomeDesc === "" && expenseDesc !== "") {
-                return (
-                    <tr key={id}>
-                        {weekDay}
-                        <td><font color={balColor}>${parseFloat(balance).toFixed(2)}</font></td>
-                        <td><font color="red">-{expense}</font> {this.renderTxnLinks(balance_row, "expense")} </td>
-                    </tr>
-                )
-            } else if (incomeDesc !== "" && expenseDesc !== "") {
-                return (
-                    <tr key={id}>
-                        {weekDay}
-                        <td><font color={balColor}>${parseFloat(balance).toFixed(2)}</font></td>
-                        <td><font color="green">+{income}</font> {this.renderTxnLinks(balance_row, "income")} {<br />}<font color="red">-{expense}</font> {this.renderTxnLinks(balance_row, "expense")}</td>
-                    </tr>
-                )
-            } else {
-                return (
-                    <tr key={id}>
-                        {weekDay}
-                        <td><font color={balColor}>${parseFloat(balance).toFixed(2)}</font></td>
-                        <td></td>
-                    </tr>
-                )
-            }
-
-        })
-    }
 
     // life cycle
     componentDidMount() {
         this.setState({ IS_LOADING: true });
         checkIfPremiumUser()
-            .then( (response) => {
+            .then((response) => {
                 this.setState({ isPremiumUser: response.isPremiumUser })
                 this.setState({ subscriptionExpired: response.subscriptionExpired })
                 this.setState({ premiumUser: response.premiumUser })
@@ -393,19 +346,16 @@ class TimeTravel extends Component {
         }
 
         fetchRecurringTransactions(this.state.year, this.state.month, this.state.category)
-            .then( (response) => {
+            .then((response) => {
                 this.setState({ recurring_txns: response.recurring_txns })
-
                 if (this.variable_exp_name !== "" && this.variable_exp_amount !== "" && this.starting_balance !== "") {
                     this.generateTimeline();
                 }
-
             })
             .catch(function (response) {
                 // Handle error
                 console.log(response);
             });
-
     }
 
     handleChange(event) {
@@ -455,43 +405,55 @@ class TimeTravel extends Component {
                             <YAxis />
                             <Tooltip />
                             <Legend />
-                            <Line type="monotone" dataKey="balance" stroke="#ff7b7b" dot={false}  />
+                            <Line type="monotone" dataKey="balance" stroke="#ff7b7b" dot={false} />
 
                         </LineChart></ResponsiveContainer>
                 </div>
 
-                <div class="filtersInput" >
-                    <button class="filterTimeline" onClick={this.toggleState}><b>hide/show timeline</b></button>
+                <div class="inset" >
+                    <h4><b>Recurring Transactions</b></h4>
+                    {this.renderRecurringTransactions()}
                 </div>
 
-                <div>
-                    {this.renderTimeline()}
-                </div>
             </div>
         );
     }
 
-    toggleState() {
-        if (this.state.showTimeline) {
-            this.setState({ showTimeline: false })
-        } else {
-            this.setState({ showTimeline: true })
-        }
-    }
-    renderTimeline() {
-        if (this.state.showTimeline) {
-            return (
-                <table id='transactions' align="center" style={{ height: '90%', width: '98%' }}>
-                    <h4><b>Timeline</b></h4>
-                    <tbody>
-                        <tr>{this.renderTableHeader()}</tr>
-                        {this.renderTableData()}
-                    </tbody>
-                </table>
+    renderRecurringTransactions() {
+        var txnsArr = [];
+        var displayDate;
+        var currDay = ""
+        for (var transaction of this.state.recurring_txns) {
+            const { id, title, amount, category, date, recurring_frequency, type, payment_method, description, is_recurring } = transaction;
+            var classname = (type === 1) ? "incomeRecurrTxn" : "expenseRecurrTxn";
+            const dayIdx = new Date(date);
+            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            var dayOfWeek = days[dayIdx.getDay()];
+            var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
+            var yesmessage = "yes (" + recurring_frequency + ")";
+            var recurring = <><b>Is Recurring Transaction: </b> {yesmessage}</>;
+
+            currDay = date.split('-')[0] - date.split('-')[1] - date.split('-')[2].split('T')[0] + " " + dayOfWeek;
+            displayDate = <h5><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
+
+            txnsArr.push(
+                <div>
+                    <div className={classname}>
+                        <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
+                        <font size="4.5">{title} - ${amount}<br /></font>
+                        <p><b>Category:</b> {category}<br />
+                            <b>Payment Method:</b> {payment_method}<br />
+                            {recurring}
+                            {description === null ? "" : desc}</p>
+                        <button id={id} className="deleteTxnButton" onClick={this.deleteTransactionButton} >delete</button>
+                        <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
+                        <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
+                    </div>
+                </div>
             );
-        } else {
-            return (<></>);
         }
+
+        return txnsArr;
     }
 
     renderBuyPage() {
