@@ -1,5 +1,7 @@
 // React
 import React, { Component, PureComponent } from 'react';
+import { Slider } from 'material-ui-slider';
+
 import {
     LineChart,
     CartesianGrid,
@@ -53,6 +55,7 @@ class CustomizedAxisTick extends PureComponent {
         );
     }
 }
+var REALTIME_SLIDER_VAL = 0;
 
 class TimeTravel extends Component {
     constructor(props) {
@@ -63,13 +66,15 @@ class TimeTravel extends Component {
             variable_exp_name: "Variably Monthly Spending (Credit Card)",
             variable_exp_amount: "0.0",
             recurring_txns: [],
-            starting_balance: "0.0",
             user: "",
             isPremiumUser: false,
             subscriptionExpired: true,
             premiumUsers: {},
-            IS_LOADING: true
+            IS_LOADING: true,
+            variableSpending: 0
         };
+
+        this.after = this.after.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.generateTimeline = this.generateTimeline.bind(this);
@@ -145,37 +150,7 @@ class TimeTravel extends Component {
         return dp;
     }
 
-    checkTimelineInputFields() {
-        if (this.state.variable_exp_amount === "") {
-            if (localStorage.getItem("variable_exp_amount") != null) {
-                this.setState({ variable_exp_amount: localStorage.getItem("variable_exp_amount") })
-            } else {
-                window.alert("Must input value for variable spending, name, value and initial balance.");
-                return;
-            }
-        } else {
-            if (localStorage.getItem("variable_exp_amount") == null || (localStorage.getItem("variable_exp_amount") != null && localStorage.getItem("variable_exp_amount") !== this.state.variable_exp_amount)) {
-                localStorage.setItem("variable_exp_amount", this.state.variable_exp_amount);
-            }
-        }
-
-        if (this.state.starting_balance === "") {
-            if (localStorage.getItem("starting_balance") != null) {
-                this.setState({ starting_balance: localStorage.getItem("starting_balance") })
-            } else {
-                window.alert("Must input value for variable spending, name, value and initial balance.");
-                return;
-            }
-        } else {
-            if (localStorage.getItem("starting_balance") == null || (localStorage.getItem("starting_balance") != null && localStorage.getItem("starting_balance") !== this.state.starting_balance)) {
-                localStorage.setItem("starting_balance", this.state.starting_balance);
-            }
-        }
-    }
-
     generateTimeline() {
-        this.checkTimelineInputFields();
-
         this.shownRecorded = {};
         var balanceRows = [];
         var start = new Date();
@@ -190,7 +165,7 @@ class TimeTravel extends Component {
             balanceRows[idx] = {
                 id: idx,
                 balanceDate: new Date(currentDay),
-                balance: (idx === 0) ? this.state.starting_balance : balanceRows[idx - 1].balance,
+                balance: (idx === 0) ? 0 : balanceRows[idx - 1].balance,
                 income: "",
                 incomeDesc: "",
                 expense: "",
@@ -322,7 +297,6 @@ class TimeTravel extends Component {
         });
     }
 
-
     // life cycle
     componentDidMount() {
         this.setState({ IS_LOADING: true });
@@ -337,20 +311,10 @@ class TimeTravel extends Component {
                 console.log(response);
             });
 
-        // check local storage for saved values, if have some, populate the fields with it.
-        if (localStorage.getItem("variable_exp_amount") != null) {
-            this.setState({ variable_exp_amount: localStorage.getItem("variable_exp_amount") });
-        }
-        if (localStorage.getItem("starting_balance") != null) {
-            this.setState({ starting_balance: localStorage.getItem("starting_balance") });
-        }
-
         fetchRecurringTransactions(this.state.year, this.state.month, this.state.category)
             .then((response) => {
                 this.setState({ recurring_txns: response.recurring_txns })
-                if (this.variable_exp_name !== "" && this.variable_exp_amount !== "" && this.starting_balance !== "") {
-                    this.generateTimeline();
-                }
+                this.generateTimeline();
             })
             .catch(function (response) {
                 // Handle error
@@ -359,6 +323,11 @@ class TimeTravel extends Component {
     }
 
     handleChange(event) {
+        if (typeof event === "number") {
+            REALTIME_SLIDER_VAL = event;
+            return;
+        }
+
         var target = event.target;
         var value = target.value;
         var name = target.name;
@@ -367,33 +336,21 @@ class TimeTravel extends Component {
         });
     }
 
+
+
+    after() {
+        this.setState({
+            variableSpending: REALTIME_SLIDER_VAL,
+            variable_exp_amount: REALTIME_SLIDER_VAL.toString()
+        }, () => {
+            this.generateTimeline()
+        });
+    }
+
     renderPremiumUserPage() {
         return (
             <div>
-                <div class="filtersInput" >
-                    <b>Amount:</b><br />
-                    <input
-                        className="roundedOutline"
-                        name="variable_exp_amount"
-                        placeholder="variable expense amount"
-                        type="text"
-                        value={this.state.variable_exp_amount}
-                        onChange={this.handleChange} /><br />
-
-
-                    <b>Starting Balance:</b><br />
-                    <input
-
-                        className="roundedOutline"
-                        name="starting_balance"
-                        placeholder="starting balance"
-                        type="text"
-                        value={this.state.starting_balance}
-                        onChange={this.handleChange} /><br />
-
-                    <button class="filterTimeline" onClick={this.generateTimeline}><b>generate timeline</b></button>
-                </div>
-                <div >
+                <div class="inset" >
                     <ResponsiveContainer height={400} width='100%'>
                         <LineChart
                             data={this.getGraphPoints()}
@@ -402,12 +359,30 @@ class TimeTravel extends Component {
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" height={60} tick={<CustomizedAxisTick />} />
 
-                            <YAxis />
+
                             <Tooltip />
                             <Legend />
                             <Line type="monotone" dataKey="balance" stroke="#ff7b7b" dot={false} />
 
                         </LineChart></ResponsiveContainer>
+                </div>
+                <div class="inset" >
+                    <div className="ccBillBox">
+                        <h4><b>Monthly Variable Spending:</b> ${this.state.variable_exp_amount}</h4>
+                    </div>
+                </div>
+
+                <div class="inset" >
+                    <Slider
+                        defaultValue={0}
+                        min={0}
+                        max={1500}
+                        color={"#ff7b7b"}
+                        onChangeComplete={this.after}
+                        onChange={this.handleChange}
+                        value={this.state.variableSpending}
+                    />
+
                 </div>
 
                 <div class="inset" >
@@ -456,6 +431,7 @@ class TimeTravel extends Component {
         return txnsArr;
     }
 
+    // TODO new component for this.
     renderBuyPage() {
         return (
             <div className="indent">
