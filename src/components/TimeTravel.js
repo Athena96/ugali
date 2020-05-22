@@ -376,8 +376,9 @@ class TimeTravel extends Component {
     }
 
     renderPremiumUserPage() {
+
         const data = this.getGraphPoints();
-        console.log(data);
+
         return (
             <div>
                 <div class="inset" >
@@ -400,7 +401,7 @@ class TimeTravel extends Component {
                         </LineChart></ResponsiveContainer>
                 </div>
                 <div class="inset" >
-                    <div className="ccBillBox">
+                    <div className="infoBox">
                         <h4><b>Monthly Variable Spending:</b> ${this.state.variable_exp_amount}</h4>
                     </div>
                 </div>
@@ -561,9 +562,19 @@ class TimeTravel extends Component {
                 </div>
             );
         } else if (!this.state.IS_LOADING && (this.state.isPremiumUser && !this.state.subscriptionExpired)) {
-            return (
-                this.renderPremiumUserPage()
-            );
+           
+            if (this.state.recurring_txns.length !== 0) {
+
+                return (
+                    this.renderPremiumUserPage()
+                );
+            } else {
+                return (<div class="indent">
+                <h4>You haven't added any transactions for the month of <b>{this.state.month}</b> yet.</h4>
+                <h4>Select <b>'Add Transaction'</b> from the menu to add some!</h4>
+            </div>)
+            }
+           
 
         } else if (!this.state.IS_LOADING && (!this.state.isPremiumUser || this.state.subscriptionExpired)) {
             return (
