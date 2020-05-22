@@ -143,7 +143,9 @@ class TimeTravel extends Component {
             var d = new Date(balanceRow.balanceDate);
             var dt = "" + d.getFullYear() + "-" + getDoubleDigitFormat(d.getMonth() + 1) + "-" + getDoubleDigitFormat(d.getDate() + 1);
             const bal = parseFloat(parseFloat(balanceRow.balance).toFixed(2));
-            const pt = { "name": dt, "amt": time, "balance": bal };
+            const fitLine = (this.state.m * time) + this.state.b;
+            console.log(fitLine);
+            const pt = { "name": dt, "amt": time, "balance": bal, "balance_avg": this.state.balance_avg, "fit_line": fitLine };
             dp.push(pt);
             time += 1;
         }
@@ -151,6 +153,10 @@ class TimeTravel extends Component {
     }
 
     generateTimeline() {
+        var sum = 0.0;
+        var xSum = 0.0;
+        var ySum = 0.0;
+
         this.shownRecorded = {};
         var balanceRows = [];
         var start = new Date();
@@ -162,15 +168,19 @@ class TimeTravel extends Component {
         while (currentDay < end) {
 
             // create entry for the current day's balance row
+            const bal = (idx === 0) ? 0 : balanceRows[idx - 1].balance;
             balanceRows[idx] = {
                 id: idx,
                 balanceDate: new Date(currentDay),
-                balance: (idx === 0) ? 0 : balanceRows[idx - 1].balance,
+                balance: bal,
                 income: "",
                 incomeDesc: "",
                 expense: "",
                 expenseDesc: ""
             }
+            sum += bal;
+            ySum += bal;
+            xSum += idx;
 
             // get any recurring transactions for current day of while loop.
             var recurringIncomes = [];
@@ -292,9 +302,27 @@ class TimeTravel extends Component {
             idx += 1;
         }
 
+        const avg = parseInt((sum/idx));
+        const xAvg = parseInt((xSum/idx));
+        const YAvg = parseInt((ySum/idx));
+
+        // num denom
+        var num = 0;
+        var denom = 0;
+        for (var i = 0; i < balanceRows.length; i += 1) {
+            num += ((balanceRows[i].balance - YAvg)*(i - xAvg));
+            denom += ((i - xAvg)*(i - xAvg));
+        }
+        const m = parseInt(num/denom);
+        const b = YAvg - (m * xAvg);
+
         this.setState({
-            balance_rows: balanceRows
+            balance_rows: balanceRows,
+            balance_avg: avg,
+            m: m,
+            b: b
         });
+
     }
 
     // life cycle
@@ -348,12 +376,14 @@ class TimeTravel extends Component {
     }
 
     renderPremiumUserPage() {
+        const data = this.getGraphPoints();
+        console.log(data);
         return (
             <div>
                 <div class="inset" >
                     <ResponsiveContainer height={400} width='100%'>
                         <LineChart
-                            data={this.getGraphPoints()}
+                            data={data}
                             margin={{ top: 20, right: 20, left: 0, bottom: 5 }}
                         >
                             <CartesianGrid strokeDasharray="3 3" />
@@ -362,7 +392,10 @@ class TimeTravel extends Component {
 
                             <Tooltip />
                             <Legend />
+
                             <Line type="monotone" dataKey="balance" stroke="#ff7b7b" dot={false} />
+                            <Line type="monotone" dataKey="balance_avg" stroke="#fcba03" dot={false} />
+                            <Line type="monotone" dataKey="fit_line" stroke="#82ca9d" dot={false} />
 
                         </LineChart></ResponsiveContainer>
                 </div>
