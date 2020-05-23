@@ -1,17 +1,5 @@
 // React
-import React, { Component, PureComponent } from 'react';
-// import LineChart from 'react-linechart';
-import {
-    LineChart,
-    CartesianGrid,
-    XAxis,
-    YAxis,
-    Tooltip,
-    Legend,
-    Line,
-    ResponsiveContainer
-} from "recharts";
-// import '../../node_modules/react-linechart/dist/styles.css';
+import React, { Component } from 'react';
 
 // Amplify
 import API, { graphqlOperation } from '@aws-amplify/api';
@@ -25,19 +13,19 @@ import { PayPalButton } from "react-paypal-button-v2";
 // GraphQl Mutations
 import { createPremiumUsers } from '../graphql/mutations';
 import { updatePremiumUsers } from '../graphql/mutations';
+import { addFriend, deleteFriendWithId } from '../dataMutation/FriendMutation';
 
 // Data Access
-import { fetchRecurringTransactions, fetchPublicTransactionsByUser} from '../dataAccess/TransactionAccess';
+import { fetchPublicTransactionsByUser } from '../dataAccess/TransactionAccess';
+import { fetchFriends } from '../dataAccess/FriendsAccess';
+
 import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 
 // Common
-import { getDoubleDigitFormat, convertDateStrToGraphqlDate, graphqlDateFromJSDate } from '../common/Utilities';
-import { Frequencies, getLastDayOfMonthFromDate } from '../common/Utilities';
+import { graphqlDateFromJSDate } from '../common/Utilities';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
-
-
 
 class Friends extends Component {
     constructor(props) {
@@ -49,17 +37,21 @@ class Friends extends Component {
             subscriptionExpired: true,
             premiumUsers: {},
             IS_LOADING: true,
-            friendsTransactions: []
+            friendsTransactions: [],
+            friends: [],
+            addFriendEmail: ""
         };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
+        this.addFriendButton = this.addFriendButton.bind(this);
+        this.deleteFriendButton = this.deleteFriendButton.bind(this);
     }
 
     // operation
     async addNewPremiumUser(premiumUser) {
         // submit
         try {
-            const res = await API.graphql(graphqlOperation(createPremiumUsers, { input: premiumUser }));
+            await API.graphql(graphqlOperation(createPremiumUsers, { input: premiumUser }));
         } catch (err) {
             console.log(err);
             window.alert("Encountered error adding you to our premium user list.\nEmail: zenspending@gmail for support.");
@@ -69,52 +61,128 @@ class Friends extends Component {
     async updatePremiumUser(premiumUser) {
         // submit
         try {
-            const res = await API.graphql(graphqlOperation(updatePremiumUsers, { input: premiumUser }));
+            await API.graphql(graphqlOperation(updatePremiumUsers, { input: premiumUser }));
         } catch (err) {
             console.log(err);
             window.alert("Encountered error updating your premium user subscription.\nEmail: zenspending@gmail for support.");
         }
     }
 
+    async loadFriendsAndTimeline() {
+        this.setState({ IS_LOADING: true });
+        const premRes = await checkIfPremiumUser();
+
+        this.setState({ isPremiumUser: premRes.isPremiumUser });
+        this.setState({ subscriptionExpired: premRes.subscriptionExpired });
+        this.setState({ premiumUser: premRes.premiumUser });
+        this.setState({ IS_LOADING: false });
+
+        var today = new Date();
+        var startDate = (new Date()).setDate(today.getDate() - 30);
+
+        // for each friend ...
+        const response = await fetchFriends();
+        this.setState({ friends: response.friends });
+
+        for (const f of response.friends) {
+            const res = await fetchPublicTransactionsByUser(startDate, today, f.myFriend);
+            var updatedFriendsTxnsList = this.state.friendsTransactions;
+            for (const t of res.friends_transactions) {
+                updatedFriendsTxnsList.push(t);
+            }
+
+            this.setState({ friendsTransactions: updatedFriendsTxnsList });
+            this.setState({ IS_LOADING: false });
+        }
+
+    }
+
     // life cycle
     componentDidMount() {
-        let currentComponent = this;
-        this.setState({ IS_LOADING: true });
-        checkIfPremiumUser()
-            .then(function (response) {
-                currentComponent.setState({ isPremiumUser: response.isPremiumUser });
-                currentComponent.setState({ subscriptionExpired: response.subscriptionExpired });
-                currentComponent.setState({ premiumUser: response.premiumUser });
-                currentComponent.setState({ IS_LOADING: false });
-                console.log(currentComponent.state);
+        this.loadFriendsAndTimeline();
+    }
 
-                var today = new Date();
-                var startDate = (new Date()).setDate(today.getDate() - 30);
-            
-                // for each friend ...
-                fetchPublicTransactionsByUser(startDate, today, "italianstallion26.21@gmail.com").then(function (response) {
-                    currentComponent.setState({friendsTransactions: response.friends_transactions});
-                }).catch(function (response) {
-                    console.log(response);
-                });
+    addFriendButton() {
+        addFriend(this.state.addFriendEmail).then(function (response) {
+            if (response.friendIsPremium) {
+                window.alert("Successfully added your friend '" + response.addedFriend + "' !");
+            } else {
+                window.alert("Sorry, we couldn't add this user as your friend because they are not a Premium Subscriber.");
+            }
+        })
+    }
 
+    deleteFriendButton(event) {
+        const idOfDeleteFriend = event.target.id;
+        deleteFriendWithId(idOfDeleteFriend).then((response) => {
+            window.alert("Successfully deleted your friend!");
+            var newFriends = [];
+            for (var friend of this.state.friends) {
+                if (friend.id !== idOfDeleteFriend) {
+                    newFriends.push(friend);
+                }
+            }
 
-            })
-            .catch(function (response) {
-                console.log(response);
+            this.setState({
+                friends: newFriends,
             });
-
+        })
     }
 
     handleChange(event) {
         var target = event.target;
         var value = target.value;
         var name = target.name;
+
         this.setState({
             [name]: value
         });
     }
 
+    renderAddFriends() {
+        return (
+            <div>
+                <label>
+                    <input
+                        className="addFriendInput"
+                        placeholder="friend email"
+                        name="addFriendEmail"
+                        type="text"
+                        value={this.state.addFriendEmail}
+                        onChange={this.handleChange} />
+                </label> <button className="addFriendButton" onClick={this.addFriendButton} >add friend</button>
+
+            </div>
+        );
+    }
+
+    renderFriends() {
+        var friends = [];
+        var displayDate;
+        var currDay = ""
+        for (var friend of this.state.friends) {
+            const { id, me, myFriend, createdAt } = friend;
+            var classname = "friendsListEntry";
+            const dayIdx = new Date(createdAt);
+            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            var dayOfWeek = days[dayIdx.getDay()];
+
+            currDay = createdAt.split('-')[0] - createdAt.split('-')[1] - createdAt.split('-')[2].split('T')[0] + " " + dayOfWeek;
+            displayDate = <h5><b>{createdAt.split('-')[0]}-{createdAt.split('-')[1]}-{createdAt.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
+
+            friends.push(
+                <div>
+                    <div className={classname}>
+                        <font size="4.5">{myFriend}<br /></font>
+                        <font size="4.5">added on <b>{createdAt.split('-')[0]}-{createdAt.split('-')[1]}-{createdAt.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
+                        <button id={id} className="deleteFriendButton" onClick={this.deleteFriendButton} >delete friend</button>
+                    </div>
+                </div>
+            );
+        }
+
+        return friends;
+    }
 
     renderRecurringTransactions() {
         var txnsArr = [];
@@ -143,29 +211,32 @@ class Friends extends Component {
                             <b>Category:</b> {category}<br />
                             <b>Payment Method:</b> {payment_method}<br />
                             {recurring}
-                            </p>
+                            {description === null ? "" : desc}</p>
                     </div>
                 </div>
             );
         }
-
-                                /* <button id={id} className="deleteTxnButton" onClick={this.deleteTransactionButton} >delete</button>
-                        <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
-                        <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button> */
-
         return txnsArr;
     }
+
     renderPremiumUserPage() {
         return (
             <div class="inset" >
-                <h4><b>Recurring Transactions</b></h4>
-                {this.renderRecurringTransactions()}
+                <div  >
+                    <h4><b>Add Friends</b></h4>
+                    {this.renderAddFriends()}
+                </div>
+                <div  >
+                    <h4><b>Friends</b></h4>
+                    {this.renderFriends()}
+                </div>
+                <div >
+                    <h4><b>Friends Transactions</b></h4>
+                    {this.renderRecurringTransactions()}
+                </div>
             </div>
-
         );
     }
-
-    
 
     renderBuyPage() {
         return (

@@ -34,3 +34,33 @@ export async function checkIfPremiumUser() {
 
     return response;
 }
+
+
+export async function checkIfPremiumUserForUser(user) {
+    var data = await API.graphql(graphqlOperation(listPremiumUserss, {
+        limit: PREMIUM_USER_LIMIT,
+        filter: { user: { eq: user } }
+    }));
+
+    const premiumUsers = data.data.listPremiumUserss.items;
+    var response = {};
+    response.email = user;
+    
+    if (premiumUsers.length === 0) {
+        response.isPremiumUser = false;
+        response.subscriptionExpired = true;
+    } else {
+        response.premiumUser = premiumUsers[0];
+        const today = new Date();
+        const expDate = new Date(premiumUsers[0].expiryDate);
+        if (today < expDate) {
+            response.isPremiumUser = true;
+            response.subscriptionExpired = false;
+        } else {
+            response.isPremiumUser = true;
+            response.subscriptionExpired = true;
+        }
+    }
+
+    return response;
+}

@@ -53,6 +53,7 @@ export const listTransactions = /* GraphQL */ `
 export const getFriend = /* GraphQL */ `
   query GetFriend($id: ID!) {
     getFriend(id: $id) {
+      id
       me
       myFriend
       createdAt
@@ -67,6 +68,7 @@ export const listFriends = /* GraphQL */ `
   ) {
     listFriends(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
+        id
         me
         myFriend
         createdAt

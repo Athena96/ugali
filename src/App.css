@@ -222,8 +222,45 @@
     margin: 4px 2px;
 }
 
+.addFriendButton {
+    background-color: rgb(131, 131, 134);
+    border: none;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
+}
+
+.addFriendInput {
+    color: black;
+    border-color: black;
+    border-width: 1px;
+    padding: 3px;
+    text-align: left;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
+}
+
 .deleteTxnButton {
     background-color: rgb(151, 7, 7);
+    border: none;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
+}
+
+.deleteFriendButton {
+    background-color: rgb(131, 131, 134);
     border: none;
     color: white;
     padding: 10px;
@@ -285,6 +322,20 @@
     background-color: rgb(235, 235, 235);
     border: none;
     color: black;
+    width: 95%;
+    padding: 10px;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px 2px;
+}
+
+.friendsListEntry {
+    background-color: rgb(255, 124, 123);
+    border: none;
+    color: white;
     width: 95%;
     padding: 10px;
     text-align: left;

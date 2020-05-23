@@ -67,6 +67,7 @@ export const onDeleteTransaction = /* GraphQL */ `
 export const onCreateFriend = /* GraphQL */ `
   subscription OnCreateFriend {
     onCreateFriend {
+      id
       me
       myFriend
       createdAt
@@ -76,6 +77,7 @@ export const onCreateFriend = /* GraphQL */ `
 export const onUpdateFriend = /* GraphQL */ `
   subscription OnUpdateFriend {
     onUpdateFriend {
+      id
       me
       myFriend
       createdAt
@@ -85,6 +87,7 @@ export const onUpdateFriend = /* GraphQL */ `
 export const onDeleteFriend = /* GraphQL */ `
   subscription OnDeleteFriend {
     onDeleteFriend {
+      id
       me
       myFriend
       createdAt

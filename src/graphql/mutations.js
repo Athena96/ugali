@@ -79,6 +79,7 @@ export const createFriend = /* GraphQL */ `
     $condition: ModelFriendConditionInput
   ) {
     createFriend(input: $input, condition: $condition) {
+      id
       me
       myFriend
       createdAt
@@ -91,6 +92,7 @@ export const updateFriend = /* GraphQL */ `
     $condition: ModelFriendConditionInput
   ) {
     updateFriend(input: $input, condition: $condition) {
+      id
       me
       myFriend
       createdAt
@@ -103,6 +105,7 @@ export const deleteFriend = /* GraphQL */ `
     $condition: ModelFriendConditionInput
   ) {
     deleteFriend(input: $input, condition: $condition) {
+      id
       me
       myFriend
       createdAt

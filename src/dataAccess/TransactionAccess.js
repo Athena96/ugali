@@ -107,7 +107,9 @@ export async function fetchPublicTransactionsByUser(startDate, endDate, user) {
 
     var txns = [];
     for (var t of data.data.transactionsByUserDatePublic.items) {
-        txns.push(t);
+        if (t.is_public === "true") {
+            txns.push(t);
+        }
     }
     var sortedTxns = txns;
 
