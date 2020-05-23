@@ -400,6 +400,10 @@ class AddTransaction extends Component {
         const res = await API.graphql(graphqlOperation(updateTransaction, { input: transaction }));
         window.alert("Successfully updated your transaction!");
       } else {
+
+    // todo temp
+    transaction["is_public"] = "true";
+
         const res = await API.graphql(graphqlOperation(createTransaction, { input: transaction }));
         window.alert("Successfully added your transaction!");
       }

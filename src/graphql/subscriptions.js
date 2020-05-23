@@ -16,6 +16,7 @@ export const onCreateTransaction = /* GraphQL */ `
       updatedAt
       user
       is_recurring
+      is_public
       recurring_frequency
       base_recurring_transaction
     }
@@ -36,6 +37,7 @@ export const onUpdateTransaction = /* GraphQL */ `
       updatedAt
       user
       is_recurring
+      is_public
       recurring_frequency
       base_recurring_transaction
     }
@@ -56,8 +58,63 @@ export const onDeleteTransaction = /* GraphQL */ `
       updatedAt
       user
       is_recurring
+      is_public
       recurring_frequency
       base_recurring_transaction
+    }
+  }
+`;
+export const onCreateFriend = /* GraphQL */ `
+  subscription OnCreateFriend {
+    onCreateFriend {
+      me
+      myFriend
+      createdAt
+    }
+  }
+`;
+export const onUpdateFriend = /* GraphQL */ `
+  subscription OnUpdateFriend {
+    onUpdateFriend {
+      me
+      myFriend
+      createdAt
+    }
+  }
+`;
+export const onDeleteFriend = /* GraphQL */ `
+  subscription OnDeleteFriend {
+    onDeleteFriend {
+      me
+      myFriend
+      createdAt
+    }
+  }
+`;
+export const onCreateFriendRequest = /* GraphQL */ `
+  subscription OnCreateFriendRequest {
+    onCreateFriendRequest {
+      from
+      to
+      createdAt
+    }
+  }
+`;
+export const onUpdateFriendRequest = /* GraphQL */ `
+  subscription OnUpdateFriendRequest {
+    onUpdateFriendRequest {
+      from
+      to
+      createdAt
+    }
+  }
+`;
+export const onDeleteFriendRequest = /* GraphQL */ `
+  subscription OnDeleteFriendRequest {
+    onDeleteFriendRequest {
+      from
+      to
+      createdAt
     }
   }
 `;
