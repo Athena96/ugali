@@ -97,6 +97,7 @@ export const onDeleteFriend = /* GraphQL */ `
 export const onCreateFriendRequest = /* GraphQL */ `
   subscription OnCreateFriendRequest {
     onCreateFriendRequest {
+      id
       from
       to
       createdAt
@@ -106,6 +107,7 @@ export const onCreateFriendRequest = /* GraphQL */ `
 export const onUpdateFriendRequest = /* GraphQL */ `
   subscription OnUpdateFriendRequest {
     onUpdateFriendRequest {
+      id
       from
       to
       createdAt
@@ -115,6 +117,7 @@ export const onUpdateFriendRequest = /* GraphQL */ `
 export const onDeleteFriendRequest = /* GraphQL */ `
   subscription OnDeleteFriendRequest {
     onDeleteFriendRequest {
+      id
       from
       to
       createdAt

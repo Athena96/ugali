@@ -37,6 +37,7 @@ export async function checkIfPremiumUser() {
 
 
 export async function checkIfPremiumUserForUser(user) {
+    console.log(user);
     var data = await API.graphql(graphqlOperation(listPremiumUserss, {
         limit: PREMIUM_USER_LIMIT,
         filter: { user: { eq: user } }

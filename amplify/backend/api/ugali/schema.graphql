@@ -27,6 +27,7 @@ type Friend @model {
 }
 
 type FriendRequest @model {
+  id: ID!
   from: String!
   to: String!
   createdAt: AWSDateTime!
