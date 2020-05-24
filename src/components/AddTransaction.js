@@ -53,6 +53,7 @@ class AddTransaction extends Component {
       payment_method: "credit",
       type: 2,
       is_recurring: false,
+      is_public: false,
       recurring_frequency: Frequencies.NA,
       user: "",
       exampleTxnId: txnId,
@@ -120,6 +121,7 @@ class AddTransaction extends Component {
             type: txn.type,
             user: txn.user,
             is_recurring: txn.is_recurring === "true" ? true : false,
+            is_public: txn.is_public === "true" ? true : false,
             recurring_frequency: txn.recurring_frequency || Frequencies.NA,
             updateTxnId: currentComponent.exampleTxnId,
             showRecurrDropdown: txn.is_recurring === "true" ? true : false,
@@ -278,6 +280,7 @@ class AddTransaction extends Component {
       description: "",
       type: 2,
       is_recurring: false,
+      is_public: false,
       recurring_frequency: Frequencies.NA,
       user: "",
       updateTxnId: null,
@@ -348,6 +351,7 @@ class AddTransaction extends Component {
         payment_method: this.state.payment_method,
         type: this.state.type,
         is_recurring: this.state.is_recurring,
+        is_public: this.state.is_public,
         recurring_frequency: this.state.recurring_frequency,
         user: this.state.user
       }
@@ -364,6 +368,7 @@ class AddTransaction extends Component {
         payment_method: this.state.payment_method,
         type: this.state.type,
         is_recurring: this.state.is_recurring,
+        is_public: this.state.is_public,
         recurring_frequency: this.state.recurring_frequency,
         user: this.state.user
       }
@@ -392,7 +397,11 @@ class AddTransaction extends Component {
       transaction.description = transaction.description.trim();
     }
     transaction.payment_method = transaction.payment_method.trim();
+
+    // true/false to string
     transaction.is_recurring = transaction.is_recurring.toString();
+    transaction.is_public = transaction.is_public.toString();
+
     // submit
     try {
 
@@ -455,6 +464,14 @@ deleteTransactionWithId(txnId)
         <div className="addTransactionBackground">
           <small>* required fields</small>
           <div>
+          <label>
+            <b>*Make Public?</b>
+              <input
+              name="is_public"
+              type="checkbox"
+              checked={this.state.is_public}
+              onChange={this.handleChange} />(your friends can see your public transactions)
+          </label><br />
             <label>
               <b>*Title:</b><br />
               <input

@@ -19,6 +19,7 @@ export const createTransaction = /* GraphQL */ `
       updatedAt
       user
       is_recurring
+      is_public
       recurring_frequency
       base_recurring_transaction
     }
@@ -42,6 +43,7 @@ export const updateTransaction = /* GraphQL */ `
       updatedAt
       user
       is_recurring
+      is_public
       recurring_frequency
       base_recurring_transaction
     }
@@ -65,8 +67,87 @@ export const deleteTransaction = /* GraphQL */ `
       updatedAt
       user
       is_recurring
+      is_public
       recurring_frequency
       base_recurring_transaction
+    }
+  }
+`;
+export const createFriend = /* GraphQL */ `
+  mutation CreateFriend(
+    $input: CreateFriendInput!
+    $condition: ModelFriendConditionInput
+  ) {
+    createFriend(input: $input, condition: $condition) {
+      id
+      me
+      myFriend
+      createdAt
+    }
+  }
+`;
+export const updateFriend = /* GraphQL */ `
+  mutation UpdateFriend(
+    $input: UpdateFriendInput!
+    $condition: ModelFriendConditionInput
+  ) {
+    updateFriend(input: $input, condition: $condition) {
+      id
+      me
+      myFriend
+      createdAt
+    }
+  }
+`;
+export const deleteFriend = /* GraphQL */ `
+  mutation DeleteFriend(
+    $input: DeleteFriendInput!
+    $condition: ModelFriendConditionInput
+  ) {
+    deleteFriend(input: $input, condition: $condition) {
+      id
+      me
+      myFriend
+      createdAt
+    }
+  }
+`;
+export const createFriendRequest = /* GraphQL */ `
+  mutation CreateFriendRequest(
+    $input: CreateFriendRequestInput!
+    $condition: ModelFriendRequestConditionInput
+  ) {
+    createFriendRequest(input: $input, condition: $condition) {
+      id
+      from
+      to
+      createdAt
+    }
+  }
+`;
+export const updateFriendRequest = /* GraphQL */ `
+  mutation UpdateFriendRequest(
+    $input: UpdateFriendRequestInput!
+    $condition: ModelFriendRequestConditionInput
+  ) {
+    updateFriendRequest(input: $input, condition: $condition) {
+      id
+      from
+      to
+      createdAt
+    }
+  }
+`;
+export const deleteFriendRequest = /* GraphQL */ `
+  mutation DeleteFriendRequest(
+    $input: DeleteFriendRequestInput!
+    $condition: ModelFriendRequestConditionInput
+  ) {
+    deleteFriendRequest(input: $input, condition: $condition) {
+      id
+      from
+      to
+      createdAt
     }
   }
 `;

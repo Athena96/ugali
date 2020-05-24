@@ -290,7 +290,7 @@ class Transactions extends Component {
         var previousCurrDay = "diff"
         for (var transaction of this.state.VISIBLE_TXNS) {
 
-            const { id, title, amount, category, date, recurring_frequency, type, payment_method, description, is_recurring } = transaction;
+            const { id, title, is_public, amount, category, date, recurring_frequency, type, payment_method, description, is_recurring } = transaction;
             var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
             const dayIdx = new Date(date);
             const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -307,14 +307,16 @@ class Transactions extends Component {
                 previousCurrDay = currDay;
                 dispDt = displayDate;
             }
-            
+                        
             txnsArr.push(
                 <div>
                     <>{dispDt}</>
                     <div className={classname}>
                         <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
                         <font size="4.5">{title} - ${amount}<br /></font>
-                        <p><b>Category:</b> {category}<br />
+                        <p> 
+                            <b>Visibility:</b> { is_public === "true" ? <span style={{color:"darkred"}}>Public</span> : <span style={{color:"green"}}>Private</span> }<br />
+                            <b>Category:</b> {category}<br />
                             <b>Payment Method:</b> {payment_method}<br />
                             {recurring}
                             {description === null ? "" : desc}</p>
