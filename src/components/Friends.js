@@ -261,6 +261,12 @@ class Friends extends Component {
     }
 
     renderFriends() {
+        if (this.state.friends.length === 0) {
+            return (
+
+                <p>You don't have any friends yet, send a friend request to other ZenSpending Premium Subscribers!</p>
+            );
+        }
         var friends = [];
         var displayDate;
         var currDay = ""
