@@ -58,6 +58,7 @@ class App extends Component {
             <Navigation>
               <Link to="/timeTravel">Time Travel</Link>
               <Link to="/transactions">Transactions</Link>
+              <Link to="/friends">Friends</Link>
               <Link to="/addTransaction">Add Transaction</Link>
             </Navigation>
             {/* <b>{this.state.users}</b> */}
@@ -67,6 +68,7 @@ class App extends Component {
             <Navigation>
               <Link to="/timeTravel">Time Travel</Link>
               <Link to="/transactions">Transactions</Link>
+              <Link to="/friends">Friends</Link>
               <Link to="/addTransaction">Add Transaction</Link>
               <Link to="/about">About</Link>
             </Navigation>

@@ -16,6 +16,7 @@ export const getTransaction = /* GraphQL */ `
       updatedAt
       user
       is_recurring
+      is_public
       recurring_frequency
       base_recurring_transaction
     }
@@ -41,8 +42,63 @@ export const listTransactions = /* GraphQL */ `
         updatedAt
         user
         is_recurring
+        is_public
         recurring_frequency
         base_recurring_transaction
+      }
+      nextToken
+    }
+  }
+`;
+export const getFriend = /* GraphQL */ `
+  query GetFriend($id: ID!) {
+    getFriend(id: $id) {
+      id
+      me
+      myFriend
+      createdAt
+    }
+  }
+`;
+export const listFriends = /* GraphQL */ `
+  query ListFriends(
+    $filter: ModelFriendFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listFriends(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        me
+        myFriend
+        createdAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getFriendRequest = /* GraphQL */ `
+  query GetFriendRequest($id: ID!) {
+    getFriendRequest(id: $id) {
+      id
+      from
+      to
+      createdAt
+    }
+  }
+`;
+export const listFriendRequests = /* GraphQL */ `
+  query ListFriendRequests(
+    $filter: ModelFriendRequestFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listFriendRequests(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        from
+        to
+        createdAt
       }
       nextToken
     }
@@ -70,6 +126,44 @@ export const listPremiumUserss = /* GraphQL */ `
         user
         oderId
         expiryDate
+      }
+      nextToken
+    }
+  }
+`;
+export const transactionsByUserDatePublic = /* GraphQL */ `
+  query TransactionsByUserDatePublic(
+    $user: String
+    $dateIs_public: ModelTransactionByUserDatePublicCompositeKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelTransactionFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    transactionsByUserDatePublic(
+      user: $user
+      dateIs_public: $dateIs_public
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        title
+        amount
+        category
+        date
+        description
+        payment_method
+        type
+        createdAt
+        updatedAt
+        user
+        is_recurring
+        is_public
+        recurring_frequency
+        base_recurring_transaction
       }
       nextToken
     }
@@ -105,6 +199,7 @@ export const transactionsByUserDate = /* GraphQL */ `
         updatedAt
         user
         is_recurring
+        is_public
         recurring_frequency
         base_recurring_transaction
       }
@@ -142,6 +237,7 @@ export const transactionsByUserRecurring = /* GraphQL */ `
         updatedAt
         user
         is_recurring
+        is_public
         recurring_frequency
         base_recurring_transaction
       }
