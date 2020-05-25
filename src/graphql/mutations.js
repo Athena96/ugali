@@ -80,8 +80,8 @@ export const createFriend = /* GraphQL */ `
   ) {
     createFriend(input: $input, condition: $condition) {
       id
-      me
-      myFriend
+      from
+      to
       createdAt
     }
   }
@@ -93,8 +93,8 @@ export const updateFriend = /* GraphQL */ `
   ) {
     updateFriend(input: $input, condition: $condition) {
       id
-      me
-      myFriend
+      from
+      to
       createdAt
     }
   }
@@ -106,8 +106,8 @@ export const deleteFriend = /* GraphQL */ `
   ) {
     deleteFriend(input: $input, condition: $condition) {
       id
-      me
-      myFriend
+      from
+      to
       createdAt
     }
   }

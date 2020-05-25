@@ -1611,7 +1611,7 @@
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-          "name" : "me",
+          "name" : "from",
           "description" : null,
           "args" : [ ],
           "type" : {
@@ -1626,7 +1626,7 @@
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-          "name" : "myFriend",
+          "name" : "to",
           "description" : null,
           "args" : [ ],
           "type" : {
@@ -1710,7 +1710,7 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "me",
+          "name" : "from",
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
@@ -1719,7 +1719,7 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "myFriend",
+          "name" : "to",
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
@@ -3265,7 +3265,7 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "me",
+          "name" : "from",
           "description" : null,
           "type" : {
             "kind" : "NON_NULL",
@@ -3278,7 +3278,7 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "myFriend",
+          "name" : "to",
           "description" : null,
           "type" : {
             "kind" : "NON_NULL",
@@ -3313,7 +3313,7 @@
         "description" : null,
         "fields" : null,
         "inputFields" : [ {
-          "name" : "me",
+          "name" : "from",
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
@@ -3322,7 +3322,7 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "myFriend",
+          "name" : "to",
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
@@ -3397,7 +3397,7 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "me",
+          "name" : "from",
           "description" : null,
           "type" : {
             "kind" : "SCALAR",
@@ -3406,7 +3406,7 @@
           },
           "defaultValue" : null
         }, {
-          "name" : "myFriend",
+          "name" : "to",
           "description" : null,
           "type" : {
             "kind" : "SCALAR",

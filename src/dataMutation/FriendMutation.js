@@ -26,12 +26,12 @@ export async function addFriend(friendReq) {
     var isPremiumCheck = await checkIfPremiumUserForUser(friendReq.email);    
     if (isPremiumCheck.isPremiumUser && !isPremiumCheck.subscriptionExpired) {
         const today = new Date();
-        var expDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+        var dateAdded = new Date(today.getFullYear(), today.getMonth(), today.getDate(), today.getHours());
     
         const friend = {
-            me: user.attributes.email,
-            myFriend: friendReq.email,
-            createdAt: graphqlDateFromJSDate(expDate)
+            from: friendReq.email,
+            to: user.attributes.email,
+            createdAt: graphqlDateFromJSDate(dateAdded)
         }
         var response = await API.graphql(graphqlOperation(createFriend, { input: friend }));
         await API.graphql(graphqlOperation(deleteFriendRequest, { input: { id: friendReq.id } }))
