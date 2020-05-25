@@ -298,7 +298,12 @@ class Transactions extends Component {
             var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
             var yesmessage = "yes (" + recurring_frequency + ")";
             var recurring = IS_PREMIUM_USER ? <><b>Is Recurring Transaction: </b> {is_recurring ? yesmessage : "no"}</> : "";
+            
+            const pub =<><span style={{color:"darkred"}}>Public</span><br /></>;
+            const priv = <><span style={{color:"green"}}>Private</span><br /></>;
 
+            var visibility = IS_PREMIUM_USER ? <><b>Visibility: </b> {is_public ? pub : priv}</> : "";
+             
             currDay = date.split('-')[0] - date.split('-')[1] - date.split('-')[2].split('T')[0] + " " + dayOfWeek;
             displayDate = <h5><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
 
@@ -315,10 +320,10 @@ class Transactions extends Component {
                         <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
                         <font size="4.5">{title} - ${amount}<br /></font>
                         <p> 
-                            <b>Visibility:</b> { is_public === "true" ? <span style={{color:"darkred"}}>Public</span> : <span style={{color:"green"}}>Private</span> }<br />
                             <b>Category:</b> {category}<br />
                             <b>Payment Method:</b> {payment_method}<br />
-                            {recurring}
+                            {IS_PREMIUM_USER ? visibility : ""}
+                            {IS_PREMIUM_USER ? recurring : ""}
                             {description === null ? "" : desc}</p>
                         <button id={id} className="deleteTxnButton" onClick={this.deleteTransactionButton} >delete</button>
                         <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>

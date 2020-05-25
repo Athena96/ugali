@@ -68,8 +68,8 @@ export const onCreateFriend = /* GraphQL */ `
   subscription OnCreateFriend {
     onCreateFriend {
       id
-      me
-      myFriend
+      from
+      to
       createdAt
     }
   }
@@ -78,8 +78,8 @@ export const onUpdateFriend = /* GraphQL */ `
   subscription OnUpdateFriend {
     onUpdateFriend {
       id
-      me
-      myFriend
+      from
+      to
       createdAt
     }
   }
@@ -88,8 +88,8 @@ export const onDeleteFriend = /* GraphQL */ `
   subscription OnDeleteFriend {
     onDeleteFriend {
       id
-      me
-      myFriend
+      from
+      to
       createdAt
     }
   }

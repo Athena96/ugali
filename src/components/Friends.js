@@ -18,7 +18,7 @@ import { addFriendRequest, deleteFriendRequestWithId } from '../dataMutation/Fri
 
 // Data Access
 import { fetchPublicTransactionsByUser } from '../dataAccess/TransactionAccess';
-import { fetchFriends } from '../dataAccess/FriendsAccess';
+import { fetchFollowing, fetchFollowers } from '../dataAccess/FriendsAccess';
 import { fetchFriendRequests } from '../dataAccess/FriendRequestAccess';
 import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 
@@ -40,6 +40,7 @@ class Friends extends Component {
             IS_LOADING: true,
             friendsTransactions: [],
             friends: [],
+            followers: [],
             addFriendEmail: "",
             friendRequests: []
         };
@@ -85,19 +86,23 @@ class Friends extends Component {
         this.setState({ premiumUser: premRes.premiumUser });
         this.setState({ IS_LOADING: false });
 
-        var today = new Date();
-        var startDate = (new Date()).setDate(today.getDate() - 30);
 
         const friendRequestResponse = await fetchFriendRequests();
         this.setState({ friendRequests: friendRequestResponse.friendRequests });
 
         // for each friend ...
-        const response = await fetchFriends();
+        const response = await fetchFollowing();
         this.setState({ friends: response.friends });
 
+        const responseFollowers = await fetchFollowers();
+        console.log(responseFollowers);
+        this.setState({ followers: responseFollowers.followers });
+
+        var today = new Date();
+        var startDate = (new Date()).setDate(today.getDate() - 30);
         var friendsTxnList = [];
         for (const f of response.friends) {
-            const res = await fetchPublicTransactionsByUser(startDate, today, f.myFriend);
+            const res = await fetchPublicTransactionsByUser(startDate, today, f.to);
             for (const t of res.friends_transactions) {
                 friendsTxnList.push(t);
             }
@@ -128,7 +133,7 @@ class Friends extends Component {
     requestFriendButton() {
         addFriendRequest(this.state.addFriendEmail).then((response) => {
             if (response.friendIsPremium) {
-                window.alert("Successfully your friend request to '" + response.newFriend + "' !");
+                window.alert("Successfully sent your friend request to '" + response.newFriend + "' !");
                 this.refreshPage();
             } else {
                 window.alert("Sorry, we couldn't add this user as your friend because they are not a Premium Subscriber.");
@@ -139,6 +144,8 @@ class Friends extends Component {
     acceptFriendRequestButton(event) {
         const friendReq = event.target.id;
         const req = { email: friendReq.split("_")[0], id: friendReq.split("_")[1] };
+
+        console.log(friendReq);
         addFriend(req).then( (response) => {
             if (response.friendIsPremium) {
                 window.alert("Successfully added your friend '" + response.addedFriend + "' !");
@@ -185,6 +192,7 @@ class Friends extends Component {
             });
         })
     }
+
     handleChange(event) {
         var target = event.target;
         var value = target.value;
@@ -206,7 +214,7 @@ class Friends extends Component {
                         type="text"
                         value={this.state.addFriendEmail}
                         onChange={this.handleChange} />
-                </label> <button className="addFriendButton" onClick={this.requestFriendButton} >send friend request</button>
+                </label> <button className="addFriendButton" onClick={this.requestFriendButton} >send follow request</button>
 
             </div>
         );
@@ -227,9 +235,6 @@ class Friends extends Component {
             displayDate = <h5><b>{createdAt.split('-')[0]}-{createdAt.split('-')[1]}-{createdAt.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
 
             const friendIq =  from + "_" + id;
-            console.log("this.state.premiumUser: ", this.state.premiumUser.user)
-            console.log("from ", from)
-            console.log("to ", to)
 
             if (from !== this.state.premiumUser.user) {
                 friendRequests.push(
@@ -260,18 +265,18 @@ class Friends extends Component {
         return friendRequests;
     }
 
-    renderFriends() {
-        if (this.state.friends.length === 0) {
+    renderFollowers() {
+        if (this.state.followers.length === 0) {
             return (
 
-                <p>You don't have any friends yet, send a friend request to other ZenSpending Premium Subscribers!</p>
+                <p>You don't have any followers yet</p>
             );
         }
         var friends = [];
         var displayDate;
         var currDay = ""
-        for (var friend of this.state.friends) {
-            const { id, me, myFriend, createdAt } = friend;
+        for (var follower of this.state.followers) {
+            const { id, from, to, createdAt } = follower;
             var classname = "friendsListEntry";
             const dayIdx = new Date(createdAt);
             const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -283,7 +288,7 @@ class Friends extends Component {
             friends.push(
                 <div>
                     <div className={classname}>
-                        <font size="4.5">{myFriend}<br /></font>
+                        <font size="4.5">{from}<br /></font>
                         <font size="4.5">added on <b>{createdAt.split('-')[0]}-{createdAt.split('-')[1]}-{createdAt.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
                         <button id={id} className="deleteFriendButton" onClick={this.deleteFriendButton} >remove</button>
                     </div>
@@ -294,7 +299,42 @@ class Friends extends Component {
         return friends;
     }
 
-    renderRecurringTransactions() {
+    renderFollowing() {
+        if (this.state.friends.length === 0) {
+            return (
+
+                <p>You're not following anyone yet, send a follow request!</p>
+            );
+        }
+        var friends = [];
+        var displayDate;
+        var currDay = ""
+        for (var following of this.state.friends) {
+            const { id, from, to, createdAt } = following;
+            var classname = "friendsListEntry";
+            const dayIdx = new Date(createdAt);
+            console.log("createdAt: ", createdAt)
+            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            var dayOfWeek = days[dayIdx.getDay()];
+
+            currDay = createdAt.split('-')[0] - createdAt.split('-')[1] - createdAt.split('-')[2].split('T')[0] + " " + dayOfWeek;
+            displayDate = <h5><b>{createdAt.split('-')[0]}-{createdAt.split('-')[1]}-{createdAt.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
+
+            friends.push(
+                <div>
+                    <div className={classname}>
+                        <font size="4.5">{to}<br /></font>
+                        <font size="4.5">added on <b>{createdAt.split('-')[0]}-{createdAt.split('-')[1]}-{createdAt.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
+                        <button id={id} className="deleteFriendButton" onClick={this.deleteFriendButton} >remove</button>
+                    </div>
+                </div>
+            );
+        }
+
+        return friends;
+    }
+
+    renderTimelineTransactions() {
         var txnsArr = [];
         var displayDate;
         var currDay = ""
@@ -333,19 +373,23 @@ class Friends extends Component {
         return (
             <div class="inset" >
                 <div  >
-                    <h4><b>Add Friends</b></h4>
+                    <h4><b>Add Friend</b></h4>
                     {this.renderAddFriends()}
                 </div>
                 <div>
-                {this.state.friendRequests.length === 0 ? <></> : <><h4><b>Friend Requests</b></h4>{this.renderFriendRequests()}</>}
+                {this.state.friendRequests.length === 0 ? <></> : <><h4><b>Requests</b></h4>{this.renderFriendRequests()}</>}
                 </div>
                 <div  >
-                    <h4><b>Friends</b></h4>
-                    {this.renderFriends()}
+                    <h4><b>Followers</b></h4>
+                    {this.renderFollowers()}
+                </div>
+                <div  >
+                    <h4><b>Following</b></h4>
+                    {this.renderFollowing()}
                 </div>
                 <div >
                     <h4><b>Transaction Timeline</b><br/><small>(your friends' public transactions)</small></h4>
-                    {this.renderRecurringTransactions()}
+                    {this.renderTimelineTransactions()}
                 </div>
             </div>
         );
@@ -430,6 +474,11 @@ class Friends extends Component {
                             <li><h6><b>Time Travel</b>: <b>Budgets aren't realistic</b>, because life is full of unexpected events.
                             This feature gives you the freedom to not stress about budgets, by showing you visually (using your <b>recurring transactions</b> + your estimated amount of variable spending)
                             if your current level of spending is sustainable for the long term.</h6></li>
+
+
+                            <li><h6><b>Social</b>: Why does money have to be a <b>taboo</b> subject? At ZenSpending, we see things differently. 
+                            Following your friends on ZenSpending see what they're spending their money on! (With the "Friends" feature, only transactions that you 
+                            mark as "Public" are shared on your followers' timelines.)</h6></li>
                         </ul>
                     </div>
                     <div align="left">

@@ -54,8 +54,8 @@ export const getFriend = /* GraphQL */ `
   query GetFriend($id: ID!) {
     getFriend(id: $id) {
       id
-      me
-      myFriend
+      from
+      to
       createdAt
     }
   }
@@ -69,8 +69,8 @@ export const listFriends = /* GraphQL */ `
     listFriends(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
-        me
-        myFriend
+        from
+        to
         createdAt
       }
       nextToken

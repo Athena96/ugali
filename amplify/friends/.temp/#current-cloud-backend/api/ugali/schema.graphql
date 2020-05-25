@@ -21,8 +21,8 @@ type Transaction @model
 
 type Friend @model {
   id: ID!
-  from: String!
-  to: String!
+  me: String!
+  myFriend: String!
   createdAt: AWSDateTime!
 }
 
