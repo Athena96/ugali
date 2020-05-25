@@ -359,8 +359,6 @@ class Friends extends Component {
                         <p>
                             <b>User:</b> {user}<br />
                             <b>Category:</b> {category}<br />
-                            <b>Payment Method:</b> {payment_method}<br />
-                            {recurring}
                             {description === null ? "" : desc}</p>
                     </div>
                 </div>
