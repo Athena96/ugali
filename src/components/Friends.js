@@ -131,7 +131,7 @@ class Friends extends Component {
     }
 
     requestFriendButton() {
-        addFriendRequest(this.state.addFriendEmail).then((response) => {
+        addFriendRequest(this.state.addFriendEmail.toLocaleLowerCase()).then((response) => {
             if (response.friendIsPremium) {
                 window.alert("Successfully sent your friend request to '" + response.newFriend + "' !");
                 this.refreshPage();
@@ -345,8 +345,6 @@ class Friends extends Component {
             const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
             var dayOfWeek = days[dayIdx.getDay()];
             var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
-            var yesmessage = "yes (" + recurring_frequency + ")";
-            var recurring = <><b>Is Recurring Transaction: </b> {yesmessage}</>;
 
             currDay = date.split('-')[0] - date.split('-')[1] - date.split('-')[2].split('T')[0] + " " + dayOfWeek;
             displayDate = <h5><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
