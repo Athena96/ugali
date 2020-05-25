@@ -250,23 +250,28 @@ class AddTransaction extends Component {
     }
   }
   renderPremiumFeatures() {
-    return (
-      <div className="premiumFeatureAddTxnBackground">
-        <div>
-          <label>
-            <b>Recurring Transaction?</b> (e.g. bill, subscription, paycheck):
-              <input
-              name="is_recurring"
-              type="checkbox"
-              checked={this.state.is_recurring}
-              onChange={this.handleChange} />
-          </label><br />
-
-          {this.renderShowPeriodDropDown()}
-
+    if (this.state.IS_PREMIUM_USER) {
+      return (
+        <div className="premiumFeatureAddTxnBackground">
+          <div>
+            <label>
+              <b>Recurring Transaction?</b> (e.g. bill, subscription, paycheck):
+                <input
+                name="is_recurring"
+                type="checkbox"
+                checked={this.state.is_recurring}
+                onChange={this.handleChange} />
+            </label><br />
+  
+            {this.renderShowPeriodDropDown()}
+  
+          </div>
         </div>
-      </div>
-    )
+      )
+    } else {
+      return (<></>)
+    }
+
   }
 
   resetState() {
@@ -457,14 +462,11 @@ deleteTransactionWithId(txnId)
             console.log(response);
         });
   }
-
-  render() {
-    return (
-      <div>
-        <div className="addTransactionBackground">
-          <small>* required fields</small>
-          <div>
-          <label>
+  renderVisibilitySetting() {
+    if (this.state.IS_PREMIUM_USER) {
+      return (
+        <div>
+        <label>
             <b>*Make Public?</b>
               <input
               name="is_public"
@@ -472,6 +474,24 @@ deleteTransactionWithId(txnId)
               checked={this.state.is_public}
               onChange={this.handleChange} />(your friends can see your public transactions)
           </label><br />
+          </div>
+      );
+    } else {
+      return (<></>);
+    }
+  }
+
+  render() {
+    return (
+      <div>
+        <div className="addTransactionBackground">
+          <small>* required fields</small>
+          <div>
+
+          {this.renderVisibilitySetting()}
+
+          
+          
             <label>
               <b>*Title:</b><br />
               <input
