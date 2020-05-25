@@ -291,6 +291,7 @@ class Transactions extends Component {
         for (var transaction of this.state.VISIBLE_TXNS) {
 
             const { id, title, is_public, amount, category, date, recurring_frequency, type, payment_method, description, is_recurring } = transaction;
+            console.log("is_public: ", is_public)
             var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
             const dayIdx = new Date(date);
             const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -302,7 +303,13 @@ class Transactions extends Component {
             const pub =<><span style={{color:"darkred"}}>Public</span><br /></>;
             const priv = <><span style={{color:"green"}}>Private</span><br /></>;
 
-            var visibility = IS_PREMIUM_USER ? <><b>Visibility: </b> {is_public ? pub : priv}</> : "";
+            var vis;
+            if (is_public === null || is_public === undefined || is_public === "") {
+                vis = false;
+            } else {
+                vis = is_public === "true" ? true : false
+            }
+            var visibility = IS_PREMIUM_USER ? <><b>Visibility: </b> {vis ? pub : priv}</> : "";
              
             currDay = date.split('-')[0] - date.split('-')[1] - date.split('-')[2].split('T')[0] + " " + dayOfWeek;
             displayDate = <h5><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
