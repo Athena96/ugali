@@ -429,40 +429,54 @@ class TimeTravel extends Component {
     }
 
     renderRecurringTransactions() {
-        var txnsArr = [];
-        var displayDate;
-        var currDay = ""
-        for (var transaction of this.state.recurring_txns) {
-            const { id, title, amount, category, date, recurring_frequency, type, payment_method, description, is_recurring } = transaction;
-            var classname = (type === 1) ? "incomeRecurrTxn" : "expenseRecurrTxn";
-            const dayIdx = new Date(date);
-            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-            var dayOfWeek = days[dayIdx.getDay()];
-            var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
-            var yesmessage = "yes (" + recurring_frequency + ")";
-            var recurring = <><b>Is Recurring Transaction: </b> {yesmessage}</>;
 
-            currDay = date.split('-')[0] - date.split('-')[1] - date.split('-')[2].split('T')[0] + " " + dayOfWeek;
-            displayDate = <h5><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
 
-            txnsArr.push(
-                <div>
-                    <div className={classname}>
-                        <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
-                        <font size="4.5">{title} - ${amount}<br /></font>
-                        <p><b>Category:</b> {category}<br />
-                            <b>Payment Method:</b> {payment_method}<br />
-                            {recurring}
-                            {description === null ? "" : desc}</p>
-                        <button id={id} className="deleteTxnButton" onClick={this.deleteTransactionButton} >delete</button>
-                        <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
-                        <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
+                   
+        if (this.state.recurring_txns.length !== 0) {
+
+      
+            var txnsArr = [];
+            var displayDate;
+            var currDay = ""
+            for (var transaction of this.state.recurring_txns) {
+                const { id, title, amount, category, date, recurring_frequency, type, payment_method, description, is_recurring } = transaction;
+                var classname = (type === 1) ? "incomeRecurrTxn" : "expenseRecurrTxn";
+                const dayIdx = new Date(date);
+                const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+                var dayOfWeek = days[dayIdx.getDay()];
+                var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
+                var yesmessage = "yes (" + recurring_frequency + ")";
+                var recurring = <><b>Is Recurring Transaction: </b> {yesmessage}</>;
+    
+                currDay = date.split('-')[0] - date.split('-')[1] - date.split('-')[2].split('T')[0] + " " + dayOfWeek;
+                displayDate = <h5><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
+    
+                txnsArr.push(
+                    <div>
+                        <div className={classname}>
+                            <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
+                            <font size="4.5">{title} - ${amount}<br /></font>
+                            <p><b>Category:</b> {category}<br />
+                                <b>Payment Method:</b> {payment_method}<br />
+                                {recurring}
+                                {description === null ? "" : desc}</p>
+                            <button id={id} className="deleteTxnButton" onClick={this.deleteTransactionButton} >delete</button>
+                            <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
+                            <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
+                        </div>
                     </div>
-                </div>
-            );
+                );
+            }
+    
+            return txnsArr;
+            
+        } else {
+            return (<div class="indent">
+            <h5>You need to have Recurring Transactions to use the TimeTravel feature, and you haven't added any yet.</h5>
+            <h5>Select <b>'Add Transaction'</b> from the menu to add some!</h5>
+        </div>)
         }
 
-        return txnsArr;
     }
 
     // TODO new component for this.
@@ -567,17 +581,11 @@ class TimeTravel extends Component {
             );
         } else if (!this.state.IS_LOADING && (this.state.isPremiumUser && !this.state.subscriptionExpired)) {
            
-            if (this.state.recurring_txns.length !== 0) {
-
+  
                 return (
                     this.renderPremiumUserPage()
                 );
-            } else {
-                return (<div class="indent">
-                <h4>You haven't added any transactions for the month of <b>{this.state.month}</b> yet.</h4>
-                <h4>Select <b>'Add Transaction'</b> from the menu to add some!</h4>
-            </div>)
-            }
+        
            
 
         } else if (!this.state.IS_LOADING && (!this.state.isPremiumUser || this.state.subscriptionExpired)) {
