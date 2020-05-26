@@ -3,14 +3,12 @@ import API, { graphqlOperation } from '@aws-amplify/api';
 import awsconfig from '../aws-exports';
 
 // GraphQl Mutations
-import { createFriend, deleteFriendRequest } from '../graphql/mutations';
-import { updateFriend } from '../graphql/mutations';
-import { deleteFriend } from '../graphql/mutations';
+import { deleteFriendRequest } from '../graphql/mutations';
+import { createFriend, updateFriend, deleteFriend } from '../graphql/mutations';
 import { Auth } from 'aws-amplify';
 
 import { graphqlDateFromJSDate } from '../common/Utilities';
 import { checkIfPremiumUserForUser } from '../dataAccess/PremiumUserAccess';
-import { deleteFriendRequestWithId } from './FriendRequestMutation';
 
 API.configure(awsconfig);
 
@@ -47,8 +45,7 @@ export async function addFriend(friendReq) {
 
 }
 
-export async function updateFriendWithId(id, updatedFriend) {
-    // TODO
-    var response = {}
+export async function updateFriendWithId(updatedFriend) {
+    var response = await API.graphql(graphqlOperation(updateFriend, { input: updatedFriend }));
     return response;
 }

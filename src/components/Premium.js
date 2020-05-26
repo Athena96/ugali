@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import { getDoubleDigitFormat, graphqlDateFromJSDate } from '../common/Utilities';
+import { graphqlDateFromJSDate } from '../common/Utilities';
 import API, { graphqlOperation } from '@aws-amplify/api';
 
 import { Auth } from 'aws-amplify';
 
-// GraphQl Mutations
-import { createPremiumUsers } from '../graphql/mutations';
-import { updatePremiumUsers } from '../graphql/mutations';
+import { addPremiumUser, updatePremiumUserWithId} from '../dataMutation/PremiumUserMutation';
 
+// GraphQl Mutations
 import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 
 // PayPal
@@ -45,7 +44,7 @@ class Premium extends Component {
     async updatePremiumUser(premiumUser) {
         // submit
         try {
-            await API.graphql(graphqlOperation(updatePremiumUsers, { input: premiumUser }));
+            await updatePremiumUserWithId(premiumUser);
         } catch (err) {
             console.log(err);
             window.alert("Encountered error updating your premium user subscription.\nEmail: zenspending@gmail for support.");
@@ -55,7 +54,7 @@ class Premium extends Component {
     async addNewPremiumUser(premiumUser) {
         // submit
         try {
-            await API.graphql(graphqlOperation(createPremiumUsers, { input: premiumUser }));
+            await addPremiumUser( premiumUser );
         } catch (err) {
             console.log(err);
             window.alert("Encountered error adding you to our premium user list.\nEmail: zenspending@gmail for support.");
@@ -75,6 +74,10 @@ class Premium extends Component {
             .catch(function (response) {
                 console.log(response);
             });
+    }
+
+    refreshPage() {
+        window.location.reload(false);
     }
 
     renderbuttonIfNotPremium() {
@@ -152,7 +155,6 @@ class Premium extends Component {
             );
         }
     }
-
     render() {
 
         return (

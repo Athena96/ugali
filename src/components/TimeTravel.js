@@ -412,7 +412,7 @@ class TimeTravel extends Component {
         if (this.state.recurring_txns.length !== 0) {
 
             return (
-                 getDisplayTransactions(this.state.recurring_txns, this.state.isPremiumUser, this.deleteTransactionButton, this.duplicateTransaction, this.updateTransaction) 
+                 getDisplayTransactions(this.state.recurring_txns, this.state.isPremiumUser, this.deleteTransactionButton, this.updateTransaction, this.duplicateTransaction) 
             );
 
         } else {

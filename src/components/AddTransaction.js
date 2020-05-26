@@ -3,11 +3,6 @@ import React, { Component } from "react";
 
 // Amplify
 import { Auth } from 'aws-amplify';
-import API, { graphqlOperation } from '@aws-amplify/api';
-
-// GraphQl Mutations
-import { createTransaction } from '../graphql/mutations';
-import { updateTransaction } from '../graphql/mutations';
 
 // Common
 import { formatDate, convertDateStrToGraphqlDate } from '../common/Utilities';
@@ -18,9 +13,7 @@ import { fetchTransactionsForUserBetween, fetchTransactionBy } from '../dataAcce
 import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 
 // Data Mutation
-import { deleteTransactionWithId } from '../dataMutation/TransactionMutation';
-import { deleteTransaction } from '../graphql/mutations';
-
+import { addTransaction, updateTransactionWithId, deleteTransactionWithId } from '../dataMutation/TransactionMutation';
 
 // Global
 var ORIGINAL_DATE = { fullStr: "", month: "", day: "", year: "" };
@@ -411,10 +404,10 @@ class AddTransaction extends Component {
     try {
 
       if (IS_UPDATE) {
-        const res = await API.graphql(graphqlOperation(updateTransaction, { input: transaction }));
+        await updateTransactionWithId(transaction);
         window.alert("Successfully updated your transaction!");
       } else {
-        const res = await API.graphql(graphqlOperation(createTransaction, { input: transaction }));
+        await addTransaction(transaction);
         window.alert("Successfully added your transaction!");
       }
       this.resetState();

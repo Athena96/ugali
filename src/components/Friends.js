@@ -111,6 +111,8 @@ class Friends extends Component {
             if (response.friendIsPremium) {
                 window.alert("Successfully sent your friend request to '" + response.newFriend + "' !");
                 this.refreshPage();
+            } else if (response.addedMyself) {
+                window.alert("Error. You cannot follow yourself, no matter how cool you are.");
             } else {
                 window.alert("Sorry, we couldn't add this user as your friend because they are not a Premium Subscriber.");
             }
