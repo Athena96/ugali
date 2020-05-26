@@ -7,12 +7,7 @@ import PubSub from '@aws-amplify/pubsub';
 import awsconfig from '../aws-exports';
 import { Auth } from 'aws-amplify';
 
-// PayPal
-import { PayPalButton } from "react-paypal-button-v2";
-
 // GraphQl Mutations
-import { createPremiumUsers } from '../graphql/mutations';
-import { updatePremiumUsers } from '../graphql/mutations';
 import { addFriend, deleteFriendWithId } from '../dataMutation/FriendMutation';
 import { addFriendRequest, deleteFriendRequestWithId } from '../dataMutation/FriendRequestMutation';
 
@@ -21,9 +16,7 @@ import { fetchPublicTransactionsByUser } from '../dataAccess/TransactionAccess';
 import { fetchFollowing, fetchFollowers } from '../dataAccess/FriendsAccess';
 import { fetchFriendRequests } from '../dataAccess/FriendRequestAccess';
 import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
-
-// Common
-import { graphqlDateFromJSDate } from '../common/Utilities';
+import { getDisplayTransactionsNoFunctions } from '../common/Utilities';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
@@ -54,27 +47,6 @@ class Friends extends Component {
 
     refreshPage() {
         window.location.reload(false);
-      }
-
-    // operation
-    async addNewPremiumUser(premiumUser) {
-        // submit
-        try {
-            await API.graphql(graphqlOperation(createPremiumUsers, { input: premiumUser }));
-        } catch (err) {
-            console.log(err);
-            window.alert("Encountered error adding you to our premium user list.\nEmail: zenspending@gmail for support.");
-        }
-    }
-
-    async updatePremiumUser(premiumUser) {
-        // submit
-        try {
-            await API.graphql(graphqlOperation(updatePremiumUsers, { input: premiumUser }));
-        } catch (err) {
-            console.log(err);
-            window.alert("Encountered error updating your premium user subscription.\nEmail: zenspending@gmail for support.");
-        }
     }
 
     async loadFriendsAndTimeline() {
@@ -83,6 +55,11 @@ class Friends extends Component {
 
         this.setState({ isPremiumUser: premRes.isPremiumUser });
         this.setState({ subscriptionExpired: premRes.subscriptionExpired });
+
+        if (!premRes.isPremiumUser || premRes.subscriptionExpired) {
+            this.props.history.push('/premium/');
+        }
+
         this.setState({ premiumUser: premRes.premiumUser });
         this.setState({ IS_LOADING: false });
 
@@ -122,7 +99,6 @@ class Friends extends Component {
 
         this.setState({ friendsTransactions: sortedTxns });
         this.setState({ IS_LOADING: false });
-
     }
 
     // life cycle
@@ -131,7 +107,7 @@ class Friends extends Component {
     }
 
     requestFriendButton() {
-        addFriendRequest(this.state.addFriendEmail).then((response) => {
+        addFriendRequest(this.state.addFriendEmail.toLocaleLowerCase()).then((response) => {
             if (response.friendIsPremium) {
                 window.alert("Successfully sent your friend request to '" + response.newFriend + "' !");
                 this.refreshPage();
@@ -335,39 +311,12 @@ class Friends extends Component {
     }
 
     renderTimelineTransactions() {
-        var txnsArr = [];
-        var displayDate;
-        var currDay = ""
-        for (var transaction of this.state.friendsTransactions) {
-            const { id, title, user, amount, category, date, recurring_frequency, type, payment_method, description, is_recurring } = transaction;
-            var classname = (type === 1) ? "incomeRecurrTxn" : "expenseRecurrTxn";
-            const dayIdx = new Date(date);
-            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-            var dayOfWeek = days[dayIdx.getDay()];
-            var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
-            var yesmessage = "yes (" + recurring_frequency + ")";
-            var recurring = <><b>Is Recurring Transaction: </b> {yesmessage}</>;
-
-            currDay = date.split('-')[0] - date.split('-')[1] - date.split('-')[2].split('T')[0] + " " + dayOfWeek;
-            displayDate = <h5><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
-
-            txnsArr.push(
-                <div>
-                    <div className={classname}>
-                        <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
-                        <font size="4.5">{title} - ${amount}<br /></font>
-                        <p>
-                            <b>User:</b> {user}<br />
-                            <b>Category:</b> {category}<br />
-                            {description === null ? "" : desc}</p>
-                    </div>
-                </div>
-            );
-        }
-        return txnsArr;
+        return (
+            getDisplayTransactionsNoFunctions(this.state.friendsTransactions, this.state.isPremiumUser, true) 
+       );
     }
 
-    renderPremiumUserPage() {
+    renderFriendsPage() {
         return (
             <div class="inset" >
                 <div  >
@@ -393,106 +342,6 @@ class Friends extends Component {
         );
     }
 
-    renderBuyPage() {
-        return (
-            <div className="indent">
-                <div align="center">
-                    <div>
-                        <h4><b>ZenSpending</b> Premium</h4>
-                    </div>
-                    <div className="premiumFeatureBackground">
-                        <h4>Upgrade Now</h4>
-                        <h5><b><i>Memorial Day Sale!</i></b></h5>
-                        <h5><del>$15.99</del> $3.99 (Memorial Day Sale!) for 1 year</h5>
-                        <PayPalButton
-                            amount="3.99"
-                            align="center"
-                            shippingPreference="NO_SHIPPING"
-                            style={{ color: "black", align: "center;" }}
-                            onSuccess={(details, data) => {
-
-                                Auth.currentAuthenticatedUser().then(user => {
-                                    let email = user.attributes.email;
-                                    this.setState({ user: email });
-
-                                    // add user or update subscription?
-                                    if (this.state.isPremiumUser && this.state.subscriptionExpired) {
-                                        // construct premium user
-                                        const today = new Date();
-                                        var year = today.getFullYear();
-                                        var month = today.getMonth();
-                                        var day = today.getDate();
-                                        var newExpDate = new Date(year + 1, month, day);
-
-                                        const updatedUser = {
-                                            id: this.state.premiumUser.id,
-                                            user: email,
-                                            oderId: data.orderID,
-                                            expiryDate: graphqlDateFromJSDate(newExpDate)
-                                        }
-                                        this.setState({ isPremiumUser: true });
-                                        this.setState({ subscriptionExpired: false });
-
-                                        // add user to premium user table.
-                                        this.updatePremiumUser(updatedUser);
-                                        alert("Transaction completed!\nWe here at ZenSpending thank you for renewing your membership!\nRefresh the page to start using Premium Features!");
-                                    } else if (this.state.isPremiumUser == false) {
-                                        // construct premium user
-                                        const today = new Date();
-                                        var year = today.getFullYear();
-                                        var month = today.getMonth();
-                                        var day = today.getDate();
-                                        var expDate = new Date(year + 1, month, day);
-
-                                        const premiumUser = {
-                                            user: email,
-                                            oderId: data.orderID,
-                                            expiryDate: graphqlDateFromJSDate(expDate)
-                                        }
-                                        this.setState({ isPremiumUser: true });
-                                        // add user to premium user table.
-                                        this.addNewPremiumUser(premiumUser);
-                                        alert("Transaction completed!\nWe here at ZenSpending thank you!\nRefresh the page to start using Premium Features!");
-                                    }
-                                }).catch((err) => {
-                                    console.log(err);
-                                });
-                            }}
-                            options={{
-                                disableFunding: ["credit", "card"],
-                                clientId: "AUn2TFaV5cB3lVtq0Q3yOlPTMNaU7kGqN8s1togkHH78v3NUsGPvvBkhxApFkCubpYUk3QhZh8xfGbOX"
-                            }}
-                        />
-                    </div>
-                    <div align="left">
-                        <h5>Features</h5>
-                        <ul>
-                            <li><h6><b>Recurring Transactions</b>: Manually inputing data is <b>boring</b> and a <b>waste of your time</b>, let a computer do it for you!
-                            With Premium, you can make your transactions recurring, and they'll be <b>automatically created</b> on a frequency basis you choose.</h6></li>
-
-                            <li><h6><b>Time Travel</b>: <b>Budgets aren't realistic</b>, because life is full of unexpected events.
-                            This feature gives you the freedom to not stress about budgets, by showing you visually (using your <b>recurring transactions</b> + your estimated amount of variable spending)
-                            if your current level of spending is sustainable for the long term.</h6></li>
-
-
-                            <li><h6><b>Social</b>: Why does money have to be a <b>taboo</b> subject? At ZenSpending, we see things differently. 
-                            Following your friends on ZenSpending see what they're spending their money on! (With the "Friends" feature, only transactions that you 
-                            mark as "Public" are shared on your followers' timelines.)</h6></li>
-                        </ul>
-                    </div>
-                    <div align="left">
-                        <h5>Terms and Conditions</h5>
-                        <ul>
-                            <li><h6>After 1 year, you will <b>not</b> be auto re-subscribed.</h6></li>
-                            <li><h6>You can cancel your membership anytime, within the first month, and receive a full refund. Just email <b>zenspending@gmail.com</b> asking for a refund.</h6></li>
-                        </ul>
-                    </div>
-
-                </div>
-            </div>
-        );
-    }
-
     render() {
         if (this.state.IS_LOADING) {
             return (
@@ -500,13 +349,9 @@ class Friends extends Component {
                     <h4>Loading...</h4>
                 </div>
             );
-        } else if (!this.state.IS_LOADING && (this.state.isPremiumUser && !this.state.subscriptionExpired)) {
+        } else {
             return (
-                this.renderPremiumUserPage()
-            );
-        } else if (!this.state.IS_LOADING && (!this.state.isPremiumUser || this.state.subscriptionExpired)) {
-            return (
-                this.renderBuyPage()
+                this.renderFriendsPage()
             );
         }
     }

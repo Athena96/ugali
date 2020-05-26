@@ -14,6 +14,7 @@ export async function checkIfPremiumUser() {
 
     const premiumUsers = data.data.listPremiumUserss.items;
     var response = {};
+    response.expiryDate = "";
     response.email = user.attributes.email;
 
     if (premiumUsers.length === 0) {
@@ -26,6 +27,8 @@ export async function checkIfPremiumUser() {
         if (today < expDate) {
             response.isPremiumUser = true;
             response.subscriptionExpired = false;
+            response.expiryDate = expDate;
+
         } else {
             response.isPremiumUser = true;
             response.subscriptionExpired = true;

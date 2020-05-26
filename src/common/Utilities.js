@@ -1,3 +1,6 @@
+import React from 'react';
+import { updateFriend } from '../graphql/mutations';
+
 export var Frequencies = {
     NA: "NA",
     ONCE: "ONCE",
@@ -59,4 +62,70 @@ export function getCategoriesFromTransactions(transactions) {
         }
     }
     return cats;
+}
+
+export function getDisplayTransactionsNoFunctions(transactions, IS_PREMIUM_USER, isFriendsTxn=false) {
+    return getDisplayTransactions(transactions, IS_PREMIUM_USER, null, null, null, isFriendsTxn, true);
+}
+
+export function getDisplayTransactions(transactions, IS_PREMIUM_USER, deleteFunc=null, updateFunc=null, duplicateFunc=null, isFriendsTxn=false, groupByDate=false) {
+    var txnsArr = [];
+    var displayDate;
+    var currDay = ""
+    var previousCurrDay = "diff"
+    for (var transaction of transactions) {
+        const { id, user, title, is_public, amount, category, date, recurring_frequency, type, payment_method, description, is_recurring } = transaction;
+        var classname = (type === 1) ? "incomeRecurrTxn" : "expenseRecurrTxn";
+        const dayIdx = new Date(date);
+        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        var dayOfWeek = days[dayIdx.getDay()];
+        var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
+        var yesmessage = "yes (" + recurring_frequency + ")";
+        var recurring = <><b>Is Recurring Transaction: </b> {yesmessage}</>;
+
+        const pub =<><span style={{color:"darkred"}}>Public</span><br /></>;
+        const priv = <><span style={{color:"green"}}>Private</span><br /></>;
+
+        var vis;
+        if (is_public === null || is_public === undefined || is_public === "") {
+            vis = false;
+        } else {
+            vis = is_public === "true" ? true : false
+        }
+        var visibility = IS_PREMIUM_USER ? <><b>Visibility: </b> {vis ? pub : priv}</> : "";
+
+        currDay = date.split('-')[0] - date.split('-')[1] - date.split('-')[2].split('T')[0] + " " + dayOfWeek;
+        displayDate = <h5><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
+
+        const hideCat = false;
+
+
+        var dispDt = "";
+        if (currDay !== previousCurrDay) {
+            previousCurrDay = currDay;
+            dispDt = displayDate;
+        }
+
+        txnsArr.push(
+            <div>
+                {groupByDate ? <>{dispDt}</> : <></>}
+                <div className={classname}>
+                    <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
+                    <font size="4.5">{title} - ${amount}<br /></font>
+                    <p>
+                        {isFriendsTxn ? <><b>User:</b> {user}<br /></> : <></>}
+                        {hideCat ? <></> : <><b>Category:</b> {category}<br /></>}
+                        {isFriendsTxn ? <></> : <><b>Payment Method:</b> {payment_method}<br /></>}
+                        {IS_PREMIUM_USER && !isFriendsTxn ? visibility : ""}
+                        {IS_PREMIUM_USER && !isFriendsTxn ? recurring : ""}
+                        {description === null ? "" : desc}</p>
+                    {deleteFunc ? <button id={id} className="deleteTxnButton" onClick={deleteFunc} >delete</button> : <></> }
+                    {duplicateFunc ? <button id={id} className="duplicateTxnButton" onClick={duplicateFunc} >duplicate</button> : <></> }
+                    {updateFunc ? <button id={id} className="updateTxnButton" onClick={updateFunc} >update</button> : <></> }
+                </div>
+            </div>
+        );
+    }
+
+    return txnsArr;
 }

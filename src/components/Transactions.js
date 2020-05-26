@@ -7,7 +7,7 @@ import PubSub from '@aws-amplify/pubsub';
 import awsconfig from '../aws-exports';
 
 // Utilities
-import { getDoubleDigitFormat } from '../common/Utilities';
+import { getDoubleDigitFormat, getDisplayTransactions } from '../common/Utilities';
 
 // Data Access
 import { fetchTransactions } from '../dataAccess/TransactionAccess';
@@ -44,7 +44,6 @@ class Transactions extends Component {
         this.updateTransaction = this.updateTransaction.bind(this);
         this.duplicateTransaction = this.duplicateTransaction.bind(this);
         this.fetchTransactionsUpdateState = this.fetchTransactionsUpdateState.bind(this);
-
     }
 
     // operations
@@ -284,64 +283,9 @@ class Transactions extends Component {
     }
 
     renderTransactionData() {
-        var txnsArr = [];
-        var displayDate;
-        var currDay = ""
-        var previousCurrDay = "diff"
-        for (var transaction of this.state.VISIBLE_TXNS) {
-
-            const { id, title, is_public, amount, category, date, recurring_frequency, type, payment_method, description, is_recurring } = transaction;
-            console.log("is_public: ", is_public)
-            var classname = (type === 1) ? "incomeTxn" : "expenseTxn";
-            const dayIdx = new Date(date);
-            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-            var dayOfWeek = days[dayIdx.getDay()];
-            var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
-            var yesmessage = "yes (" + recurring_frequency + ")";
-            var recurring = IS_PREMIUM_USER ? <><b>Is Recurring Transaction: </b> {is_recurring ? yesmessage : "no"}</> : "";
-            
-            const pub =<><span style={{color:"darkred"}}>Public</span><br /></>;
-            const priv = <><span style={{color:"green"}}>Private</span><br /></>;
-
-            var vis;
-            if (is_public === null || is_public === undefined || is_public === "") {
-                vis = false;
-            } else {
-                vis = is_public === "true" ? true : false
-            }
-            var visibility = IS_PREMIUM_USER ? <><b>Visibility: </b> {vis ? pub : priv}</> : "";
-             
-            currDay = date.split('-')[0] - date.split('-')[1] - date.split('-')[2].split('T')[0] + " " + dayOfWeek;
-            displayDate = <h5><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
-
-            var dispDt = "";
-            if (currDay !== previousCurrDay) {
-                previousCurrDay = currDay;
-                dispDt = displayDate;
-            }
-                        
-            txnsArr.push(
-                <div>
-                    <>{dispDt}</>
-                    <div className={classname}>
-                        <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
-                        <font size="4.5">{title} - ${amount}<br /></font>
-                        <p> 
-                            <b>Category:</b> {category}<br />
-                            <b>Payment Method:</b> {payment_method}<br />
-                            {IS_PREMIUM_USER ? visibility : ""}
-                            {IS_PREMIUM_USER ? recurring : ""}
-                            {description === null ? "" : desc}</p>
-                        <button id={id} className="deleteTxnButton" onClick={this.deleteTransactionButton} >delete</button>
-                        <button id={id} className="duplicateTxnButton" onClick={this.duplicateTransaction} >duplicate</button>
-                        <button id={id} className="updateTxnButton" onClick={this.updateTransaction} >update</button>
-                    </div>
-                </div>
-
-            );
-        }
-
-        return txnsArr;
+        return (
+            getDisplayTransactions(this.state.VISIBLE_TXNS, IS_PREMIUM_USER, this.deleteTransactionButton, this.duplicateTransaction, this.updateTransaction, false, true) 
+       );
     }
 
     renderYearDropdown() {
