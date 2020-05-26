@@ -1,5 +1,4 @@
 import React from 'react';
-import { updateFriend } from '../graphql/mutations';
 
 export var Frequencies = {
     NA: "NA",

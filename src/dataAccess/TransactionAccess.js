@@ -7,7 +7,7 @@ import { getTransaction } from '../graphql/queries';
 // Constants
 const TXN_LIMIT = 200;
 
-export async function fetchTransactions(year, month, category) {
+export async function fetchTransactions(year, month) {
     var lastDay = new Date(year, month, 0);
     var firstDay = new Date(year, month - 1, 1)
 

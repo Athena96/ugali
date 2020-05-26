@@ -284,7 +284,7 @@ class Transactions extends Component {
 
     renderTransactionData() {
         return (
-            getDisplayTransactions(this.state.VISIBLE_TXNS, IS_PREMIUM_USER, this.deleteTransactionButton, this.duplicateTransaction, this.updateTransaction, false, true) 
+            getDisplayTransactions(this.state.VISIBLE_TXNS, IS_PREMIUM_USER, this.deleteTransactionButton, this.updateTransaction, this.duplicateTransaction, false, true) 
        );
     }
 
@@ -307,7 +307,7 @@ class Transactions extends Component {
     // data
     fetchTransactionsUpdateState() {
         this.setState({ IS_LOADING: true });
-        fetchTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1), this.state.category)
+        fetchTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1))
             .then( (response) => {
                 this.setState({
                     categories: response.categories,

@@ -3,10 +3,7 @@ import API, { graphqlOperation } from '@aws-amplify/api';
 import awsconfig from '../aws-exports';
 
 // GraphQl Mutations
-import { createTransaction } from '../graphql/mutations';
-import { updateTransaction } from '../graphql/mutations';
-import { deleteTransaction } from '../graphql/mutations';
-
+import { createTransaction, updateTransaction, deleteTransaction} from '../graphql/mutations';
 
 API.configure(awsconfig);
 
@@ -16,13 +13,11 @@ export async function deleteTransactionWithId(id) {
 }
 
 export async function addTransaction(transaction) {
-    // TODO
-    var response = {}
+    var response = await API.graphql(graphqlOperation(createTransaction, { input: transaction }));
     return response;
 }
 
-export async function updateTransactionWithId(id, updatedTransaction) {
-    // TODO
-    var response = {}
+export async function updateTransactionWithId(updatedTransaction) {
+    var response = await API.graphql(graphqlOperation(updateTransaction, { input: updatedTransaction }));
     return response;
 }
