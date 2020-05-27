@@ -96,8 +96,8 @@ class Premium extends Component {
             return (
                 <div className="premiumFeatureBackground">
                     <h4>Upgrade Now</h4>
-                    <h5><b><i>Memorial Day Sale!</i></b></h5>
-                    <h5><del>$15.99</del> $3.99 for 1 year</h5>
+                    <h5><b>ZenSpending Premium</b></h5>
+                    <h5>$15.99 for 1 year</h5>
                     <PayPalButton
                         amount="3.99"
                         align="center"
