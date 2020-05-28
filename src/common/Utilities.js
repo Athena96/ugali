@@ -79,8 +79,8 @@ export function getDisplayTransactions(transactions, IS_PREMIUM_USER, deleteFunc
         const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         var dayOfWeek = days[dayIdx.getDay()];
         var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
-        var yesmessage = "yes (" + recurring_frequency + ")";
-        var recurring = <><b>Is Recurring Transaction: </b> {yesmessage}</>;
+        var yesmessage = "Yes (" + recurring_frequency + ")";
+        var recurring = <><b>Is Recurring Transaction: </b> {is_recurring ? yesmessage : "No"}</>;
 
         const pub =<><span style={{color:"darkred"}}>Public</span><br /></>;
         const priv = <><span style={{color:"green"}}>Private</span><br /></>;
