@@ -12,7 +12,7 @@ export var Frequencies = {
 };
 
 export function getDoubleDigitFormat(number) {
-    return (number < 10) ? "0" + number : number;
+    return (number < 10) ? "0" + number : "" + number;
 }
 
 export function getLastDayOfMonthFromDate(currentDay) {
