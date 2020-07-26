@@ -12,6 +12,7 @@ import { getDoubleDigitFormat, getDisplayTransactions } from '../common/Utilitie
 // Data Access
 import { fetchTransactions } from '../dataAccess/TransactionAccess';
 import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
+import { getAvgSpendingMapForUser } from '../dataAccess/CustomDataAccess';
 
 // Data Mutation
 import { deleteTransactionWithId } from '../dataMutation/TransactionMutation';
@@ -36,7 +37,8 @@ class Transactions extends Component {
             category: '',
             VISIBLE_TXNS: [],
             categories: [],
-            IS_LOADING: true
+            IS_LOADING: true,
+            avgSpendingMap: {}
         };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
@@ -50,7 +52,7 @@ class Transactions extends Component {
     deleteTransactionButton(event) {
         const txnId = event.target.id;
         deleteTransactionWithId(txnId)
-            .then( (response) => {
+            .then((response) => {
                 window.alert("Successfully deleted your transaction!");
                 var newTxns = [];
                 for (var txn of this.state.transactions) {
@@ -178,6 +180,8 @@ class Transactions extends Component {
     }
 
     renderCategoryTableData() {
+        console.log(process.env);
+        console.log("renderCategoryTableData: ", this.state.avgSpendingMap);
         var categoryAgg = {}
         for (var txn of this.state.VISIBLE_TXNS) {
             if (categoryAgg[txn.category] === undefined) {
@@ -211,12 +215,17 @@ class Transactions extends Component {
             if (catVal.category.includes('income')) {
                 color = "green";
             }
+            var avg = catVal.amount;
+            if (this.state.avgSpendingMap[catVal.category]) {
+                avg = this.state.avgSpendingMap[catVal.category].sum / this.state.avgSpendingMap[catVal.category].count;
+            }
 
             if (catVal.category.includes('-')) {
                 return (
                     <tr key={index}>
                         <td><font color={color}><i>- {catVal.category}</i></font></td>
                         <td><font color='black'>${parseFloat(catVal.amount).toFixed(2)}</font></td>
+                        <td><font color='black'>${parseFloat(avg).toFixed(2)}</font></td>
                     </tr>
                 )
             } else {
@@ -224,6 +233,7 @@ class Transactions extends Component {
                     <tr key={index}>
                         <td><font color={color}><b>{catVal.category}</b></font></td>
                         <td><font color='black'>${parseFloat(catVal.amount).toFixed(2)}</font></td>
+                        <td><font color='black'>${parseFloat(avg).toFixed(2)}</font></td>
                     </tr>
                 )
             }
@@ -231,7 +241,8 @@ class Transactions extends Component {
     }
 
     renderTableHeader() {
-        let header = ['category', 'amount'];
+        const year = (new Date()).getFullYear();
+        let header = ['category', 'amount', 'average ('+year+')'];
         return header.map((key, index) => {
             return <th key={index}>{key.toUpperCase()}</th>
         })
@@ -284,8 +295,8 @@ class Transactions extends Component {
 
     renderTransactionData() {
         return (
-            getDisplayTransactions(this.state.VISIBLE_TXNS, IS_PREMIUM_USER, this.deleteTransactionButton, this.updateTransaction, this.duplicateTransaction, false, true) 
-       );
+            getDisplayTransactions(this.state.VISIBLE_TXNS, IS_PREMIUM_USER, this.deleteTransactionButton, this.updateTransaction, this.duplicateTransaction, false, true)
+        );
     }
 
     renderYearDropdown() {
@@ -307,20 +318,35 @@ class Transactions extends Component {
     // data
     fetchTransactionsUpdateState() {
         this.setState({ IS_LOADING: true });
-        fetchTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1))
-            .then( (response) => {
-                this.setState({
-                    categories: response.categories,
-                    transactions: response.transactions,
-                    VISIBLE_TXNS: response.VISIBLE_TXNS,
-                    IS_LOADING: false
-                }, () => {
-                    this.filterTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1), this.state.category);
-                })
+        getAvgSpendingMapForUser()
+            .then((data) => {
+
+                if (data) {
+                    this.setState({
+                        avgSpendingMap: data.categoryMap
+                    });
+                }
+
+                    fetchTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1))
+                        .then((response) => {
+                            this.setState({
+                                categories: response.categories,
+                                transactions: response.transactions,
+                                VISIBLE_TXNS: response.VISIBLE_TXNS,
+                                IS_LOADING: false
+                            }, () => {
+                                this.filterTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1), this.state.category);
+                            })
+                        })
+                        .catch(function (response) {
+                            console.log(response);
+                        });
+            
+
+
+
             })
-            .catch(function (response) {
-                console.log(response);
-            });
+
     }
 
     checkPremiumUser() {
