@@ -4,6 +4,11 @@ const config = require('../config.json');
 var AWS = require('aws-sdk');
 AWS.config = new AWS.Config();
 AWS.config.region = config.region;
+AWS.config.accessKeyId = process.env.accessKeyId;
+AWS.config.secretAccessKey = process.env.secretAccessKey;
+
+// AWS.config.accessKeyId = "AKIASQ7R57SOXQA77OE5";
+// AWS.config.secretAccessKey = "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";
 
 var ddb = new AWS.DynamoDB.DocumentClient();
 

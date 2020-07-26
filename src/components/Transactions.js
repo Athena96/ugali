@@ -180,7 +180,9 @@ class Transactions extends Component {
     }
 
     renderCategoryTableData() {
+        console.log(process.env.secretAccessKey);
         console.log(process.env);
+
         console.log("renderCategoryTableData: ", this.state.avgSpendingMap);
         var categoryAgg = {}
         for (var txn of this.state.VISIBLE_TXNS) {
