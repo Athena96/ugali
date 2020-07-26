@@ -180,10 +180,6 @@ class Transactions extends Component {
     }
 
     renderCategoryTableData() {
-        console.log(process.env.secretAccessKey);
-        console.log(process.env);
-
-        console.log("renderCategoryTableData: ", this.state.avgSpendingMap);
         var categoryAgg = {}
         for (var txn of this.state.VISIBLE_TXNS) {
             if (categoryAgg[txn.category] === undefined) {
@@ -322,7 +318,6 @@ class Transactions extends Component {
         this.setState({ IS_LOADING: true });
         getAvgSpendingMapForUser()
             .then((data) => {
-
                 if (data) {
                     this.setState({
                         avgSpendingMap: data.categoryMap
