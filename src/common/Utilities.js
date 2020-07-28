@@ -1,5 +1,9 @@
 import React from 'react';
 
+
+export const monthNames = ["January", "February", "March", "April", "May", "June",
+"July", "August", "September", "October", "November", "December"];
+
 export var Frequencies = {
     NA: "NA",
     ONCE: "ONCE",
@@ -10,6 +14,26 @@ export var Frequencies = {
     LAST_DAY_OF_MONTH: "LAST_DAY_OF_MONTH",
     YEARLY: "YEARLY"
 };
+
+export function aggregateTransactions(transactions) {
+    var categoryAgg = {}
+    for (var txn of transactions) {
+        if (categoryAgg[txn.category] === undefined) {
+            categoryAgg[txn.category] = 0.0
+        }
+        categoryAgg[txn.category] += txn.amount;
+
+        if (txn.category.includes('-')) {
+            var keyParts = txn.category.split('-');
+            var masterKey = keyParts[0];
+            if (categoryAgg[masterKey] === undefined) {
+                categoryAgg[masterKey] = 0.0
+            }
+            categoryAgg[masterKey] += txn.amount;
+        }
+    }
+    return categoryAgg;
+}
 
 export function getDoubleDigitFormat(number) {
     return (number < 10) ? "0" + number : "" + number;
@@ -64,10 +88,10 @@ export function getCategoriesFromTransactions(transactions) {
 }
 
 export function getDisplayTransactionsNoFunctions(transactions, IS_PREMIUM_USER, isFriendsTxn=false) {
-    return getDisplayTransactions(transactions, IS_PREMIUM_USER, null, null, null, isFriendsTxn, true);
+    return renderDisplayTransactions(transactions, IS_PREMIUM_USER, null, null, null, isFriendsTxn, true);
 }
 
-export function getDisplayTransactions(transactions, IS_PREMIUM_USER, deleteFunc=null, updateFunc=null, duplicateFunc=null, isFriendsTxn=false, groupByDate=false) {
+export function renderDisplayTransactions(transactions, IS_PREMIUM_USER, deleteFunc=null, updateFunc=null, duplicateFunc=null, isFriendsTxn=false, groupByDate=false) {
     var txnsArr = [];
     var displayDate;
     var currDay = ""
