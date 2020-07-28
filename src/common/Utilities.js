@@ -15,6 +15,52 @@ export var Frequencies = {
     YEARLY: "YEARLY"
 };
 
+
+export function filterTransactions(fyear, fmonth, category, transactions) {
+    var filteredTxns = [];
+
+    for (var txn of transactions) {
+        var dateParts = txn.date.split("-");
+        var year = dateParts[0];
+        var month = dateParts[1];
+
+        if (year === fyear && month === fmonth) {
+            if (category !== "" && category !== "ALL") {
+                // is category a sub or not?
+                if (category.includes("-")) {
+                    // use exact match if filtering to sub cat level
+                    if (txn.category === category) {
+                        filteredTxns.push(txn);
+                    }
+                } else {
+                    // get the primary cat
+                    const txnPrimaryCat = txn.category.split("-")[0];
+                    if (txnPrimaryCat === category) {
+                        filteredTxns.push(txn);
+                    }
+                }
+            } else {
+                filteredTxns.push(txn);
+            }
+        }
+    }
+    return filteredTxns;
+}
+
+export function getCCSpending(transactions) {
+    var sum = 0.0;
+    for (var txn of transactions) {
+        if (txn.payment_method.includes("cc") || txn.payment_method.includes("credit")) {
+            if (txn.type === 2) {
+                sum += txn.amount;
+            } else {
+                sum -= txn.amount;
+            }
+        }
+    }
+    return sum.toFixed(2);
+}
+
 export function aggregateTransactions(transactions) {
     var categoryAgg = {}
     for (var txn of transactions) {
