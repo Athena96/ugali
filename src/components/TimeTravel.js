@@ -29,7 +29,7 @@ import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 
 // Common
 import { getDoubleDigitFormat } from '../common/Utilities';
-import { Frequencies, getLastDayOfMonthFromDate, getDisplayTransactions } from '../common/Utilities';
+import { Frequencies, getLastDayOfMonthFromDate, renderDisplayTransactions } from '../common/Utilities';
 
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
@@ -412,7 +412,7 @@ class TimeTravel extends Component {
         if (this.state.recurring_txns.length !== 0) {
 
             return (
-                 getDisplayTransactions(this.state.recurring_txns, this.state.isPremiumUser, this.deleteTransactionButton, this.updateTransaction, this.duplicateTransaction) 
+                renderDisplayTransactions(this.state.recurring_txns, this.state.isPremiumUser, this.deleteTransactionButton, this.updateTransaction, this.duplicateTransaction) 
             );
 
         } else {

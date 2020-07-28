@@ -24,7 +24,7 @@ export async function fetchTransactions(year, month) {
     var txns = [];
     for (var t of data.data.transactionsByUserDate.items) {
         if (t != null) {
-            t.is_recurring = t.is_recurring == "true" ? true : false;
+            t.is_recurring = t.is_recurring === "true" || t.is_recurring === true ? true : false;
             txns.push(t);
         }
 
