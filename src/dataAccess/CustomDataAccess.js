@@ -19,9 +19,13 @@ export async function getAvgSpendingMapForUser() {
             }
         };
         const result = await ddb.get(params).promise();
-        return result.Item.avgSpendingData;
+        if (result && result.Item && result.Item.avgSpendingData) {
+            return result.Item.avgSpendingData;
+        } else {
+            return {categoryMap: {}};
+        }
     } catch (err) {
-        console.log("ERROR FETCHING");
         console.error(err);
+        return {categoryMap: {}};
     }
 }
