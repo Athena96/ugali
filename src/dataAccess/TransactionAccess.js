@@ -96,39 +96,6 @@ export async function fetchTransactionsForUserBetween(startDate, endDate) {
     return response;
 }
 
-
-export async function fetchPublicTransactionsByUser(startDate, endDate, user) {
-    var data = await API.graphql(graphqlOperation(transactionsByUserDatePublic, {
-        limit: TXN_LIMIT,
-        user: user,
-        date: { between: [startDate, endDate] },
-        is_public: { eq: "true" }
-    }));
-
-    var txns = [];
-    for (var t of data.data.transactionsByUserDatePublic.items) {
-        if (t.is_public === "true") {
-            txns.push(t);
-        }
-    }
-    var sortedTxns = txns;
-
-    sortedTxns.sort((t1, t2) => {
-        var d1 = new Date(t1.date);
-        var d2 = new Date(t2.date);
-        if (d1 < d2)
-            return 1;
-        if (d1 > d2)
-            return -1;
-        return 0;
-    });
-
-    var response = {};
-    response.friends_transactions = sortedTxns;
-    return response;
-}
-
-
 export async function fetchTransactionBy(id) {
     var user = await Auth.currentAuthenticatedUser();
     var transactionData = await API.graphql(graphqlOperation(getTransaction, {

@@ -455,24 +455,6 @@ deleteTransactionWithId(txnId)
             console.log(response);
         });
   }
-  renderVisibilitySetting() {
-    if (this.state.IS_PREMIUM_USER) {
-      return (
-        <div>
-        <label>
-            <b>*Make Public?</b>
-              <input
-              name="is_public"
-              type="checkbox"
-              checked={this.state.is_public}
-              onChange={this.handleChange} />(your friends can see your public transactions)
-          </label><br />
-          </div>
-      );
-    } else {
-      return (<></>);
-    }
-  }
 
   render() {
     return (
@@ -480,10 +462,6 @@ deleteTransactionWithId(txnId)
         <div className="addTransactionBackground">
           <small>* required fields</small>
           <div>
-
-          {this.renderVisibilitySetting()}
-
-          
           
             <label>
               <b>*Title:</b><br />

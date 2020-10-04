@@ -345,20 +345,6 @@
     margin: 4px 2px;
 }
 
-.friendsListEntry {
-    background-color: rgb(255, 124, 123);
-    border: none;
-    color: white;
-    width: 95%;
-    padding: 10px;
-    text-align: left;
-    text-decoration: none;
-    display: inline-block;
-    border-radius: 8px;
-    font-size: 13px;
-    margin: 4px 2px;
-}
-
 .expenseRecurrTxn {
     background-color: rgb(235, 235, 235);
     border: none;

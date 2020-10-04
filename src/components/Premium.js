@@ -80,10 +80,7 @@ class Premium extends Component {
         window.location.reload(false);
     }
 
-    renderbuttonIfNotPremium() {
-        console.log("renderbuttonIfNotPremium: ");
-
-        
+    renderbuttonIfNotPremium() {        
         if (this.state.isPremiumUser) {
             return (
                 <div className="premiumFeatureBackground">
@@ -177,9 +174,6 @@ class Premium extends Component {
                         This feature gives you the freedom to not stress about budgets, by showing you visually (using your <b>recurring transactions</b> + your estimated amount of variable spending)
                         if your current level of spending is sustainable for the long term.</h6></li>
 
-                            <li><h6><b>Friends</b>: Why does money have to be a <b>taboo</b> subject? At ZenSpending, we see things differently.
-                        Following your friends on ZenSpending and see what they're spending their money on! (With the "Friends" feature, only transactions that you
-                        mark as "Public" are shared on your followers' timelines.)</h6></li>
                         </ul>
                     </div>
                     <div align="left">
