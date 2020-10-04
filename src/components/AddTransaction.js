@@ -458,7 +458,7 @@ deleteTransactionWithId(txnId)
 
   render() {
     return (
-      <div>
+      <div >
         <div className="addTransactionBackground">
           <small>* required fields</small>
           <div>
@@ -487,8 +487,8 @@ deleteTransactionWithId(txnId)
                   <select name="full_category" value={this.state.category + ((this.state.sub_category !== "") ? ("-" + this.state.sub_category) : "")} onChange={this.handleChange}>
                 {this.renderCategoryOptions()}
               </select>
-              {" "} (*or enter a new category below)
-                </label>
+              <br /> (*or enter a new category below)<br />
+                </label><br />
 
             <label>
               <input
