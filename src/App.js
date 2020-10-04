@@ -4,6 +4,8 @@ import React, { Component } from 'react';
 // React MDL
 import { Layout, Header, Navigation, Drawer, Content } from 'react-mdl';
 import { Link } from 'react-router-dom';
+import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Amplify
 import API from '@aws-amplify/api';
@@ -50,39 +52,37 @@ class App extends Component {
 
   render() {
     if (this.props.authState == "signedIn") {
-
+//rgb(255, 124, 123)
     return (
-      <div className="demo-big-content">
-        <Layout fixedHeader>
-          <Header style={{ backgroundColor: 'rgb(255, 124, 123)' }}  seamed>
-            <Navigation>
-              <Link to="/timeTravel">Time Travel</Link>
-              <Link to="/transactions">Transactions</Link>
-              <Link to="/addTransaction">Add Transaction</Link>
-            </Navigation>
-            {/* <b>{this.state.users}</b> */}
-            {/* <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br /> */}
-          </Header>
-          <Drawer title={<Link style={{ textDecoration: 'none', color: 'black' }} to="/">Zen Spending</Link>}>
-            <Navigation>
-              <Link to="/timeTravel">Time Travel</Link>
-              <Link to="/transactions">Transactions</Link>
-              <Link to="/addTransaction">Add Transaction</Link>
-              <Link to="/about">About</Link>
-            </Navigation>
-            <p align="center"><b>{this.state.user}</b></p>
-            <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br />
-          </Drawer>
-          <Content>
-            <div className="page-content">
+      <div className="main">
+        {/* <Layout fixedHeader> */}
+          
+        <Navbar className="color-nav" variant="dark" fixed="top"  collapseOnSelect expand="lg">
+          <Navbar.Brand href="/home"><b>ZenSpending</b></Navbar.Brand>
+          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+          <Navbar.Collapse id="responsive-navbar-nav">
+
+          <Nav className="mr-auto">
+            <Nav.Link href="/timeTravel">Time Travel</Nav.Link>
+            <Nav.Link href="/transactions">Transactions</Nav.Link>
+            <Nav.Link href="/addTransaction">Add Transaction</Nav.Link>
+            <Nav.Link href="/about">About</Nav.Link>
+          </Nav>
+          </Navbar.Collapse>
+        </Navbar>
+{/* 
+        <p align="center"><b>{this.state.user}</b></p>
+            <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br /> */}
+          {/* <Content> */}
+            <div >
             <Main />
             </div>
+          {/* </Content> */}
 
-          </Content>
-          <footer class="footer">
+          {/* <footer class="footer">
             <p class="footerText"><small>© Copyright ZenSpending.com - All rights reserved </small></p>
-          </footer>
-        </Layout>
+          </footer> */}
+        {/* </Layout> */}
       </div>
     );
     } else {

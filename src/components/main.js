@@ -10,6 +10,8 @@ import Premium from './Premium';
 const Main = () => (
   <Switch>
     <Route exact path="/" component={Transactions} />
+    <Route path="/home" component={Transactions} />
+
     <Route path="/transactions" component={Transactions} />
     <Route path="/timeTravel" component={TimeTravel} />
     <Route path="/addTransaction" component={AddTransaction} />
