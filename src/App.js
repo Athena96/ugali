@@ -66,13 +66,14 @@ class App extends Component {
             <Nav.Link href="/timeTravel">Time Travel</Nav.Link>
             <Nav.Link href="/transactions">Transactions</Nav.Link>
             <Nav.Link href="/addTransaction">Add Transaction</Nav.Link>
-            <Nav.Link href="/about">About</Nav.Link>
+            <Nav.Link onClick={this.signOut}><b>Sign Out</b></Nav.Link>
+
+
           </Nav>
           </Navbar.Collapse>
         </Navbar>
-{/* 
-        <p align="center"><b>{this.state.user}</b></p>
-            <button class="signOut" onClick={this.signOut} ><b>Sign Out</b></button> <br /> */}
+
+        
           {/* <Content> */}
             <div >
             <Main />

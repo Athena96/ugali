@@ -26,7 +26,8 @@ class Transactions extends Component {
             categories: [],
             IS_LOADING: true,
             avgSpendingMap: {},
-            IS_PREMIUM_USER: false
+            IS_PREMIUM_USER: false,
+            email: ''
         };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
@@ -80,6 +81,8 @@ class Transactions extends Component {
     /* data */
     // 24
     fetchTransactions() {
+
+
         this.setState({ IS_LOADING: true });
         getAvgSpendingMapForUser()
             .then((data) => {
@@ -118,8 +121,11 @@ class Transactions extends Component {
     // 2
     componentDidMount() {
         checkIfPremiumUser()
-            .then(function (response) {
-                this.setState({ IS_PREMIUM_USER: response.isPremiumUser });
+            .then((response) => {
+                this.setState({ 
+                    IS_PREMIUM_USER: response.isPremiumUser, 
+                    email: response.email
+                });
             })
             .catch(function (response) {
                 console.log(response);
@@ -170,7 +176,7 @@ class Transactions extends Component {
                     </div>
                     <div class="column2">
                         <div>
-                            <h4><b>Transactions</b></h4>
+                    <h4><b>Transactions for: {this.state.email}</b></h4>
                             {renderDisplayTransactions(this.state.displayTransactions, this.state.IS_PREMIUM_USER, this.deleteTransactionButton, this.updateTransaction, this.duplicateTransaction, false, true)}
                         </div>
                     </div>
