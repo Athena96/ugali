@@ -52,7 +52,6 @@ class App extends Component {
 
   render() {
     if (this.props.authState == "signedIn") {
-//rgb(255, 124, 123)
     return (
       <div className="main">
         {/* <Layout fixedHeader> */}
@@ -74,11 +73,9 @@ class App extends Component {
         </Navbar>
 
         
-          {/* <Content> */}
             <div >
             <Main />
             </div>
-          {/* </Content> */}
 
           {/* <footer class="footer">
             <p class="footerText"><small>© Copyright ZenSpending.com - All rights reserved </small></p>
