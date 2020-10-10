@@ -161,7 +161,6 @@ export function renderDisplayTransactions(transactions, IS_PREMIUM_USER, deleteF
         } else {
             vis = is_public === "true" ? true : false
         }
-        var visibility = IS_PREMIUM_USER ? <><b>Visibility: </b> {vis ? pub : priv}</> : "";
 
         currDay = date.split('-')[0] - date.split('-')[1] - date.split('-')[2].split('T')[0] + " " + dayOfWeek;
         displayDate = <h5><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;
@@ -185,7 +184,6 @@ export function renderDisplayTransactions(transactions, IS_PREMIUM_USER, deleteF
                         {isFriendsTxn ? <><b>User:</b> {user}<br /></> : <></>}
                         {hideCat ? <></> : <><b>Category:</b> {category}<br /></>}
                         {isFriendsTxn ? <></> : <><b>Payment Method:</b> {payment_method}<br /></>}
-                        {IS_PREMIUM_USER && !isFriendsTxn ? visibility : ""}
                         {IS_PREMIUM_USER && !isFriendsTxn ? recurring : ""}
                         {description === null ? "" : desc}</p>
                     {deleteFunc ? <button id={id} className="deleteTxnButton" onClick={deleteFunc} >delete</button> : <></> }
