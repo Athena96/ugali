@@ -1,6 +1,6 @@
 import { Auth } from 'aws-amplify';
 import API, { graphqlOperation } from '@aws-amplify/api';
-import { transactionsByUserDate, transactionsByUserRecurring,transactionsByUserDatePublic } from '../graphql/queries';
+import { transactionsByUserDate, transactionsByUserRecurring } from '../graphql/queries';
 import { getDoubleDigitFormat, getCategoriesFromTransactions } from '../common/Utilities';
 import { getTransaction } from '../graphql/queries';
 
