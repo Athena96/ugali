@@ -6,5 +6,6 @@
     "premiumUserTableNameDev": "PremiumUsers-kkgm6iv2yra6rdjcihe4m3sqly-dev",
     "spendingAggregatorTableName": "AverageSpendingMapTable-prod",
     "spendingAggregatorTableDev": "AverageSpendingMapTable-dev",
-    "byUserActualDateIdx": "ByUserActualDate"
+    "byUserActualDateIdx": "ByUserActualDate",
+    "stage": "prod"
 }
