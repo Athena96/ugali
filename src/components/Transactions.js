@@ -247,8 +247,8 @@ class Transactions extends Component {
                     return (a.category > b.category) ? 1 : -1;
                 }).map((catVal, index) => {
                     const color = catVal.category.indexOf('income') !== 0 ? "black" : "green";
-                    const avgSpending = this.state.avgSpendingMap[this.state.year][this.state.monthNum][catVal.category] !== undefined ? (this.state.avgSpendingMap[this.state.year][this.state.monthNum][catVal.category].sum / this.state.avgSpendingMap[this.state.year][this.state.monthNum][catVal.category].count) : 'no data';
-                    const avgSpendingVal = this.state.avgSpendingMap[this.state.year][this.state.monthNum][catVal.category] !== undefined ? `$${parseFloat(avgSpending).toFixed(2)}` : avgSpending
+                    const avgSpending = this.state.avgSpendingMap ? (this.state.avgSpendingMap[this.state.year][this.state.monthNum][catVal.category] !== undefined ? (this.state.avgSpendingMap[this.state.year][this.state.monthNum][catVal.category].sum / this.state.avgSpendingMap[this.state.year][this.state.monthNum][catVal.category].count) : 'no data') : 'no data';
+                    const avgSpendingVal = this.state.avgSpendingMap ? (this.state.avgSpendingMap[this.state.year][this.state.monthNum][catVal.category] !== undefined ? `$${parseFloat(avgSpending).toFixed(2)}` : avgSpending) : 'no data'
                     const nametd = catVal.category.includes('-') ? <td><font color={color}><i>- {catVal.category}</i></font></td> : <td><font color={color}><b>{catVal.category}</b></font></td>;
                     return (
                         <tr key={index}>
