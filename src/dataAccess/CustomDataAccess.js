@@ -7,6 +7,7 @@ AWS.config.region = config.region;
 AWS.config.accessKeyId = process.env.REACT_APP_ACCESS_KEY;
 AWS.config.secretAccessKey = process.env.REACT_APP_SEC_ACCESS_KEY;
 
+
 var ddb = new AWS.DynamoDB.DocumentClient();
 
 export async function getAvgSpendingMapForUser() {
