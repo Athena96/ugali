@@ -153,28 +153,28 @@ class Transactions extends Component {
 
         if (this.state.IS_LOADING) {
             return (
-                <div class="indent">
+                <div className="indent">
                     <h4>Loading...</h4>
                 </div>
             )
         } else if (!this.state.IS_LOADING && this.state.monthTransactions.length === 0) {
             return (
-                <div class="indent">
+                <div className="indent">
                     <h4>You haven't added any transactions for the month of <b>{this.state.month}</b> yet.</h4>
                     <h4>Select <b>'Add Transaction'</b> from the menu to add some!</h4>
                 </div>
             )
         } else {
             return (
-                <div class="row">
-                    <div class="column1" >
+                <div className="row">
+                    <div className="column1" >
                         <div className="ccBillBox">
-                            <h4>{this.state.month} <b>Credit Card Bill:</b> ${getCCSpending(this.state.displayTransactions)}</h4>
+                            <>{this.state.month} Credit Card Bill: ${getCCSpending(this.state.displayTransactions)}</>
                         </div>
 
                         <div className="ccBillBox">
                             <table id='transactions' style={{ width: "100%" }}>
-                                <h4><b>Category Summary</b></h4>
+                                Category Summary
                                 <tbody>
                                     <tr>{categoryHeader}</tr>
                                     {this.renderCategoryTableData()}
@@ -183,7 +183,7 @@ class Transactions extends Component {
                         </div>
 
                     </div>
-                    <div class="column2">
+                    <div className="column2">
                         <div>
                     <h4><b>Transactions for: {this.state.email}</b></h4>
                             {renderDisplayTransactions(this.state.displayTransactions, this.state.IS_PREMIUM_USER, this.deleteTransactionButton, this.updateTransaction, this.duplicateTransaction, false, true)}
@@ -196,7 +196,7 @@ class Transactions extends Component {
 
     // 21
     getAllYearAverages(map) {
-        var yearAvgMap = {}        
+        var yearAvgMap = {}
         for (const month in map[this.state.year]) {
             for (const cat in map[this.state.year][month]) {
                 if (yearAvgMap[cat] === undefined) {
@@ -205,8 +205,7 @@ class Transactions extends Component {
                         count: 0
                     }
                 }
-
-                yearAvgMap[cat].count += map[this.state.year][month][cat].count;
+                yearAvgMap[cat].count += 1; // (1 = 1 month) Aggregate by month so that you get avg per month, not avg per transaction.
                 yearAvgMap[cat].sum += map[this.state.year][month][cat].sum;
             }
         }
@@ -264,7 +263,7 @@ class Transactions extends Component {
 
     // 21
     renderCategoryDropdown() {
-        var catOptions = [<option value="ALL">{"ALL"}</option>];
+        var catOptions = [<option key="ALL" value="ALL">{"ALL"}</option>];
         var cpArr = this.state.categories;
         cpArr.sort((a, b) => {
             return (a > b) ? 1 : -1;
@@ -272,12 +271,12 @@ class Transactions extends Component {
 
         var primaryCategories = []
         for (var cat of cpArr) {
-            catOptions.push(<option value={cat}>{cat}</option>)
+            catOptions.push(<option key={cat} value={cat}>{cat}</option>)
 
             if (cat.split('-').length > 1) {
                 const primaryCategory = cat.split('-')[0];
                 if (!primaryCategories.includes(primaryCategory)) {
-                    catOptions.push(<option value={primaryCategory}>{primaryCategory}</option>);
+                    catOptions.push(<option key={primaryCategory} value={primaryCategory}>{primaryCategory}</option>);
                     primaryCategories.push(primaryCategory);
                 }
             } else {
@@ -291,17 +290,17 @@ class Transactions extends Component {
     renderYearDropdown() {
         var yearOptions = [];
         for (var year = 1967; year <= 2096; year += 1) {
-            yearOptions.push(<option value={year.toString()}>{year}</option>)
+            yearOptions.push(<option key={year.toString()} value={year.toString()}>{year}</option>)
         }
         return (yearOptions);
     }
 
     // 4
     renderMonthDropdown() {
-        var monthOptions = [<option value="ALL">{"ALL"}</option>];
+        var monthOptions = [<option key="ALL" value="ALL">{"ALL"}</option>];
 
         for (var monthIdx = 0; monthIdx < monthNames.length; monthIdx += 1) {
-            monthOptions.push(<option value={monthNames[monthIdx]}>{monthNames[monthIdx]}</option>)
+            monthOptions.push(<option key={monthNames[monthIdx]} value={monthNames[monthIdx]}>{monthNames[monthIdx]}</option>)
         }
         return (monthOptions);
     }
@@ -310,9 +309,9 @@ class Transactions extends Component {
     render() {
         return (
             <div>
-                <div class="filtersInput">
+                <div className="filtersInput">
 
-                    <div class="barStack">
+                    <div className="barStack">
                         <label>
                             <b>Year:</b><br />
                             <select name="year" value={this.state.year} onChange={this.handleChange}>
@@ -321,7 +320,7 @@ class Transactions extends Component {
                         </label>
                     </div>
 
-                    <div class="barStack">
+                    <div className="barStack">
                         <label>
                             <b>Month:</b><br />
                             <select name="month" value={this.state.month} onChange={this.handleChange}>
@@ -330,7 +329,7 @@ class Transactions extends Component {
                         </label>
                     </div>
 
-                    <div class="barStack">
+                    <div className="barStack">
                         <label>
                             <b>Category:</b><br />
                             <select name="category" value={this.state.category} onChange={this.handleChange}>

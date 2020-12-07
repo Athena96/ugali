@@ -175,7 +175,7 @@ export function renderDisplayTransactions(transactions, IS_PREMIUM_USER, deleteF
         }
 
         txnsArr.push(
-            <div>
+            <div key={transaction.id}>
                 {groupByDate ? <>{dispDt}</> : <></>}
                 <div className={classname}>
                     <font size="4.5"><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></font><br />
