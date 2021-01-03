@@ -11,7 +11,20 @@ import { getAvgSpendingMapForUser } from '../dataAccess/CustomDataAccess';
 
 // Data Mutation
 import { deleteTransactionWithId } from '../dataMutation/TransactionMutation';
-
+const nums = {
+    "January": "01",
+    "February": "02",
+    "March": "03",
+    "April": "04",
+    "May": "05",
+    "June": "06",
+    "July": "07",
+    "August": "08",
+    "September": "09",
+    "October": "10",
+    "November": "11",
+    "December": "12"
+};
 
 class Transactions extends Component {
     constructor(props) {
@@ -22,7 +35,7 @@ class Transactions extends Component {
             monthTransactions: [],
             year: today.getFullYear().toString(),
             month: monthNames[today.getMonth()],
-            monthNum: today.getMonth()+1,
+            monthNum: nums[monthNames[today.getMonth()]],
             category: '',
             displayTransactions: [],
             categories: [],
@@ -123,9 +136,19 @@ class Transactions extends Component {
         var target = event.target;
         var value = target.value;
         var name = target.name;
-        this.setState({ [name]: value }, () => {
-            this.fetchTransactions();
-        });
+        if (name === "month") {
+            this.setState({ 
+                [name]: value,
+                monthNum: nums[value] 
+            }, () => {
+                this.fetchTransactions();
+            });
+        } else {
+            this.setState({ [name]: value }, () => {
+                this.fetchTransactions();
+            });    
+        }
+           
     }
 
     // 2
@@ -240,8 +263,8 @@ class Transactions extends Component {
             Object.keys(categoryAggMap).forEach(category => {
                 categoryArray.push({ category: category, amount: categoryAggMap[category] });
             });
-    
-            return categoryArray
+            if (this.state.avgSpendingMap[this.state.year] !== undefined && this.state.avgSpendingMap[this.state.year][this.state.monthNum]) {
+                return categoryArray
                 .sort((a, b) => {
                     return (a.category > b.category) ? 1 : -1;
                 }).map((catVal, index) => {
@@ -257,8 +280,8 @@ class Transactions extends Component {
                         </tr>
                     );
                 })
+            }
         }
-
     }
 
     // 21
