@@ -146,11 +146,7 @@ class AddTransaction extends Component {
     var value = target.type === 'checkbox' ? target.checked : target.value;
     var name = target.name;
 
-    if (name === "is_recurring" && !this.state.IS_PREMIUM_USER) {
-      window.alert("Oops, 'Recurring Transactions' is a premium feature.");
-      this.props.history.push('/timeTravel')
-
-    } else if (name === "is_recurring" && this.state.IS_PREMIUM_USER) {
+    if (name === "is_recurring" && this.state.IS_PREMIUM_USER) {
       this.setState({ "showRecurrDropdown": value, "is_recurring": value});
       
       if (value) {
@@ -236,7 +232,6 @@ class AddTransaction extends Component {
             <small><b>*A recurring transaction will:*</b></small>
 
             <li><small>Be automatically created after each frequency period.</small></li>
-            <li><small>Be placed on your TimeTravel timeline.</small></li>
           </ul>
         </div>
       );
