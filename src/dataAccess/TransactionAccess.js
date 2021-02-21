@@ -76,12 +76,18 @@ export async function fetchRecurringTransactions() {
     return response;
 }
 
+function formatDate(date) {
+    return `${date.getFullYear()}-${(date.getMonth() + 1) < 10 ? '0'+(date.getMonth() + 1) : date.getMonth() + 1}-${(date.getDate() + 1) < 10 ? '0'+(date.getDate() + 1) : date.getDate() + 1}T00:00:00`;
+}
+
 export async function fetchTransactionsForUserBetween(startDate, endDate) {
+    const start = formatDate(startDate);
+    const end = formatDate(endDate);
     var user = await Auth.currentAuthenticatedUser();
     var data = await API.graphql(graphqlOperation(transactionsByUserDate, {
         limit: TXN_LIMIT,
         user: user.attributes.email,
-        date: { between: [startDate, endDate] }
+        date: { between: [start, end] }
     }));
 
     var categories = [];
