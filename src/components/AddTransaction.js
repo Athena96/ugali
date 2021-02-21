@@ -69,7 +69,7 @@ class AddTransaction extends Component {
     let currentComponent = this;
 
     var today = new Date();
-    var catLookBack = (new Date()).setDate(today.getDate() - CATEGORY_LOOKBACK_DAYS);
+    var catLookBack = new Date((new Date()).setDate(today.getDate() - CATEGORY_LOOKBACK_DAYS));
 
     fetchTransactionsForUserBetween(catLookBack, today)
       .then(function (response) {
