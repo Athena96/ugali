@@ -11,6 +11,10 @@ import { getAvgSpendingMapForUser } from '../dataAccess/CustomDataAccess';
 
 // Data Mutation
 import { deleteTransactionWithId } from '../dataMutation/TransactionMutation';
+
+import { LineChart, PieChart } from 'react-chartkick'
+import 'chart.js'
+
 const nums = {
     "January": "01",
     "February": "02",
@@ -344,16 +348,15 @@ class Transactions extends Component {
         return (monthOptions);
     }
 
-    renderMonthlySpending() {
-        var data = [];
+    getMonthlyCCSpending() {
+        var data = {};
         if (this.state.IS_LOADING === false) {
             for (const ob of this.state.ccSumData) {
-                data.push(<li >{ob.month}/{ob.year}: {ob.ccSum}</li>)
+                data[`${ob.year}-${ob.month}-01`] = ob.ccSum;
             }
         }
         return data;
     }
-
     // 39
     render() {
         return (
@@ -391,9 +394,8 @@ class Transactions extends Component {
                 </div>
 
                 <div>
-                    <ul>
-                    {this.renderMonthlySpending()}
-                    </ul>
+                <h4><b>Monthly Credit Card Spending</b></h4>
+                    <LineChart data={this.getMonthlyCCSpending()} />
                 </div>
                 <div className="fl">
                     {this.renderMain()}
