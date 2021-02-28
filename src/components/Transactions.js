@@ -100,8 +100,24 @@ class Transactions extends Component {
         this.setState({ IS_LOADING: true });
         getAvgSpendingMapForUser()
             .then((data) => {
+
+                // ccSum
+                var ccData = [];
+                for (const year of Object.keys(data)) {
+                    for (const month of  Object.keys(data[year])) {
+                        const yrmoSum = data[year][month]["ccSum"] !== undefined ? data[year][month]["ccSum"] : 0.0;
+                        ccData.push({
+                            year: year,
+                            month: month,
+                            ccSum: yrmoSum
+                        });
+                    }
+                }
+                console.log("ccData " + JSON.stringify(ccData));
+
                 this.setState({
-                    avgSpendingMap: data
+                    avgSpendingMap: data,
+                    ccSumData: ccData
                 }, () => {
                     if (this.state.month !== 'ALL') {
                         fetchTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1))
@@ -328,6 +344,16 @@ class Transactions extends Component {
         return (monthOptions);
     }
 
+    renderMonthlySpending() {
+        var data = [];
+        if (this.state.IS_LOADING === false) {
+            for (const ob of this.state.ccSumData) {
+                data.push(<li >{ob.month}/{ob.year}: {ob.ccSum}</li>)
+            }
+        }
+        return data;
+    }
+
     // 39
     render() {
         return (
@@ -362,6 +388,12 @@ class Transactions extends Component {
                     </div>
                     <br clear="all" />
 
+                </div>
+
+                <div>
+                    <ul>
+                    {this.renderMonthlySpending()}
+                    </ul>
                 </div>
                 <div className="fl">
                     {this.renderMain()}
