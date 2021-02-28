@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 
 // Utilities
-import { getDoubleDigitFormat, renderDisplayTransactions, monthNames, aggregateTransactions, getCCSpending, filterTransactions } from '../common/Utilities';
+import { getDoubleDigitFormat, renderDisplayTransactions, monthNames, aggregateTransactions, filterTransactions } from '../common/Utilities';
 
 // Data Access
 import { fetchTransactions } from '../dataAccess/TransactionAccess';
@@ -12,7 +12,7 @@ import { getAvgSpendingMapForUser } from '../dataAccess/CustomDataAccess';
 // Data Mutation
 import { deleteTransactionWithId } from '../dataMutation/TransactionMutation';
 
-import { LineChart, PieChart } from 'react-chartkick'
+import { LineChart } from 'react-chartkick'
 import 'chart.js'
 
 const nums = {
@@ -212,19 +212,15 @@ class Transactions extends Component {
                 <div className="row">
                     <div className="column1" >
                         <div className="ccBillBox">
-                            <>{this.state.month} Credit Card Bill: ${getCCSpending(this.state.displayTransactions)}</>
-                        </div>
+                        <h5>Category Summary</h5>
 
-                        <div className="ccBillBox">
                             <table id='transactions' style={{ width: "100%" }}>
-                                Category Summary
                                 <tbody>
                                     <tr>{categoryHeader}</tr>
                                     {this.renderCategoryTableData()}
                                 </tbody>
                             </table>
                         </div>
-
                     </div>
                     <div className="column2">
                         <div>
@@ -352,7 +348,7 @@ class Transactions extends Component {
         var data = {};
         if (this.state.IS_LOADING === false) {
             for (const ob of this.state.ccSumData) {
-                data[`${ob.year}-${ob.month}-01`] = ob.ccSum;
+                data[`${ob.year}-${ob.month}-01`] = ob.ccSum.toFixed(2);
             }
         }
         return data;

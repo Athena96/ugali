@@ -1,5 +1,5 @@
 import React from "react";
-import { SignIn, SignOut } from "aws-amplify-react";
+import { SignIn } from "aws-amplify-react";
 import config from "../aws-exports";
 import { CustomSignIn } from "./CustomSignIn";
 import App from "../App";
@@ -7,10 +7,6 @@ import { Authenticator } from 'aws-amplify-react';
 import { Greetings } from 'aws-amplify-react';
 
 class AppWithAuth extends React.Component {
-
-  constructor(props, context) {
-    super(props, context);
-  }
 
   render() {
     const signUpConfig = {

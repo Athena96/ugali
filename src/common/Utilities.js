@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 export const monthNames = ["January", "February", "March", "April", "May", "June",
 "July", "August", "September", "October", "November", "December"];
 
@@ -14,7 +13,6 @@ export var Frequencies = {
     LAST_DAY_OF_MONTH: "LAST_DAY_OF_MONTH",
     YEARLY: "YEARLY"
 };
-
 
 export function filterTransactions(fyear, fmonth, category, transactions) {
     var filteredTxns = [];
@@ -45,20 +43,6 @@ export function filterTransactions(fyear, fmonth, category, transactions) {
         }
     }
     return filteredTxns;
-}
-
-export function getCCSpending(transactions) {
-    var sum = 0.0;
-    for (var txn of transactions) {
-        if (txn.payment_method.includes("cc") || txn.payment_method.includes("credit")) {
-            if (txn.type === 2) {
-                sum += txn.amount;
-            } else {
-                sum -= txn.amount;
-            }
-        }
-    }
-    return sum.toFixed(2);
 }
 
 export function aggregateTransactions(transactions) {
@@ -143,7 +127,7 @@ export function renderDisplayTransactions(transactions, IS_PREMIUM_USER, deleteF
     var currDay = ""
     var previousCurrDay = "diff"
     for (var transaction of transactions) {
-        const { id, user, title, is_public, amount, category, date, recurring_frequency, type, payment_method, description, is_recurring } = transaction;
+        const { id, user, title, amount, category, date, recurring_frequency, type, payment_method, description, is_recurring } = transaction;
         var classname = (type === 1) ? "incomeRecurrTxn" : "expenseRecurrTxn";
         const dayIdx = new Date(date);
         const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -152,15 +136,15 @@ export function renderDisplayTransactions(transactions, IS_PREMIUM_USER, deleteF
         var yesmessage = "Yes (" + recurring_frequency + ")";
         var recurring = <><b>Is Recurring Transaction: </b> {is_recurring ? yesmessage : "No"}</>;
 
-        const pub =<><span style={{color:"darkred"}}>Public</span><br /></>;
-        const priv = <><span style={{color:"green"}}>Private</span><br /></>;
+        // const pub =<><span style={{color:"darkred"}}>Public</span><br /></>;
+        // const priv = <><span style={{color:"green"}}>Private</span><br /></>;
 
-        var vis;
-        if (is_public === null || is_public === undefined || is_public === "") {
-            vis = false;
-        } else {
-            vis = is_public === "true" ? true : false
-        }
+        // var vis;
+        // if (is_public === null || is_public === undefined || is_public === "") {
+        //     vis = false;
+        // } else {
+        //     vis = is_public === "true" ? true : false
+        // }
 
         currDay = date.split('-')[0] - date.split('-')[1] - date.split('-')[2].split('T')[0] + " " + dayOfWeek;
         displayDate = <h5><b>{date.split('-')[0]}-{date.split('-')[1]}-{date.split('-')[2].split('T')[0]} {dayOfWeek}</b></h5>;

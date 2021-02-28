@@ -315,7 +315,7 @@ class AddTransaction extends Component {
     var formattedDate = convertDateStrToGraphqlDate(this.state.date);
 
     var fullCat = "";
-    if (this.state.sub_category != "") {
+    if (this.state.sub_category !== "") {
       fullCat = this.state.category + "-" + this.state.sub_category;
     } else {
       fullCat = this.state.category;
@@ -325,9 +325,9 @@ class AddTransaction extends Component {
     var transaction = {};
     if (IS_UPDATE) {
       var d = "";
-      if (ORIGINAL_DATE.year == this.state.date.split('-')[0]
-        && ORIGINAL_DATE.month == this.state.date.split('-')[1]
-        && ORIGINAL_DATE.day == this.state.date.split('-')[2]) {
+      if (ORIGINAL_DATE.year === this.state.date.split('-')[0]
+        && ORIGINAL_DATE.month === this.state.date.split('-')[1]
+        && ORIGINAL_DATE.day === this.state.date.split('-')[2]) {
         d = ORIGINAL_DATE.fullStr;
       } else {
         d = formattedDate;
