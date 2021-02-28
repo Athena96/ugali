@@ -2,9 +2,7 @@
 import React, { Component } from 'react';
 
 // React MDL
-import { Layout, Header, Navigation, Drawer, Content } from 'react-mdl';
-import { Link } from 'react-router-dom';
-import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
+import { Navbar, Nav } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Amplify
@@ -51,7 +49,7 @@ class App extends Component {
   }
 
   render() {
-    if (this.props.authState == "signedIn") {
+    if (this.props.authState === "signedIn") {
     return (
       <div className="main">
         {/* <Layout fixedHeader> */}

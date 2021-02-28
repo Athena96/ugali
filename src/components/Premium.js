@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { graphqlDateFromJSDate } from '../common/Utilities';
-import API, { graphqlOperation } from '@aws-amplify/api';
 
 import { Auth } from 'aws-amplify';
 
@@ -24,14 +23,9 @@ class Premium extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.renderbuttonIfNotPremium = this.renderbuttonIfNotPremium.bind(this);
-
     }
 
-
     handleChange(event) {
-
-        console.log("HAND CHANGE");
-
         var target = event.target;
         var value = target.value;
         var name = target.name;
@@ -39,7 +33,6 @@ class Premium extends Component {
             [name]: value
         });
     }
-
 
     async updatePremiumUser(premiumUser) {
         // submit
@@ -153,7 +146,6 @@ class Premium extends Component {
         }
     }
     render() {
-
         return (
             <div className="indent">
                 <div align="center">

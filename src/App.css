@@ -309,13 +309,15 @@
     border: none;
     color: rgb(255, 255, 255);
     width: 100%;
-    padding: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
     text-align: left;
     text-decoration: none;
     display: inline-block;
     border-radius: 8px;
-    font-size: 13px;
-    margin: 4px 2px;
+    /* font-size: 13px; */
+    /* margin: 4px 2px; */
 }
 
 .infoBox {
