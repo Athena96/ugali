@@ -4,8 +4,8 @@ const config = require('../config.json');
 var AWS = require('aws-sdk');
 AWS.config = new AWS.Config();
 AWS.config.region = config.region;
-AWS.config.accessKeyId = "AKIASQ7R57SOYTNJ3VLD"; //process.env.REACT_APP_ACCESS_KEY;
-AWS.config.secretAccessKey = "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"; //process.env.REACT_APP_SEC_ACCESS_KEY;
+AWS.config.accessKeyId = process.env.REACT_APP_ACCESS_KEY;
+AWS.config.secretAccessKey = process.env.REACT_APP_SEC_ACCESS_KEY;
 
 
 var ddb = new AWS.DynamoDB.DocumentClient();
