@@ -348,7 +348,7 @@ class Transactions extends Component {
         var data = {};
         if (this.state.IS_LOADING === false) {
             for (const ob of this.state.ccSumData) {
-                data[`${ob.year}-${ob.month}-01`] = ob.ccSum.toFixed(2);
+                data[`${ob.year}-${ob.month}-01`] = ob.ccSum;
             }
         }
         return data;
@@ -391,7 +391,7 @@ class Transactions extends Component {
 
                 <div>
                 <h4><b>Monthly Credit Card Spending</b></h4>
-                    <LineChart data={this.getMonthlyCCSpending()} />
+                    <LineChart round={2} zeros={true} thousands="," prefix="$" colors={["#EE837F"]} data={this.getMonthlyCCSpending()} />
                 </div>
                 <div className="fl">
                     {this.renderMain()}
