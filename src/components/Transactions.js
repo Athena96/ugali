@@ -1,17 +1,9 @@
-// React
 import React, { Component } from 'react';
-
-// Utilities
 import { getDoubleDigitFormat, renderDisplayTransactions, monthNames, aggregateTransactions, filterTransactions } from '../common/Utilities';
-
-// Data Access
 import { fetchTransactions } from '../dataAccess/TransactionAccess';
 import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
 import { getAvgSpendingMapForUser } from '../dataAccess/CustomDataAccess';
-
-// Data Mutation
 import { deleteTransactionWithId } from '../dataMutation/TransactionMutation';
-
 import { LineChart } from 'react-chartkick'
 import 'chart.js'
 
@@ -57,7 +49,7 @@ class Transactions extends Component {
     }
 
     /* UI operations */
-    // 27
+    
     deleteTransactionButton(event) {
         const txnId = event.target.id;
         deleteTransactionWithId(txnId)
@@ -86,26 +78,22 @@ class Transactions extends Component {
             });
     }
 
-    // 1
+    
     updateTransaction(event) {
         this.props.history.push('/addTransaction/update/' + event.target.id)
     }
 
-    // 1
+    
     duplicateTransaction(event) {
         this.props.history.push('/addTransaction/duplicate/' + event.target.id)
     }
 
     /* data */
-    // 24
     fetchTransactions() {
-
-
         this.setState({ IS_LOADING: true });
         getAvgSpendingMapForUser()
             .then((data) => {
-
-                // ccSum
+                
                 var ccData = [];
                 for (const year of Object.keys(data)) {
                     for (const month of  Object.keys(data[year])) {
@@ -151,7 +139,7 @@ class Transactions extends Component {
     }
 
     /* life cycle */
-    // 6
+    
     handleChange(event) {
         var target = event.target;
         var value = target.value;
@@ -167,11 +155,9 @@ class Transactions extends Component {
             this.setState({ [name]: value }, () => {
                 this.fetchTransactions();
             });    
-        }
-           
+        }           
     }
 
-    // 2
     componentDidMount() {
         checkIfPremiumUser()
             .then((response) => {
@@ -187,7 +173,7 @@ class Transactions extends Component {
     }
 
     /* render / ui */
-    // 48
+    
     renderMain() {
         let header = ['category', 'amount', this.state.allYear ? 'average (' + this.state.year + ')' : 'average (' + this.state.monthNum + '/' + this.state.year + ')'];
         const categoryHeader = header.map((key, index) => {
@@ -209,7 +195,7 @@ class Transactions extends Component {
             )
         } else {
             return (
-                <div className="row">
+                <div className="row"> 
                     <div className="column1" >
                         <div className="ccBillBox">
                         <h5>Category Summary</h5>
@@ -222,9 +208,14 @@ class Transactions extends Component {
                             </table>
                         </div>
                     </div>
+                    
                     <div className="column2">
                         <div>
-                    <h4><b>Transactions for: {this.state.email}</b></h4>
+                            <h4><b>Monthly Credit Card Spending</b></h4>
+                            <LineChart round={2} zeros={true} thousands="," prefix="$" colors={["#EE837F"]} data={this.getMonthlyCCSpending()} />
+                        </div>
+                        <div>
+                            <h4><b>Transactions for:</b> {this.state.email}</h4>
                             {renderDisplayTransactions(this.state.displayTransactions, this.state.IS_PREMIUM_USER, this.deleteTransactionButton, this.updateTransaction, this.duplicateTransaction, false, true)}
                         </div>
                     </div>
@@ -233,7 +224,7 @@ class Transactions extends Component {
         }
     }
 
-    // 21
+    
     getAllYearAverages(map) {
         var yearAvgMap = {}
         for (const month in map[this.state.year]) {
@@ -244,7 +235,7 @@ class Transactions extends Component {
                         count: 0
                     }
                 }
-                yearAvgMap[cat].count += 1; // (1 = 1 month) Aggregate by month so that you get avg per month, not avg per transaction.
+                yearAvgMap[cat].count += 1;
                 yearAvgMap[cat].sum += map[this.state.year][month][cat].sum;
             }
         }
@@ -262,16 +253,18 @@ class Transactions extends Component {
                 .sort((a, b) => {
                     return (a.category > b.category) ? 1 : -1;
                 }).map((catVal, index) => {
-                    const color = catVal.category.indexOf('income') !== 0 ? "black" : "green";
-                    const avgSpending = yearAvgSpendingMap[catVal.category].sum / yearAvgSpendingMap[catVal.category].count;    
-                    const nametd = catVal.category.includes('-') ? <td><font color={color}><i>- {catVal.category}</i></font></td> : <td><font color={color}><b>{catVal.category}</b></font></td>;
-                    return (
-                        <tr key={index}>
-                            {nametd}
-                            <td><font color='black'>${parseFloat(catVal.amount).toFixed(2)}</font></td>
-                            <td><font color='black'>${parseFloat(avgSpending).toFixed(2)}</font></td>
-                        </tr>
-                    );
+                    if ("ccSum" !== catVal.category) {
+                        const color = catVal.category.indexOf('income') !== 0 ? "black" : "green";
+                        const avgSpending = yearAvgSpendingMap[catVal.category].sum / yearAvgSpendingMap[catVal.category].count;      
+                        const nametd = catVal.category.includes('-') ? <td><font color={color}><i>- {catVal.category}</i></font></td> : <td><font color={color}><b>{catVal.category}</b></font></td>;
+                        return (
+                            <tr key={index}>
+                                {nametd}
+                                <td><font color='black'>${parseFloat(catVal.amount).toFixed(2)}</font></td>
+                                <td><font color='black'>${parseFloat(avgSpending).toFixed(2)}</font></td>
+                            </tr>
+                        );
+                    }
                 })
         } else {
             var categoryArray = [];
@@ -300,7 +293,6 @@ class Transactions extends Component {
         }
     }
 
-    // 21
     renderCategoryDropdown() {
         var catOptions = [<option key="ALL" value="ALL">{"ALL"}</option>];
         var cpArr = this.state.categories;
@@ -324,8 +316,7 @@ class Transactions extends Component {
         }
         return (catOptions);
     }
-
-    // 4
+    
     renderYearDropdown() {
         var yearOptions = [];
         for (var year = 1967; year <= 2096; year += 1) {
@@ -334,7 +325,6 @@ class Transactions extends Component {
         return (yearOptions);
     }
 
-    // 4
     renderMonthDropdown() {
         var monthOptions = [<option key="ALL" value="ALL">{"ALL"}</option>];
 
@@ -342,6 +332,40 @@ class Transactions extends Component {
             monthOptions.push(<option key={monthNames[monthIdx]} value={monthNames[monthIdx]}>{monthNames[monthIdx]}</option>)
         }
         return (monthOptions);
+    }
+
+    renderTransactionFilters() {
+        return (
+            <div>
+                <div className="barStack">
+                    <label>
+                        <b>Year:</b><br />
+                        <select name="year" value={this.state.year} onChange={this.handleChange}>
+                            {this.renderYearDropdown()}
+                        </select>
+                    </label>
+                </div>
+
+                <div className="barStack">
+                    <label>
+                        <b>Month:</b><br />
+                        <select name="month" value={this.state.month} onChange={this.handleChange}>
+                            {this.renderMonthDropdown()}
+                        </select>
+                    </label>
+                </div>
+
+                <div className="barStack">
+                    <label>
+                        <b>Category:</b><br />
+                        <select name="category" value={this.state.category} onChange={this.handleChange}>
+                            {this.renderCategoryDropdown()}
+                        </select>
+                    </label>
+                </div>
+                <br clear="all" />
+            </div>
+        );
     }
 
     getMonthlyCCSpending() {
@@ -353,47 +377,12 @@ class Transactions extends Component {
         }
         return data;
     }
-    // 39
+
     render() {
         return (
             <div>
-                <div className="filtersInput">
-
-                    <div className="barStack">
-                        <label>
-                            <b>Year:</b><br />
-                            <select name="year" value={this.state.year} onChange={this.handleChange}>
-                                {this.renderYearDropdown()}
-                            </select>
-                        </label>
-                    </div>
-
-                    <div className="barStack">
-                        <label>
-                            <b>Month:</b><br />
-                            <select name="month" value={this.state.month} onChange={this.handleChange}>
-                                {this.renderMonthDropdown()}
-                            </select>
-                        </label>
-                    </div>
-
-                    <div className="barStack">
-                        <label>
-                            <b>Category:</b><br />
-                            <select name="category" value={this.state.category} onChange={this.handleChange}>
-                                {this.renderCategoryDropdown()}
-                            </select>
-                        </label>
-                    </div>
-                    <br clear="all" />
-
-                </div>
-
-                <div>
-                <h4><b>Monthly Credit Card Spending</b></h4>
-                    <LineChart round={2} zeros={true} thousands="," prefix="$" colors={["#EE837F"]} data={this.getMonthlyCCSpending()} />
-                </div>
                 <div className="fl">
+                    {this.renderTransactionFilters()}
                     {this.renderMain()}
                 </div>
             </div>

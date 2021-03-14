@@ -494,10 +494,8 @@
 }
 
 .barStack {
-    /* width: 100px;
-  height: 100px; */
     float: left;
-    padding: 6px 8px 6px 16px;
+    padding: 5px;
 }
 
 .barBig {
@@ -543,12 +541,6 @@
     margin-left: 8px;
     margin-right: 8px;
     border-radius: 8px;
-}
-
-.filtersInput {
-    margin-top: 8px;
-    margin-left: 12px;
-    margin-right: 12px;
 }
 
 .inset {
