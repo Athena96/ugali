@@ -175,7 +175,7 @@ class Transactions extends Component {
     /* render / ui */
     
     renderMain() {
-        let header = ['category', 'amount', this.state.allYear ? 'average (' + this.state.year + ')' : 'average (' + this.state.monthNum + '/' + this.state.year + ')'];
+        let header = ['category', 'amount', 'average (' + this.state.year + ')' ];
         const categoryHeader = header.map((key, index) => {
             return <th key={index}>{key.toUpperCase()}</th>
         })
@@ -224,8 +224,7 @@ class Transactions extends Component {
         }
     }
 
-    
-    getAllYearAverages(map) {
+    computeAllYearAverages(map) {
         var yearAvgMap = {}
         for (const month in map[this.state.year]) {
             for (const cat in map[this.state.year][month]) {
@@ -242,14 +241,20 @@ class Transactions extends Component {
         return yearAvgMap
     }
     renderCategoryTableData() {
-        if (this.state.allYear) {
-            var allCategoryArray = [];
-            var yearAvgSpendingMap = this.getAllYearAverages(this.state.avgSpendingMap);
+            let categoryArray = [];
+            let aggregatedTransactions = aggregateTransactions(this.state.displayTransactions);
+            let yearAvgSpendingMap = this.computeAllYearAverages(this.state.avgSpendingMap);
             Object.keys(yearAvgSpendingMap).forEach(category => {
-                allCategoryArray.push({ category: category, amount: yearAvgSpendingMap[category].sum });
+                if (this.state.allYear === false) {
+                    if (Object.keys(aggregatedTransactions).includes(category)) {
+                        categoryArray.push({ category: category, amount: aggregatedTransactions[category] });
+                    }
+                } else {
+                    categoryArray.push({ category: category, amount: yearAvgSpendingMap[category].sum });
+                }
             });
-    
-            return allCategoryArray
+            if (this.state.avgSpendingMap[this.state.year] && ((!this.state.allYear && this.state.avgSpendingMap[this.state.year][this.state.monthNum]) || (this.state.allYear))) {
+                return categoryArray
                 .sort((a, b) => {
                     return (a.category > b.category) ? 1 : -1;
                 }).map((catVal, index) => {
@@ -266,31 +271,7 @@ class Transactions extends Component {
                         );
                     }
                 })
-        } else {
-            var categoryArray = [];
-            var categoryAggMap = aggregateTransactions(this.state.displayTransactions);
-            Object.keys(categoryAggMap).forEach(category => {
-                categoryArray.push({ category: category, amount: categoryAggMap[category] });
-            });
-            if (this.state.avgSpendingMap[this.state.year] !== undefined && this.state.avgSpendingMap[this.state.year][this.state.monthNum]) {
-                return categoryArray
-                .sort((a, b) => {
-                    return (a.category > b.category) ? 1 : -1;
-                }).map((catVal, index) => {
-                    const color = catVal.category.indexOf('income') !== 0 ? "black" : "green";
-                    const avgSpending = this.state.avgSpendingMap ? (this.state.avgSpendingMap[this.state.year][this.state.monthNum][catVal.category] !== undefined ? (this.state.avgSpendingMap[this.state.year][this.state.monthNum][catVal.category].sum / this.state.avgSpendingMap[this.state.year][this.state.monthNum][catVal.category].count) : 'no data') : 'no data';
-                    const avgSpendingVal = this.state.avgSpendingMap ? (this.state.avgSpendingMap[this.state.year][this.state.monthNum][catVal.category] !== undefined ? `$${parseFloat(avgSpending).toFixed(2)}` : avgSpending) : 'no data'
-                    const nametd = catVal.category.includes('-') ? <td><font color={color}><i>- {catVal.category}</i></font></td> : <td><font color={color}><b>{catVal.category}</b></font></td>;
-                    return (
-                        <tr key={index}>
-                            {nametd}
-                            <td><font color='black'>${parseFloat(catVal.amount).toFixed(2)}</font></td>
-                            <td><font color='black'>{avgSpendingVal}</font></td>
-                        </tr>
-                    );
-                })
             }
-        }
     }
 
     renderCategoryDropdown() {
