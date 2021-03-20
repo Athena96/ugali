@@ -38,7 +38,8 @@ class Transactions extends Component {
             IS_LOADING: true,
             avgSpendingMap: {},
             IS_PREMIUM_USER: false,
-            email: ''
+            email: '',
+            onlyCCTransactions: false
         };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
@@ -121,7 +122,7 @@ class Transactions extends Component {
                                 displayTransactions: response.VISIBLE_TXNS,
                                 IS_LOADING: false
                             }, () => {
-                                var filteredTxns = filterTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1), this.state.category, this.state.monthTransactions);
+                                var filteredTxns = filterTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1), this.state.category, this.state.onlyCCTransactions, this.state.monthTransactions);
                                 this.setState({ displayTransactions: filteredTxns });
                             });
                         })
@@ -142,7 +143,7 @@ class Transactions extends Component {
     
     handleChange(event) {
         var target = event.target;
-        var value = target.value;
+        var value = target.type === 'checkbox' ? target.checked : target.value;
         var name = target.name;
         if (name === "month") {
             this.setState({ 
@@ -342,6 +343,17 @@ class Transactions extends Component {
                         <select name="category" value={this.state.category} onChange={this.handleChange}>
                             {this.renderCategoryDropdown()}
                         </select>
+                    </label>
+                </div>
+
+                <div className="barStack">
+                    <label>
+                        <b>Credit Card Transactions:</b><br />      
+                            <input
+                            name="onlyCCTransactions"
+                            type="checkbox"
+                            checked={this.state.onlyCCTransactions}
+                            onChange={this.handleChange} />
                     </label>
                 </div>
                 <br clear="all" />

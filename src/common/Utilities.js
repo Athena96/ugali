@@ -14,10 +14,13 @@ export var Frequencies = {
     YEARLY: "YEARLY"
 };
 
-export function filterTransactions(fyear, fmonth, category, transactions) {
+export function filterTransactions(fyear, fmonth, category, filterOnlyCC, transactions) {
     var filteredTxns = [];
 
     for (var txn of transactions) {
+        if (filterOnlyCC && txn.payment_method !== "credit") {
+            continue;
+        }
         var dateParts = txn.date.split("-");
         var year = dateParts[0];
         var month = dateParts[1];
