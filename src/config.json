@@ -7,5 +7,9 @@
     "spendingAggregatorTableName": "AverageSpendingMapTable-prod",
     "spendingAggregatorTableDev": "AverageSpendingMapTable-dev",
     "byUserActualDateIdx": "ByUserActualDate",
-    "stage": "prod"
+    "stage": "prod",
+    "budgetTableNameProd": "Budget-s3aq7ikxjbecpn4jn4c63v67pi-dev",
+    "budgetTableNameDev": "Budget-s3aq7ikxjbecpn4jn4c63v67pi-dev",
+    "simulationTableNameProd": "Simulation-s3aq7ikxjbecpn4jn4c63v67pi-dev",
+    "simulationTableNameDev": "Simulation-s3aq7ikxjbecpn4jn4c63v67pi-dev"
 }
