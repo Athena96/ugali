@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { getDoubleDigitFormat, renderDisplayTransactions, monthNames, aggregateTransactions, filterTransactions } from '../common/Utilities';
 import { fetchTransactions } from '../dataAccess/TransactionAccess';
 import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
-import { getAvgSpendingMapForUser } from '../dataAccess/CustomDataAccess';
+import { getAvgSpendingMapForUser, getBudgetData } from '../dataAccess/CustomDataAccess';
 import { deleteTransactionWithId } from '../dataMutation/TransactionMutation';
 import { LineChart } from 'react-chartkick'
 import 'chart.js'
@@ -39,7 +39,8 @@ class Transactions extends Component {
             avgSpendingMap: {},
             IS_PREMIUM_USER: false,
             email: '',
-            onlyCCTransactions: false
+            onlyCCTransactions: false,
+            budget: {}
         };
         this.handleChange = this.handleChange.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
@@ -50,7 +51,7 @@ class Transactions extends Component {
     }
 
     /* UI operations */
-    
+
     deleteTransactionButton(event) {
         const txnId = event.target.id;
         deleteTransactionWithId(txnId)
@@ -79,12 +80,12 @@ class Transactions extends Component {
             });
     }
 
-    
+
     updateTransaction(event) {
         this.props.history.push('/addTransaction/update/' + event.target.id)
     }
 
-    
+
     duplicateTransaction(event) {
         this.props.history.push('/addTransaction/duplicate/' + event.target.id)
     }
@@ -94,10 +95,10 @@ class Transactions extends Component {
         this.setState({ IS_LOADING: true });
         getAvgSpendingMapForUser()
             .then((data) => {
-                
+
                 var ccData = [];
                 for (const year of Object.keys(data)) {
-                    for (const month of  Object.keys(data[year])) {
+                    for (const month of Object.keys(data[year])) {
                         const yrmoSum = data[year][month]["ccSum"] !== undefined ? data[year][month]["ccSum"] : 0.0;
                         ccData.push({
                             year: year,
@@ -114,21 +115,21 @@ class Transactions extends Component {
                 }, () => {
                     if (this.state.month !== 'ALL') {
                         fetchTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1))
-                        .then((response) => {
-                            this.setState({
-                                allYear: false,
-                                categories: response.categories,
-                                monthTransactions: response.transactions,
-                                displayTransactions: response.VISIBLE_TXNS,
-                                IS_LOADING: false
-                            }, () => {
-                                var filteredTxns = filterTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1), this.state.category, this.state.onlyCCTransactions, this.state.monthTransactions);
-                                this.setState({ displayTransactions: filteredTxns });
+                            .then((response) => {
+                                this.setState({
+                                    allYear: false,
+                                    categories: response.categories,
+                                    monthTransactions: response.transactions,
+                                    displayTransactions: response.VISIBLE_TXNS,
+                                    IS_LOADING: false
+                                }, () => {
+                                    var filteredTxns = filterTransactions(this.state.year, getDoubleDigitFormat(monthNames.indexOf(this.state.month) + 1), this.state.category, this.state.onlyCCTransactions, this.state.monthTransactions);
+                                    this.setState({ displayTransactions: filteredTxns });
+                                });
+                            })
+                            .catch(function (response) {
+                                console.log(response);
                             });
-                        })
-                        .catch(function (response) {
-                            console.log(response);
-                        });
                     } else {
                         this.setState({
                             allYear: true,
@@ -137,33 +138,39 @@ class Transactions extends Component {
                     }
                 });
             });
+
+        getBudgetData(this.state.monthNum, this.state.year).then((budgetData) => {
+            console.log('budgetData ' + JSON.stringify(budgetData));
+            this.setState({ budget: budgetData });
+
+        })
     }
 
     /* life cycle */
-    
+
     handleChange(event) {
         var target = event.target;
         var value = target.type === 'checkbox' ? target.checked : target.value;
         var name = target.name;
         if (name === "month") {
-            this.setState({ 
+            this.setState({
                 [name]: value,
-                monthNum: nums[value] 
+                monthNum: nums[value]
             }, () => {
                 this.fetchTransactions();
             });
         } else {
             this.setState({ [name]: value }, () => {
                 this.fetchTransactions();
-            });    
-        }           
+            });
+        }
     }
 
     componentDidMount() {
         checkIfPremiumUser()
             .then((response) => {
-                this.setState({ 
-                    IS_PREMIUM_USER: response.isPremiumUser, 
+                this.setState({
+                    IS_PREMIUM_USER: response.isPremiumUser,
                     email: response.email
                 });
             })
@@ -174,9 +181,9 @@ class Transactions extends Component {
     }
 
     /* render / ui */
-    
+
     renderMain() {
-        let header = ['category', 'amount', 'average (' + this.state.year + ')' ];
+        let header = ['category', 'amount', 'Budget', 'average (' + this.state.year + ')',];
         const categoryHeader = header.map((key, index) => {
             return <th key={index}>{key.toUpperCase()}</th>
         })
@@ -196,10 +203,10 @@ class Transactions extends Component {
             )
         } else {
             return (
-                <div className="row"> 
+                <div className="row">
                     <div className="column1" >
                         <div className="ccBillBox">
-                        <h5>Category Summary</h5>
+                            <h5>Category Summary</h5>
 
                             <table id='transactions' style={{ width: "100%" }}>
                                 <tbody>
@@ -209,7 +216,7 @@ class Transactions extends Component {
                             </table>
                         </div>
                     </div>
-                    
+
                     <div className="column2">
                         <div>
                             <h4><b>Monthly Credit Card Spending</b></h4>
@@ -241,38 +248,54 @@ class Transactions extends Component {
         }
         return yearAvgMap
     }
+
+    getCategoryFromBudget(categoryToMatch) {
+        for (const category of this.state.budget.categories) {
+            const catWords = category.name.split('_');
+            const txnCatWords = categoryToMatch.split('-');
+            if (catWords.includes(txnCatWords[0]) || catWords.includes(txnCatWords[1])) {
+                return category;
+            }
+        }
+        return {
+            value: 0.00
+        };
+    }
+
     renderCategoryTableData() {
-            let categoryArray = [];
-            let aggregatedTransactions = aggregateTransactions(this.state.displayTransactions);
-            let yearAvgSpendingMap = this.computeAllYearAverages(this.state.avgSpendingMap);
-            Object.keys(yearAvgSpendingMap).forEach(category => {
-                if (this.state.allYear === false) {
-                    if (Object.keys(aggregatedTransactions).includes(category)) {
-                        categoryArray.push({ category: category, amount: aggregatedTransactions[category] });
-                    }
-                } else {
-                    categoryArray.push({ category: category, amount: yearAvgSpendingMap[category].sum });
+        let categoryArray = [];
+        let aggregatedTransactions = aggregateTransactions(this.state.displayTransactions);
+        let yearAvgSpendingMap = this.computeAllYearAverages(this.state.avgSpendingMap);
+        Object.keys(yearAvgSpendingMap).forEach(category => {
+            if (this.state.allYear === false) {
+                if (Object.keys(aggregatedTransactions).includes(category)) {
+                    categoryArray.push({ category: category, amount: aggregatedTransactions[category] });
                 }
-            });
-            if (this.state.avgSpendingMap[this.state.year] && ((!this.state.allYear && this.state.avgSpendingMap[this.state.year][this.state.monthNum]) || (this.state.allYear))) {
-                return categoryArray
+            } else {
+                categoryArray.push({ category: category, amount: yearAvgSpendingMap[category].sum });
+            }
+        });
+        if (this.state.budget && this.state.avgSpendingMap[this.state.year] && ((!this.state.allYear && this.state.avgSpendingMap[this.state.year][this.state.monthNum]) || (this.state.allYear))) {
+            return categoryArray
                 .sort((a, b) => {
                     return (a.category > b.category) ? 1 : -1;
                 }).map((catVal, index) => {
                     if ("ccSum" !== catVal.category) {
                         const color = catVal.category.indexOf('income') !== 0 ? "black" : "green";
-                        const avgSpending = yearAvgSpendingMap[catVal.category].sum / yearAvgSpendingMap[catVal.category].count;      
+                        const avgSpending = yearAvgSpendingMap[catVal.category].sum / yearAvgSpendingMap[catVal.category].count;
                         const nametd = catVal.category.includes('-') ? <td><font color={color}><i>- {catVal.category}</i></font></td> : <td><font color={color}><b>{catVal.category}</b></font></td>;
+                        let c = this.getCategoryFromBudget(catVal.category);
                         return (
                             <tr key={index}>
                                 {nametd}
                                 <td><font color='black'>${parseFloat(catVal.amount).toFixed(2)}</font></td>
+                                <td><font color='black'>{c.value === 0.0 ? "-" : `$${parseFloat(c.value).toFixed(2)} ($${parseFloat(c.value - catVal.amount).toFixed(2)})`}</font></td>
                                 <td><font color='black'>${parseFloat(avgSpending).toFixed(2)}</font></td>
                             </tr>
                         );
                     }
                 })
-            }
+        }
     }
 
     renderCategoryDropdown() {
@@ -298,7 +321,7 @@ class Transactions extends Component {
         }
         return (catOptions);
     }
-    
+
     renderYearDropdown() {
         var yearOptions = [];
         for (var year = 1967; year <= 2096; year += 1) {
@@ -348,8 +371,8 @@ class Transactions extends Component {
 
                 <div className="barStack">
                     <label>
-                        <b>Credit Card Transactions:</b><br />      
-                            <input
+                        <b>Credit Card Transactions:</b><br />
+                        <input
                             name="onlyCCTransactions"
                             type="checkbox"
                             checked={this.state.onlyCCTransactions}
