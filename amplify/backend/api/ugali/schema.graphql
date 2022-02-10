@@ -1,7 +1,6 @@
 type Transaction @model
 @key(name: "ByUserDatePublic", fields: ["user", "date", "is_public"], queryField: "transactionsByUserDatePublic") 
-@key(name: "ByUserActualDate", fields: ["user", "date"], queryField: "transactionsByUserDate") 
-@key(name: "ByUserRecurring", fields: ["user", "is_recurring"], queryField: "transactionsByUserRecurring") {
+@key(name: "ByUserActualDate", fields: ["user", "date"], queryField: "transactionsByUserDate") {
   id: ID!
   title: String!
   amount: Float
@@ -13,35 +12,7 @@ type Transaction @model
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
   user: String!
-  is_recurring: String!
   is_public: String
-  recurring_frequency: Frequency
-  base_recurring_transaction: String
-}
-
-type Friend @model {
-  id: ID!
-  from: String!
-  to: String!
-  createdAt: AWSDateTime!
-}
-
-type FriendRequest @model {
-  id: ID!
-  from: String!
-  to: String!
-  createdAt: AWSDateTime!
-}
-
-enum Frequency {
-  NA
-  ONCE
-  MONTHLY
-  YEARLY
-  WEEKLY
-  BIWEEKLY
-  FIRST_DAY_OF_MONTH
-  LAST_DAY_OF_MONTH
 }
 
 type PremiumUsers @model {
