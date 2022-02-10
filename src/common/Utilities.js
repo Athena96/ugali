@@ -171,7 +171,6 @@ export function renderDisplayTransactions(transactions, IS_PREMIUM_USER, deleteF
                         {isFriendsTxn ? <><b>User:</b> {user}<br /></> : <></>}
                         {hideCat ? <></> : <><b>Category:</b> {category}<br /></>}
                         {isFriendsTxn ? <></> : <><b>Payment Method:</b> {payment_method}<br /></>}
-                        {IS_PREMIUM_USER && !isFriendsTxn ? recurring : ""}
                         {description === null ? "" : desc}</p>
                     {deleteFunc ? <button id={id} className="deleteTxnButton" onClick={deleteFunc} >delete</button> : <></> }
                     {duplicateFunc ? <button id={id} className="duplicateTxnButton" onClick={duplicateFunc} >duplicate</button> : <></> }
