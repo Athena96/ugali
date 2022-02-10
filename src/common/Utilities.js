@@ -130,14 +130,14 @@ export function renderDisplayTransactions(transactions, IS_PREMIUM_USER, deleteF
     var currDay = ""
     var previousCurrDay = "diff"
     for (var transaction of transactions) {
-        const { id, user, title, amount, category, date, recurring_frequency, type, payment_method, description, is_recurring } = transaction;
+        const { id, user, title, amount, category, date, type, payment_method, description } = transaction;
         var classname = (type === 1) ? "incomeRecurrTxn" : "expenseRecurrTxn";
         const dayIdx = new Date(date);
         const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         var dayOfWeek = days[dayIdx.getDay()];
         var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
-        var yesmessage = "Yes (" + recurring_frequency + ")";
-        var recurring = <><b>Is Recurring Transaction: </b> {is_recurring ? yesmessage : "No"}</>;
+
+
 
         // const pub =<><span style={{color:"darkred"}}>Public</span><br /></>;
         // const priv = <><span style={{color:"green"}}>Private</span><br /></>;

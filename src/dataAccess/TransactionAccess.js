@@ -24,7 +24,6 @@ export async function fetchTransactions(year, month) {
     var txns = [];
     for (var t of data.data.transactionsByUserDate.items) {
         if (t != null) {
-            t.is_recurring = t.is_recurring === "true" || t.is_recurring === true ? true : false;
             txns.push(t);
         }
 
@@ -46,35 +45,7 @@ export async function fetchTransactions(year, month) {
     return response;
 }
 
-export async function fetchRecurringTransactions() {
-    var user = await Auth.currentAuthenticatedUser();
-    var data = await API.graphql(graphqlOperation(transactionsByUserRecurring, {
-        limit: TXN_LIMIT,
-        user: user.attributes.email,
-        is_recurring: { eq: "true" }
-    }));
 
-    var txns = [];
-    for (var t of data.data.transactionsByUserRecurring.items) {
-        t.is_recurring = t.is_recurring === "true" ? true : false;
-        txns.push(t);
-    }
-    var sortedTxns = txns;
-
-    sortedTxns.sort((t1, t2) => {
-        var d1 = new Date(t1.date);
-        var d2 = new Date(t2.date);
-        if (d1 < d2)
-            return 1;
-        if (d1 > d2)
-            return -1;
-        return 0;
-    });
-
-    var response = {};
-    response.recurring_txns = sortedTxns;
-    return response;
-}
 
 function formatDate(date) {
     return `${date.getFullYear()}-${(date.getMonth() + 1) < 10 ? '0'+(date.getMonth() + 1) : date.getMonth() + 1}-${(date.getDate() + 1) < 10 ? '0'+(date.getDate() + 1) : date.getDate() + 1}T00:00:00`;
