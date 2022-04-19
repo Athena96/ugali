@@ -39,7 +39,6 @@ async function getSelectedSimulationId() {
         const result = await ddb.scan(params).promise();
         if (result && result.Items) {
             for (const item of result.Items) {
-                console.log('->' + JSON.stringify(item));
                 if (item.selected) {
                     return item.id;
                 }
@@ -48,7 +47,6 @@ async function getSelectedSimulationId() {
             return null;
         }
     } catch (err) {
-        console.error(err);
         return null;
     }
 }
@@ -76,7 +74,6 @@ export async function getBudgetData(viewMonth, viewYear) {
         const date = new Date(viewYear, viewMonth, 1)
         return getCurrentBudget(budgets.Items, date);
     } catch (err) {
-        console.error(err);
         return { categoryMap: {} };
     }
 }
