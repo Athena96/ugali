@@ -30,6 +30,7 @@ export async function getAvgSpendingMapForUser() {
     }
 }
 
+
 // async function getSelectedSimulationId() {
 //     try {
 //         const params = {
@@ -64,6 +65,7 @@ export async function getAvgSpendingMapForUser() {
 //     }
 // }
 
+
 // export async function getBudgetData(viewMonth, viewYear) {
 //     try {
 //         const selectedSimId = await getSelectedSimulationId();
@@ -80,3 +82,4 @@ export async function getAvgSpendingMapForUser() {
 //         return { categoryMap: {} };
 //     }
 // }
+
