@@ -6,7 +6,6 @@ import { Auth } from 'aws-amplify';
 
 // Common
 import { formatDate, convertDateStrToGraphqlDate } from '../common/Utilities';
-import { Frequencies } from '../common/Utilities';
 
 // Data Access
 import { fetchTransactionsForUserBetween, fetchTransactionBy } from '../dataAccess/TransactionAccess';
@@ -50,18 +49,14 @@ class AddTransaction extends Component {
 
       user: "",
       exampleTxnId: txnId,
-      base_recurring_transaction: null,
       usersLatestCateogories: [],
-      showRecurrDropdown: false,
-      IS_PREMIUM_USER: false,
-      wasAutoAdded: false
+      IS_PREMIUM_USER: false
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.renderButton = this.renderButton.bind(this);
-    this.updateParentRecurringTransaction = this.updateParentRecurringTransaction.bind(this);
     this.deleteTransaction = this.deleteTransaction.bind(this);
   }
 
@@ -118,11 +113,7 @@ class AddTransaction extends Component {
 
             updateTxnId: currentComponent.exampleTxnId,
 
-            wasAutoAdded: txn.base_recurring_transaction !== undefined && txn.base_recurring_transaction !== null,
-            base_recurring_transaction: txn.base_recurring_transaction
           });
-
-          console.log(currentComponent.state)
 
         })
         .catch(function (response) {
@@ -165,28 +156,20 @@ class AddTransaction extends Component {
     } else {
       this.setState({ [name]: value });
     }
-    console.log(this.state)
+
   }
 
   renderButton() {
     if (IS_UPDATE) {
 
-      if (IS_UPDATE && this.state.wasAutoAdded) {
-        return (
-          <div>
-            <button class="updateButton" onClick={this.handleSubmit}>Update</button>
-            <button className="updateButton" onClick={this.updateParentRecurringTransaction} >Update Original Recurring Tranaction</button>
-            <button class="deleteButton" onClick={this.deleteTransaction}>Delete</button>
-          </div>
-        )
-      } else {
+
         return (
           <div>
             <button class="updateButton" onClick={this.handleSubmit}>Update</button>
             <button class="deleteButton" onClick={this.deleteTransaction}>Delete</button>
           </div>
         )
-      }
+      
 
 
     } else {
@@ -202,28 +185,8 @@ class AddTransaction extends Component {
   }
 
   renderShowPeriodDropDown() {
-    var freqOptions = [];
+    return (<></>)
 
-    for (const freq in Frequencies) {
-      if (freq !== Frequencies.NA) {
-        freqOptions.push(<option value={Frequencies[freq]}>{Frequencies[freq]}</option>)
-      }
-    }
-    if (this.state.showRecurrDropdown) {
-      return (
-        <div>
-          <b>Frequency: </b>
-          <select name="recurring_frequency" value={this.state.recurring_frequency} onChange={this.handleChange}>
-            {freqOptions}
-          </select><br />
-          <ul>
-            <small><b>*A recurring transaction will:*</b></small>
-
-            <li><small>Be automatically created after each frequency period.</small></li>
-          </ul>
-        </div>
-      );
-    }
   }
   renderPremiumFeatures() {
     return (<></>)
@@ -243,13 +206,11 @@ class AddTransaction extends Component {
       type: 2,
       is_public: false,
       user: "",
-      updateTxnId: null,
-      showRecurrDropdown: false
-    });
+      updateTxnId: null
+        });
   }
 
   async handleSubmit(e) {
-    console.log("HANDLE SUBMIT");
     // todo ?
     e.preventDefault();
 
@@ -397,11 +358,6 @@ class AddTransaction extends Component {
     return (catOptions);
   }
 
-  updateParentRecurringTransaction() {
-    console.log(this.state.base_recurring_transaction)
-    this.props.history.push('/addTransaction/update/' + this.state.base_recurring_transaction)
-    window.location.reload(false)
-  }
 
   deleteTransaction() {
 let currcom = this;

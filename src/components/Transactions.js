@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { getDoubleDigitFormat, renderDisplayTransactions, monthNames, aggregateTransactions, filterTransactions } from '../common/Utilities';
 import { fetchTransactions } from '../dataAccess/TransactionAccess';
 import { checkIfPremiumUser } from '../dataAccess/PremiumUserAccess';
-import { getAvgSpendingMapForUser, getBudgetData } from '../dataAccess/CustomDataAccess';
+import { getAvgSpendingMapForUser } from '../dataAccess/CustomDataAccess';
 import { deleteTransactionWithId } from '../dataMutation/TransactionMutation';
 import { LineChart } from 'react-chartkick'
 import 'chart.js'
@@ -107,7 +107,6 @@ class Transactions extends Component {
                         });
                     }
                 }
-                console.log("ccData " + JSON.stringify(ccData));
 
                 this.setState({
                     avgSpendingMap: data,
@@ -139,11 +138,10 @@ class Transactions extends Component {
                 });
             });
 
-        getBudgetData(this.state.monthNum, this.state.year).then((budgetData) => {
-            console.log('budgetData ' + JSON.stringify(budgetData));
-            this.setState({ budget: budgetData });
-
-        })
+        // getBudgetData(this.state.monthNum, this.state.year).then((budgetData) => {
+        //     console.log('budgetData ' + JSON.stringify(budgetData));
+        //     this.setState({ budget: budgetData });
+        // })
     }
 
     /* life cycle */
@@ -183,7 +181,7 @@ class Transactions extends Component {
     /* render / ui */
 
     renderMain() {
-        let header = ['category', 'amount', 'Budget', 'average (' + this.state.year + ')',];
+        let header = ['category', 'amount', 'average (' + this.state.year + ')',];
         const categoryHeader = header.map((key, index) => {
             return <th key={index}>{key.toUpperCase()}</th>
         })
@@ -275,7 +273,7 @@ class Transactions extends Component {
                 categoryArray.push({ category: category, amount: yearAvgSpendingMap[category].sum });
             }
         });
-        if (this.state.budget && this.state.avgSpendingMap[this.state.year] && ((!this.state.allYear && this.state.avgSpendingMap[this.state.year][this.state.monthNum]) || (this.state.allYear))) {
+        if (this.state.displayTransactions && this.state.avgSpendingMap[this.state.year] && ((!this.state.allYear && this.state.avgSpendingMap[this.state.year][this.state.monthNum]) || (this.state.allYear))) {
             return categoryArray
                 .sort((a, b) => {
                     return (a.category > b.category) ? 1 : -1;
@@ -284,15 +282,16 @@ class Transactions extends Component {
                         const color = catVal.category.indexOf('income') !== 0 ? "black" : "green";
                         const avgSpending = yearAvgSpendingMap[catVal.category].sum / yearAvgSpendingMap[catVal.category].count;
                         const nametd = catVal.category.includes('-') ? <td><font color={color}><i>- {catVal.category}</i></font></td> : <td><font color={color}><b>{catVal.category}</b></font></td>;
-                        let c = this.getCategoryFromBudget(catVal.category);
+
                         return (
                             <tr key={index}>
                                 {nametd}
                                 <td><font color='black'>${parseFloat(catVal.amount).toFixed(2)}</font></td>
-                                <td><font color='black'>{c.value === 0.0 ? "-" : `$${parseFloat(c.value).toFixed(2)} ($${parseFloat(c.value - catVal.amount).toFixed(2)})`}</font></td>
                                 <td><font color='black'>${parseFloat(avgSpending).toFixed(2)}</font></td>
                             </tr>
                         );
+                    } else {
+                        return (<></>)
                     }
                 })
         }
