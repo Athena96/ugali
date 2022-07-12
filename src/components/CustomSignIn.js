@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
 import { SignIn } from "aws-amplify-react";
 import '../App.css';
@@ -55,6 +56,7 @@ export class CustomSignIn extends SignIn {
                 />
                 <p className="text-grey-dark text-xs">
                   Forgot your password?{" "}
+
                   <a
                     className="text-indigo cursor-pointer hover:text-indigo-darker"
                     onClick={() => super.changeState("forgotPassword")}

@@ -130,14 +130,14 @@ export function renderDisplayTransactions(transactions, IS_PREMIUM_USER, deleteF
     var currDay = ""
     var previousCurrDay = "diff"
     for (var transaction of transactions) {
-        const { id, user, title, amount, category, date, recurring_frequency, type, payment_method, description, is_recurring } = transaction;
+        const { id, user, title, amount, category, date, type, payment_method, description } = transaction;
         var classname = (type === 1) ? "incomeRecurrTxn" : "expenseRecurrTxn";
         const dayIdx = new Date(date);
         const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         var dayOfWeek = days[dayIdx.getDay()];
         var desc = <div className="desc"><p><b>Description:</b><br />{description}</p></div>;
-        var yesmessage = "Yes (" + recurring_frequency + ")";
-        var recurring = <><b>Is Recurring Transaction: </b> {is_recurring ? yesmessage : "No"}</>;
+
+
 
         // const pub =<><span style={{color:"darkred"}}>Public</span><br /></>;
         // const priv = <><span style={{color:"green"}}>Private</span><br /></>;
@@ -171,7 +171,6 @@ export function renderDisplayTransactions(transactions, IS_PREMIUM_USER, deleteF
                         {isFriendsTxn ? <><b>User:</b> {user}<br /></> : <></>}
                         {hideCat ? <></> : <><b>Category:</b> {category}<br /></>}
                         {isFriendsTxn ? <></> : <><b>Payment Method:</b> {payment_method}<br /></>}
-                        {IS_PREMIUM_USER && !isFriendsTxn ? recurring : ""}
                         {description === null ? "" : desc}</p>
                     {deleteFunc ? <button id={id} className="deleteTxnButton" onClick={deleteFunc} >delete</button> : <></> }
                     {duplicateFunc ? <button id={id} className="duplicateTxnButton" onClick={duplicateFunc} >duplicate</button> : <></> }

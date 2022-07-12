@@ -55,8 +55,6 @@ class Premium extends Component {
     }
 
     componentDidMount() {
-        console.log("componentDidMount");
-
         checkIfPremiumUser()
             .then((response) => {
                 this.setState({

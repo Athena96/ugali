@@ -13,7 +13,7 @@ type Transaction @model
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
   user: String!
-  is_recurring: String!
+  is_recurring: String
   is_public: String
   recurring_frequency: Frequency
   base_recurring_transaction: String

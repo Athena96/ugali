@@ -6,7 +6,6 @@ import { Auth } from 'aws-amplify';
 
 // Common
 import { formatDate, convertDateStrToGraphqlDate } from '../common/Utilities';
-import { Frequencies } from '../common/Utilities';
 
 // Data Access
 import { fetchTransactionsForUserBetween, fetchTransactionBy } from '../dataAccess/TransactionAccess';
@@ -45,23 +44,19 @@ class AddTransaction extends Component {
       description: "",
       payment_method: "credit",
       type: 2,
-      is_recurring: false,
+
       is_public: false,
-      recurring_frequency: Frequencies.NA,
+
       user: "",
       exampleTxnId: txnId,
-      base_recurring_transaction: null,
       usersLatestCateogories: [],
-      showRecurrDropdown: false,
-      IS_PREMIUM_USER: false,
-      wasAutoAdded: false
+      IS_PREMIUM_USER: false
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.renderButton = this.renderButton.bind(this);
-    this.updateParentRecurringTransaction = this.updateParentRecurringTransaction.bind(this);
     this.deleteTransaction = this.deleteTransaction.bind(this);
   }
 
@@ -113,16 +108,12 @@ class AddTransaction extends Component {
             payment_method: txn.payment_method,
             type: txn.type,
             user: txn.user,
-            is_recurring: txn.is_recurring === "true" ? true : false,
-            is_public: txn.is_public === "true" ? true : false,
-            recurring_frequency: txn.recurring_frequency || Frequencies.NA,
-            updateTxnId: currentComponent.exampleTxnId,
-            showRecurrDropdown: txn.is_recurring === "true" ? true : false,
-            wasAutoAdded: txn.base_recurring_transaction !== undefined && txn.base_recurring_transaction !== null,
-            base_recurring_transaction: txn.base_recurring_transaction
-          });
 
-          console.log(currentComponent.state)
+            is_public: txn.is_public === "true" ? true : false,
+
+            updateTxnId: currentComponent.exampleTxnId,
+
+          });
 
         })
         .catch(function (response) {
@@ -146,19 +137,7 @@ class AddTransaction extends Component {
     var value = target.type === 'checkbox' ? target.checked : target.value;
     var name = target.name;
 
-    if (name === "is_recurring" && this.state.IS_PREMIUM_USER) {
-      this.setState({ "showRecurrDropdown": value, "is_recurring": value});
-      
-      if (value) {
-        this.setState({
-          "recurring_frequency": Frequencies.ONCE
-        });
-      } else {
-        this.setState({
-          "recurring_frequency": Frequencies.NA
-        });
-      }
-    } else if (name === "type") {
+    if (name === "type") {
       value = parseInt(value);
       this.setState({
         [name]: value
@@ -177,28 +156,20 @@ class AddTransaction extends Component {
     } else {
       this.setState({ [name]: value });
     }
-    console.log(this.state)
+
   }
 
   renderButton() {
     if (IS_UPDATE) {
 
-      if (IS_UPDATE && this.state.wasAutoAdded) {
-        return (
-          <div>
-            <button class="updateButton" onClick={this.handleSubmit}>Update</button>
-            <button className="updateButton" onClick={this.updateParentRecurringTransaction} >Update Original Recurring Tranaction</button>
-            <button class="deleteButton" onClick={this.deleteTransaction}>Delete</button>
-          </div>
-        )
-      } else {
+
         return (
           <div>
             <button class="updateButton" onClick={this.handleSubmit}>Update</button>
             <button class="deleteButton" onClick={this.deleteTransaction}>Delete</button>
           </div>
         )
-      }
+      
 
 
     } else {
@@ -214,51 +185,12 @@ class AddTransaction extends Component {
   }
 
   renderShowPeriodDropDown() {
-    var freqOptions = [];
+    return (<></>)
 
-    for (const freq in Frequencies) {
-      if (freq !== Frequencies.NA) {
-        freqOptions.push(<option value={Frequencies[freq]}>{Frequencies[freq]}</option>)
-      }
-    }
-    if (this.state.showRecurrDropdown) {
-      return (
-        <div>
-          <b>Frequency: </b>
-          <select name="recurring_frequency" value={this.state.recurring_frequency} onChange={this.handleChange}>
-            {freqOptions}
-          </select><br />
-          <ul>
-            <small><b>*A recurring transaction will:*</b></small>
-
-            <li><small>Be automatically created after each frequency period.</small></li>
-          </ul>
-        </div>
-      );
-    }
   }
   renderPremiumFeatures() {
-    if (this.state.IS_PREMIUM_USER) {
-      return (
-        <div className="premiumFeatureAddTxnBackground">
-          <div>
-            <label>
-              <b>Recurring Transaction?</b> (e.g. bill, subscription, paycheck):
-                <input
-                name="is_recurring"
-                type="checkbox"
-                checked={this.state.is_recurring}
-                onChange={this.handleChange} />
-            </label><br />
-  
-            {this.renderShowPeriodDropDown()}
-  
-          </div>
-        </div>
-      )
-    } else {
-      return (<></>)
-    }
+    return (<></>)
+
 
   }
 
@@ -272,17 +204,13 @@ class AddTransaction extends Component {
       date: strDate,
       description: "",
       type: 2,
-      is_recurring: false,
       is_public: false,
-      recurring_frequency: Frequencies.NA,
       user: "",
-      updateTxnId: null,
-      showRecurrDropdown: false
-    });
+      updateTxnId: null
+        });
   }
 
   async handleSubmit(e) {
-    console.log("HANDLE SUBMIT");
     // todo ?
     e.preventDefault();
 
@@ -343,9 +271,9 @@ class AddTransaction extends Component {
         description: this.state.description,
         payment_method: this.state.payment_method,
         type: this.state.type,
-        is_recurring: this.state.is_recurring,
+
         is_public: this.state.is_public,
-        recurring_frequency: this.state.recurring_frequency,
+
         user: this.state.user
       }
 
@@ -360,9 +288,9 @@ class AddTransaction extends Component {
         description: this.state.description,
         payment_method: this.state.payment_method,
         type: this.state.type,
-        is_recurring: this.state.is_recurring,
+
         is_public: this.state.is_public,
-        recurring_frequency: this.state.recurring_frequency,
+
         user: this.state.user
       }
 
@@ -392,7 +320,7 @@ class AddTransaction extends Component {
     transaction.payment_method = transaction.payment_method.trim();
 
     // true/false to string
-    transaction.is_recurring = transaction.is_recurring.toString();
+
     transaction.is_public = transaction.is_public.toString();
 
     // submit
@@ -430,11 +358,6 @@ class AddTransaction extends Component {
     return (catOptions);
   }
 
-  updateParentRecurringTransaction() {
-    console.log(this.state.base_recurring_transaction)
-    this.props.history.push('/addTransaction/update/' + this.state.base_recurring_transaction)
-    window.location.reload(false)
-  }
 
   deleteTransaction() {
 let currcom = this;
