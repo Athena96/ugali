@@ -18,10 +18,7 @@ export const createTransaction = /* GraphQL */ `
       createdAt
       updatedAt
       user
-      is_recurring
       is_public
-      recurring_frequency
-      base_recurring_transaction
     }
   }
 `;
@@ -42,10 +39,7 @@ export const updateTransaction = /* GraphQL */ `
       createdAt
       updatedAt
       user
-      is_recurring
       is_public
-      recurring_frequency
-      base_recurring_transaction
     }
   }
 `;
@@ -66,10 +60,7 @@ export const deleteTransaction = /* GraphQL */ `
       createdAt
       updatedAt
       user
-      is_recurring
       is_public
-      recurring_frequency
-      base_recurring_transaction
     }
   }
 `;
@@ -83,6 +74,7 @@ export const createFriend = /* GraphQL */ `
       from
       to
       createdAt
+      updatedAt
     }
   }
 `;
@@ -96,6 +88,7 @@ export const updateFriend = /* GraphQL */ `
       from
       to
       createdAt
+      updatedAt
     }
   }
 `;
@@ -109,6 +102,7 @@ export const deleteFriend = /* GraphQL */ `
       from
       to
       createdAt
+      updatedAt
     }
   }
 `;
@@ -122,6 +116,7 @@ export const createFriendRequest = /* GraphQL */ `
       from
       to
       createdAt
+      updatedAt
     }
   }
 `;
@@ -135,6 +130,7 @@ export const updateFriendRequest = /* GraphQL */ `
       from
       to
       createdAt
+      updatedAt
     }
   }
 `;
@@ -148,6 +144,7 @@ export const deleteFriendRequest = /* GraphQL */ `
       from
       to
       createdAt
+      updatedAt
     }
   }
 `;
@@ -161,6 +158,8 @@ export const createPremiumUsers = /* GraphQL */ `
       user
       oderId
       expiryDate
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -174,6 +173,8 @@ export const updatePremiumUsers = /* GraphQL */ `
       user
       oderId
       expiryDate
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -187,6 +188,8 @@ export const deletePremiumUsers = /* GraphQL */ `
       user
       oderId
       expiryDate
+      createdAt
+      updatedAt
     }
   }
 `;

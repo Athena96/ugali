@@ -15,10 +15,7 @@ export const getTransaction = /* GraphQL */ `
       createdAt
       updatedAt
       user
-      is_recurring
       is_public
-      recurring_frequency
-      base_recurring_transaction
     }
   }
 `;
@@ -41,10 +38,7 @@ export const listTransactions = /* GraphQL */ `
         createdAt
         updatedAt
         user
-        is_recurring
         is_public
-        recurring_frequency
-        base_recurring_transaction
       }
       nextToken
     }
@@ -57,6 +51,7 @@ export const getFriend = /* GraphQL */ `
       from
       to
       createdAt
+      updatedAt
     }
   }
 `;
@@ -72,6 +67,7 @@ export const listFriends = /* GraphQL */ `
         from
         to
         createdAt
+        updatedAt
       }
       nextToken
     }
@@ -84,6 +80,7 @@ export const getFriendRequest = /* GraphQL */ `
       from
       to
       createdAt
+      updatedAt
     }
   }
 `;
@@ -99,6 +96,7 @@ export const listFriendRequests = /* GraphQL */ `
         from
         to
         createdAt
+        updatedAt
       }
       nextToken
     }
@@ -111,6 +109,8 @@ export const getPremiumUsers = /* GraphQL */ `
       user
       oderId
       expiryDate
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -126,6 +126,8 @@ export const listPremiumUserss = /* GraphQL */ `
         user
         oderId
         expiryDate
+        createdAt
+        updatedAt
       }
       nextToken
     }
@@ -160,10 +162,7 @@ export const transactionsByUserDatePublic = /* GraphQL */ `
         createdAt
         updatedAt
         user
-        is_recurring
         is_public
-        recurring_frequency
-        base_recurring_transaction
       }
       nextToken
     }
@@ -198,48 +197,7 @@ export const transactionsByUserDate = /* GraphQL */ `
         createdAt
         updatedAt
         user
-        is_recurring
         is_public
-        recurring_frequency
-        base_recurring_transaction
-      }
-      nextToken
-    }
-  }
-`;
-export const transactionsByUserRecurring = /* GraphQL */ `
-  query TransactionsByUserRecurring(
-    $user: String
-    $is_recurring: ModelStringKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelTransactionFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    transactionsByUserRecurring(
-      user: $user
-      is_recurring: $is_recurring
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        title
-        amount
-        category
-        date
-        description
-        payment_method
-        type
-        createdAt
-        updatedAt
-        user
-        is_recurring
-        is_public
-        recurring_frequency
-        base_recurring_transaction
       }
       nextToken
     }
