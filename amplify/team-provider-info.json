@@ -1,38 +1,38 @@
 {
-	"ugalienv": {
-		"awscloudformation": {
-			"AuthRoleName": "amplify-ugali-ugalienv-95004-authRole",
-			"UnauthRoleArn": "arn:aws:iam::173916683421:role/amplify-ugali-ugalienv-95004-unauthRole",
-			"AuthRoleArn": "arn:aws:iam::173916683421:role/amplify-ugali-ugalienv-95004-authRole",
-			"Region": "us-west-2",
-			"DeploymentBucketName": "amplify-ugali-ugalienv-95004-deployment",
-			"UnauthRoleName": "amplify-ugali-ugalienv-95004-unauthRole",
-			"StackName": "amplify-ugali-ugalienv-95004",
-			"StackId": "arn:aws:cloudformation:us-west-2:173916683421:stack/amplify-ugali-ugalienv-95004/173d6780-5be5-11ea-a09d-06c82e60cd18",
-			"AmplifyAppId": "d2i7grpxbxqdu4"
-		},
-		"categories": {
-			"auth": {
-				"ugali9cbd228b": {}
-			}
-		}
-	},
-	"dev": {
-		"awscloudformation": {
-			"AuthRoleName": "amplify-ugali-dev-192945-authRole",
-			"UnauthRoleArn": "arn:aws:iam::173916683421:role/amplify-ugali-dev-192945-unauthRole",
-			"AuthRoleArn": "arn:aws:iam::173916683421:role/amplify-ugali-dev-192945-authRole",
-			"Region": "us-west-2",
-			"DeploymentBucketName": "amplify-ugali-dev-192945-deployment",
-			"UnauthRoleName": "amplify-ugali-dev-192945-unauthRole",
-			"StackName": "amplify-ugali-dev-192945",
-			"StackId": "arn:aws:cloudformation:us-west-2:173916683421:stack/amplify-ugali-dev-192945/07b26f30-8378-11ea-b094-02513dab9d2a",
-			"AmplifyAppId": "d2i7grpxbxqdu4"
-		},
-		"categories": {
-			"auth": {
-				"ugali9cbd228b": {}
-			}
-		}
-	}
+  "ugalienv": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-ugali-ugalienv-95004-authRole",
+      "UnauthRoleArn": "arn:aws:iam::173916683421:role/amplify-ugali-ugalienv-95004-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::173916683421:role/amplify-ugali-ugalienv-95004-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-ugali-ugalienv-95004-deployment",
+      "UnauthRoleName": "amplify-ugali-ugalienv-95004-unauthRole",
+      "StackName": "amplify-ugali-ugalienv-95004",
+      "StackId": "arn:aws:cloudformation:us-west-2:173916683421:stack/amplify-ugali-ugalienv-95004/173d6780-5be5-11ea-a09d-06c82e60cd18",
+      "AmplifyAppId": "d2i7grpxbxqdu4"
+    },
+    "categories": {
+      "auth": {
+        "ugali9cbd228b": {}
+      }
+    }
+  },
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-ugali-dev-192945-authRole",
+      "UnauthRoleArn": "arn:aws:iam::173916683421:role/amplify-ugali-dev-192945-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::173916683421:role/amplify-ugali-dev-192945-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-ugali-dev-192945-deployment",
+      "UnauthRoleName": "amplify-ugali-dev-192945-unauthRole",
+      "StackName": "amplify-ugali-dev-192945",
+      "StackId": "arn:aws:cloudformation:us-west-2:173916683421:stack/amplify-ugali-dev-192945/07b26f30-8378-11ea-b094-02513dab9d2a",
+      "AmplifyAppId": "d2i7grpxbxqdu4"
+    },
+    "categories": {
+      "auth": {
+        "ugali9cbd228b": {}
+      }
+    }
+  }
 }
