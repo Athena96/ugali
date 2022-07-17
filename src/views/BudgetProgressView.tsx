@@ -69,12 +69,44 @@ class BudgetProgressView extends React.Component<BudgetProgressViewProps, IState
     this.setState({ categoryMap: finalCategoryMap });
   }
 
+  getTotalBudget() {
+    let sum = 0.0
+    if (this.state.categoryMap) {
+      for (const c of this.state.categoryMap) {
+        sum += c.budgetCategory!.value
+      }
+    }
+    return sum;
+  }
+  getTotalSpent() {
+    let sum = 0.0
+    if (this.state.categoryMap) {
+      for (const c of this.state.categoryMap) {
+        sum += c.sum
+      }
+    }
+    return sum;
+  }
 
   render() {
     if (this.state.categoryMap !== undefined) {
+      const totalCanSpend = this.getTotalBudget();
+      const totalOfTotalSpent = this.getTotalSpent();
+      const percentSpent = (totalOfTotalSpent/totalCanSpend)*100.0
+      const isOverTotalBudget = percentSpent > 100.0
+      const leftOfTotalToSpend = totalCanSpend - totalOfTotalSpent;
+      const leftOrOverMsgTotal = isOverTotalBudget ?  "over budget" : "left to spend";
       return (
         <Box >
           <h2>Budget</h2>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Box sx={{ width: '100%', mr: 1 }}>
+                    <LinearProgress variant="determinate" value={percentSpent} />
+                  </Box>
+                  <Box sx={{ minWidth: 35 }}>
+                    <Typography variant="body2" color={isOverTotalBudget ? "red" : "text.secondary"}>{`$${leftOfTotalToSpend.toFixed(2)} ${leftOrOverMsgTotal}`}</Typography>
+                  </Box>
+                </Box>
           <hr />
           {this.state.categoryMap.map((category) => {
             const rawSpentCalc = (category.sum / (category.budgetCategory?.value || 0.0))*100.0

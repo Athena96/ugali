@@ -41,17 +41,10 @@ class BudgetView extends React.Component<BudgetViewProps, IState> {
   }
 
   async componentDidMount() {
-    console.log('componentDidMount')
-
    let budget = await getBudgetForUserDB(this.props.user)
-   console.log('found budget: budget ' + JSON.stringify(budget))
-
    if (!budget) {
-    
     budget = new Budget(new Date().getTime().toString(),'default_budget', new Date(), new Date(), new Date(), this.props.user, [])
-    console.log('was no default_budget, creating one...')
     await createBudgetDB(budget);
-    console.log(JSON.stringify(budget));
    }
    this.setState({budget})
   }
@@ -89,17 +82,11 @@ class BudgetView extends React.Component<BudgetViewProps, IState> {
 
   async saveBudget() {
     if (this.state.budget) {
-      console.log('saveBudget')
-      console.log(JSON.stringify(this.state.budget))
-
       try {
         await updateBudgetDB(this.state.budget);
-
       } catch(e) {
-        console.log(e)
-
+        console.error(e)
       }
-
     }
   }
   render() {

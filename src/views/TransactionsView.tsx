@@ -57,10 +57,6 @@ class TransactionsView extends React.Component<TransactionsViewProps, IState> {
     }
 
     async fetchTransactions(year: number, month: number) {
-        console.log('fetchTransactions')
-        console.log(parseInt(this.state.year), parseInt(this.state.month))
-
-
         const transactions = await fetchTransactionsForYearMonth(this.props.user, year, month+1)
         transactions.sort((a, b) => (a.date > b.date) ? -1 : 1)
         this.setState({ transactions })
