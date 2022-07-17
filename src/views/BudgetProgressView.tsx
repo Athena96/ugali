@@ -11,6 +11,7 @@ import { CategoryDirectory, groupTransactionsByCategory } from '../utilities/tra
 import { getBudgetForUserDB } from '../dataAccess/BudgetDataAccess';
 import { Category } from '../model/Category';
 import { Budget } from '../model/Budget';
+import { Link } from 'react-router-dom';
 
 interface BudgetProgressViewProps {
   user: string;
@@ -98,9 +99,12 @@ class BudgetProgressView extends React.Component<BudgetProgressViewProps, IState
       const isOverTotalBudget = percentSpent > 100.0
       const leftOfTotalToSpend = totalCanSpend - totalOfTotalSpent;
       const leftOrOverMsgTotal = isOverTotalBudget ? "over budget" : "left to spend";
+      const today = new Date();
+      const year = today.getFullYear()
+      const month = today.getMonth() + 1;
       return (
         <Box >
-          <h2>Budget</h2>
+          <h2><Link style={{ color: 'black', textDecoration: 'none' }} to={`/transactions/${year}/${month}`}>Budget</Link></h2>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box sx={{ width: '100%', mr: 1 }}>
               <LinearProgress variant="determinate" value={percentSpent} />
@@ -118,7 +122,7 @@ class BudgetProgressView extends React.Component<BudgetProgressViewProps, IState
             const leftOrOverMsg = isOverBudget ? "over budget" : "left to spend";
             return (
               <>
-                <h3>{category.name}</h3>
+                <h3><Link style={{ color: 'black', textDecoration: 'none' }} to={`/transactions/${year}/${month}/${category.name}`}>{category.name}</Link></h3>
                 <p>${category.sum.toFixed(2)}</p>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   <Box sx={{ width: '100%', mr: 1 }}>

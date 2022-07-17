@@ -41,33 +41,33 @@ class BudgetView extends React.Component<BudgetViewProps, IState> {
   }
 
   async componentDidMount() {
-   let budget = await getBudgetForUserDB(this.props.user)
-   if (!budget) {
-    budget = new Budget(new Date().getTime().toString(),'default_budget', new Date(), new Date(), new Date(), this.props.user, [])
-    await createBudgetDB(budget);
-   }
-   this.setState({budget})
+    let budget = await getBudgetForUserDB(this.props.user)
+    if (!budget) {
+      budget = new Budget(new Date().getTime().toString(), 'default_budget', new Date(), new Date(), new Date(), this.props.user, [])
+      await createBudgetDB(budget);
+    }
+    this.setState({ budget })
   }
 
 
   handleDeleteCategory(category: Category) {
-    
+
   }
   handleCategoryNameUpdate(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, i: number) {
     const newVal = event.target.value;
     if (this.state.budget) {
-        const b = this.state.budget;
-        b.categories![i].name = newVal;
-        this.setState({ budget: b })
+      const b = this.state.budget;
+      b.categories![i].name = newVal;
+      this.setState({ budget: b })
     }
   }
 
   handleCateogryValueUpdate(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, i: number) {
     const newVal = event.target.value;
     if (this.state.budget) {
-        const b = this.state.budget;
-        b.categories![i].setValue(cleanNumberDataInput(newVal));
-        this.setState({ budget: b })
+      const b = this.state.budget;
+      b.categories![i].setValue(cleanNumberDataInput(newVal));
+      this.setState({ budget: b })
     }
   }
 
@@ -77,17 +77,28 @@ class BudgetView extends React.Component<BudgetViewProps, IState> {
       const budget = this.state.budget;
       budget.categories = newCategories;
       this.setState({ budget })
-  }
+    }
   }
 
   async saveBudget() {
     if (this.state.budget) {
       try {
         await updateBudgetDB(this.state.budget);
-      } catch(e) {
+      } catch (e) {
         console.error(e)
       }
     }
+  }
+
+  getBudgetTotal() {
+    let sum = 0.0
+    if (this.state.budget) {
+      for (const c of this.state.budget.categories) {
+        sum += c.value
+      }
+
+    }
+    return sum;
   }
   render() {
     const isMobile = window.innerWidth <= 390;
@@ -95,50 +106,50 @@ class BudgetView extends React.Component<BudgetViewProps, IState> {
     if (this.state.budget) {
       return (
         <Box >
-          <h2>Budget</h2>
+          <h2>Budget <small> - <i>${this.getBudgetTotal().toFixed(2)}</i></small></h2>
           <hr />
-          <br/>
-          { this.state.budget.categories.map((category, i) => {
+          <br />
+          {this.state.budget.categories.map((category, i) => {
 
             return (
               <>
-                       <Stack direction={isMobile ? 'column' : 'row'}  spacing={1}>
-                       <TextField sx={{ width: isMobile ? '100%' : '55%' }} label={'description'} id="outlined-basic" variant="outlined" onChange={(event) => this.handleCategoryNameUpdate(event, i)} value={category.name} />
-                       <TextField sx={{ width: isMobile ? '100%' : '40%' }} label={'amount'} id="outlined-basic" variant="outlined" onChange={(event) => this.handleCateogryValueUpdate(event, i)} InputProps={{
-                           startAdornment: (
-                               <InputAdornment position="start">
-                                   <AttachMoneyIcon />
-                               </InputAdornment>
-                           ),
-                           endAdornment: (
-                               <InputAdornment position="end">
-                                   Monthly
-                               </InputAdornment>
-                           ),
-                       }} value={category.strVal}></TextField>
-                       <Button onClick={(event) => this.handleDeleteCategory(category)} sx={{ width: isMobile ? '100%' : '5%' }} variant="outlined"><HighlightOffIcon /></Button>
-                   </Stack>
-                   <br/>
-                   </>
+                <Stack direction={isMobile ? 'column' : 'row'} spacing={1}>
+                  <TextField sx={{ width: isMobile ? '100%' : '55%' }} label={'description'} id="outlined-basic" variant="outlined" onChange={(event) => this.handleCategoryNameUpdate(event, i)} value={category.name} />
+                  <TextField sx={{ width: isMobile ? '100%' : '40%' }} label={'amount'} id="outlined-basic" variant="outlined" onChange={(event) => this.handleCateogryValueUpdate(event, i)} InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AttachMoneyIcon />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        Monthly
+                      </InputAdornment>
+                    ),
+                  }} value={category.strVal}></TextField>
+                  <Button onClick={(event) => this.handleDeleteCategory(category)} sx={{ width: isMobile ? '100%' : '5%' }} variant="outlined"><HighlightOffIcon /></Button>
+                </Stack>
+                <br />
+              </>
             )
           })}
 
 
-<Button sx={{ width: '100%' }} onClick={(event) => this.addCategory()} variant="outlined"><AddCircleIcon /></Button>
-<br/>
-<br/>
-<Button sx={{ width: '100%' }} onClick={(event) => this.saveBudget()} variant="outlined">save</Button>
+          <Button sx={{ width: '100%' }} onClick={(event) => this.addCategory()} variant="outlined"><AddCircleIcon /></Button>
+          <br />
+          <br />
+          <Button sx={{ width: '100%' }} onClick={(event) => this.saveBudget()} variant="outlined">save</Button>
 
-          
+
         </Box >
       )
     } else {
       return (<></>)
     }
 
-    }
+  }
 
-  
+
 }
 
 export default BudgetView;

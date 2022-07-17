@@ -6,8 +6,10 @@ import { Link } from "react-router-dom";
 import { Transaction } from '../model/Transaction';
 import { deleteTransactionDB, fetchTransactionsForYearMonth } from '../dataAccess/TransactionDataAccess';
 
-import { FormControl, MenuItem, InputLabel, Button, Box, Paper, TableRow, TableHead, 
-    TableContainer, TableCell, TableBody, Table, Stack, Select, SelectChangeEvent} from '@mui/material';
+import {
+    FormControl, MenuItem, InputLabel, Button, Box, Paper, TableRow, TableHead,
+    TableContainer, TableCell, TableBody, Table, Stack, Select, SelectChangeEvent
+} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 interface TransactionsViewProps {
@@ -44,7 +46,23 @@ class TransactionsView extends React.Component<TransactionsViewProps, Transactio
     }
 
     async componentDidMount() {
-        await this.fetchTransactions(parseInt(this.state.year), parseInt(this.state.month), this.state.category)
+        const year = window.location.pathname.split('/')[2]
+        const month = window.location.pathname.split('/')[3]
+        const category = window.location.pathname.split('/')[4]
+        // options
+        // 1: year/month/category
+        // 2: year/month
+        let realMonth = 0;
+        if (month) {
+            realMonth = parseInt(month) - 1
+        }
+        if (year && month && category) {
+            await this.fetchTransactions(parseInt(year), realMonth, category)
+        } else if (year && month && category === undefined) {
+            await this.fetchTransactions(parseInt(year), realMonth, this.state.category)
+        } else {
+            await this.fetchTransactions(parseInt(this.state.year), parseInt(this.state.month), this.state.category)
+        }
     }
 
     async fetchTransactions(year: number, month: number, category: string) {
