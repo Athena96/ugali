@@ -8,14 +8,15 @@ import { fetchTransactionsForYearMonth } from '../dataAccess/TransactionDataAcce
 import { DateDirectory, groupByMonth } from '../utilities/transactionUtils';
 import { Line } from "react-chartjs-2";
 import { salmonRed } from '../utilities/constants';
+import { Tick } from 'chart.js';
 
 interface BudgetGraphViewProps {
-    user: string
+  user: string
 
 }
 
 interface IState {
-    dateDirectory: DateDirectory[]
+  dateDirectory: DateDirectory[]
 }
 
 
@@ -24,7 +25,7 @@ class BudgetGraphView extends React.Component<BudgetGraphViewProps, IState> {
   constructor(props: BudgetGraphViewProps) {
     super(props);
     this.state = {
-        dateDirectory: []
+      dateDirectory: []
     }
     this.componentDidMount = this.componentDidMount.bind(this);
     this.render = this.render.bind(this);
@@ -34,81 +35,103 @@ class BudgetGraphView extends React.Component<BudgetGraphViewProps, IState> {
   async componentDidMount() {
     const today = new Date();
     const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear()-1);
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
     const dates = dateRange(oneYearAgo, today);
     const allTxns: Transaction[] = []
     for (const date of dates) {
-        
-        const year = date.getFullYear();
-        const month = date.getMonth()+1;
-        const yearMonthTransactions = await fetchTransactionsForYearMonth(this.props.user, year, month)
 
-        for (const t of yearMonthTransactions) {
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const yearMonthTransactions = await fetchTransactionsForYearMonth(this.props.user, year, month)
 
-            allTxns.push(t);
-        }
+      for (const t of yearMonthTransactions) {
+
+        allTxns.push(t);
+      }
 
     }
 
 
     const dateDirectory: DateDirectory[] = groupByMonth(allTxns);
-    this.setState({dateDirectory});
+    this.setState({ dateDirectory });
   }
-  
+
   getChartData() {
     var chartData: any = {
-        labels: [],
-        datasets: []
+      labels: [],
+      datasets: []
     }
 
     const lines = [
-
-        {
-          name: 'spending',
-          color: salmonRed,
-          key: 'spending'
-        }
-      ]
+      {
+        name: 'spending',
+        color: salmonRed,
+        key: 'spending'
+      }
+    ]
 
     for (const ob of this.state.dateDirectory) {
-
-        chartData.labels.push(`${ob.month}/${ob.year}`)
-        
+      chartData.labels.push(`${ob.month}/${ob.year}`)
     }
 
     for (const line of lines) {
-        chartData.datasets.push({
-            label: line.name,
-            data: [],
-            borderColor: line.color,
-            pointBorderWidth: 1,
-            pointRadius: 1,
-        })
+      chartData.datasets.push({
+        label: line.name,
+        data: [],
+        borderColor: line.color,
+        pointBorderWidth: 1,
+        lineTension: 0.25,
+
+      })
     }
 
     for (const ob of this.state.dateDirectory) {
-        // data[`${ob.year}-${ob.month}-01`] = ob.sum;
-        chartData.datasets[0].data.push(ob.sum)
-        
+      chartData.datasets[0].data.push(ob.sum)
     }
 
     return chartData
-}
+  }
 
   render() {
+    const isMobile = window.innerWidth <= 390;
     const options = {
- 
-      };
-  
+      scales: {
+        y: {
+          min: 0,
+          max: 3000,
+          ticks: {
+            callback: function (tickValue: string | number, index: number, ticks: Tick[]) {
+              if ((tickValue as number) >= 1000000) {
+                return '$' + (tickValue as number) / 1000000 + ' M'
+              } else if ((tickValue as number) <= -1000000) {
+                return '$' + (tickValue as number) / 1000000 + ' M'
+              } else {
+                return '$' + (tickValue as number);
+              }
+            }
+          }
+        },
+        x: {
+          display: isMobile ? true : false
+        }
 
-      return (
-        <Box >
-          <h2>Monthly Spending</h2>
+      },
+      plugins: {
+        legend: {
+          position: "bottom" as const,
+          display: isMobile ? false : true,
+        },
+      
+      }
+    };
 
-            {this.state.dateDirectory && <Line style={{width: '100%'}} data={this.getChartData()} options={options} />}
 
-        </Box >
-        )
+    return (
+      <Box >
+        <h2>Monthly Spending</h2>
+        {this.state.dateDirectory && <Line style={{ width: '100%' }} data={this.getChartData()} options={options} />}
+      </Box >
+    )
   }
 }
 

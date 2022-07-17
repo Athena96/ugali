@@ -55,18 +55,18 @@ class DashboardView extends React.Component<DashboardViewProps, IState> {
 
 
   render() {
+    const isMobile = window.innerWidth <= 390;
+
     if (this.state.transactions) {
       return (
         <Box >
-          <Stack direction='row' spacing={8}>
-            <Stack direction='column' spacing={2} sx={{width: '50%'}}>
+          <Stack direction={isMobile ? 'column' : 'row'} spacing={8}>
+            <Stack direction='column' spacing={2} sx={{width: isMobile ? '100%' : '25%'}}>
               <BudgetProgressView user={this.props.user}/>
             </Stack>
-            <Stack direction='column' spacing={2} sx={{width: '50%'}}>
+            <Stack direction='column' spacing={2} sx={{width: isMobile ? '100%' : '75%'}}>
               <BudgetGraphView user={this.props.user}/>
             </Stack>
-
-          
           </Stack>
         </Box >
       )
