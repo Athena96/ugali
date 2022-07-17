@@ -15,6 +15,23 @@ type Transaction @model
   is_public: String
 }
 
+type Category {
+  id: ID
+  name: String
+  value: Float
+}
+
+type SpendingBudget @model
+@key(name: "ByUserActualDate", fields: ["user", "date"], queryField: "budgetsByUserDate") {
+  id: ID!
+  title: String!
+  date: AWSDateTime!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  user: String!
+  categories: [Category]
+}
+
 type Friend @model {
   id: ID!
   from: String!
