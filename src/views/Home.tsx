@@ -1,19 +1,16 @@
 import * as React from 'react';
 import '../App.css';
-
-import AppBar from '@mui/material/AppBar';
-
 import { Auth } from 'aws-amplify';
-import { MenuItem, Menu, Dialog, Typography, IconButton, Toolbar, Box
-} from '@mui/material';
-
-import AccountCircle from '@mui/icons-material/AccountCircle';
 import { Link } from "react-router-dom";
 
 import Main from './Main';
-
-import AddIcon from '@mui/icons-material/Add';
 import AddTransactionView from './AddEditTransactionView';
+
+import {
+  AppBar, MenuItem, Menu, Dialog, Typography, IconButton, Toolbar, Box
+} from '@mui/material';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import AddIcon from '@mui/icons-material/Add';
 
 interface IProps {
   hideSignIn: () => void;
@@ -118,7 +115,7 @@ class Home extends React.Component<IProps, IState> {
           <AppBar position="static">
             <Toolbar>
               <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                <Link style={{ color: 'white', textDecoration: 'none' }} to="/">Money Tomorrow</Link>
+                <Link style={{ color: 'white', textDecoration: 'none' }} to="/">Zen Spending</Link>
                 <Link style={{ color: 'white', textDecoration: 'none' }} to="/transactions"><small style={{ marginLeft: '20px' }}>Transactions</small></Link>
                 <Link style={{ color: 'white', textDecoration: 'none' }} to="/budget"><small style={{ marginLeft: '20px' }}>Budget</small></Link>
 

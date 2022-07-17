@@ -1,64 +1,67 @@
 import * as React from 'react';
 
 import '../App.css';
-import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import { Link } from "react-router-dom";
+
 import { Transaction } from '../model/Transaction';
 import { deleteTransactionDB, fetchTransactionsForYearMonth } from '../dataAccess/TransactionDataAccess';
-import { Link } from "react-router-dom";
+
+import { FormControl, MenuItem, InputLabel, Button, Box, Paper, TableRow, TableHead, 
+    TableContainer, TableCell, TableBody, Table, Stack, Select, SelectChangeEvent} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Button } from '@mui/material';
-
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import Stack from '@mui/material/Stack';
-
 
 interface TransactionsViewProps {
     user: string
-
 }
 
-interface IState {
+interface TransactionsViewState {
     transactions: Transaction[]
     year: string,
     month: string
+    category: string
+    categories: string[]
 }
 
-
-class TransactionsView extends React.Component<TransactionsViewProps, IState> {
+const ALL = 'all';
+class TransactionsView extends React.Component<TransactionsViewProps, TransactionsViewState> {
 
     constructor(props: TransactionsViewProps) {
         super(props);
         const date = new Date()
-
         this.state = {
             transactions: [],
             year: date.getFullYear().toString(),
-            month: (date.getMonth()).toString()
+            month: (date.getMonth()).toString(),
+            category: ALL,
+            categories: []
         }
         this.componentDidMount = this.componentDidMount.bind(this);
         this.render = this.render.bind(this);
         this.handleYearChange = this.handleYearChange.bind(this);
         this.handleMonthChange = this.handleMonthChange.bind(this);
+        this.handleCategoryChange = this.handleCategoryChange.bind(this);
         this.fetchTransactions = this.fetchTransactions.bind(this);
     }
 
     async componentDidMount() {
-        await this.fetchTransactions(parseInt(this.state.year), parseInt(this.state.month))
+        await this.fetchTransactions(parseInt(this.state.year), parseInt(this.state.month), this.state.category)
     }
 
-    async fetchTransactions(year: number, month: number) {
-        const transactions = await fetchTransactionsForYearMonth(this.props.user, year, month+1)
-        transactions.sort((a, b) => (a.date > b.date) ? -1 : 1)
+    async fetchTransactions(year: number, month: number, category: string) {
+        let transactions = await fetchTransactionsForYearMonth(this.props.user, year, month + 1)
+        const categories: string[] = [ALL]
+        for (const transaction of transactions) {
+            if (!categories.includes(transaction.category)) {
+                categories.push(transaction.category)
+            }
+        }
+        this.setState({ categories })
+
+        transactions = transactions
+            .filter((transaction) =>
+                category === ALL ? true :
+                    transaction.category === category)
+            .sort((a, b) => (a.date > b.date) ? -1 : 1)
         this.setState({ transactions })
     }
 
@@ -70,24 +73,27 @@ class TransactionsView extends React.Component<TransactionsViewProps, IState> {
     }
 
     handleYearChange(event: SelectChangeEvent) {
-
         const selectedSimulationName = event.target.value as string;
-        this.setState({year: selectedSimulationName});
-        this.fetchTransactions(parseInt(selectedSimulationName),parseInt(this.state.month))
+        this.setState({ year: selectedSimulationName });
+        this.fetchTransactions(parseInt(selectedSimulationName), parseInt(this.state.month), this.state.category)
     }
 
     handleMonthChange(event: SelectChangeEvent) {
-
         const selectedSimulationName = event.target.value as string;
-        this.setState({month: selectedSimulationName})
-        this.fetchTransactions(parseInt(this.state.year),parseInt(selectedSimulationName))
+        this.setState({ month: selectedSimulationName })
+        this.fetchTransactions(parseInt(this.state.year), parseInt(selectedSimulationName), this.state.category)
+    }
 
+    handleCategoryChange(event: SelectChangeEvent) {
+        const selectedSimulationName = event.target.value as string;
+        this.setState({ category: selectedSimulationName })
+        this.fetchTransactions(parseInt(this.state.year), parseInt(this.state.month), selectedSimulationName)
     }
 
     getYears() {
         const date = new Date();
         let years: string[] = []
-        for (let i = date.getFullYear()-5; i <= date.getFullYear(); i += 1 ) {
+        for (let i = date.getFullYear() - 5; i <= date.getFullYear(); i += 1) {
             years.push(i.toString());
         }
         return years;
@@ -107,49 +113,62 @@ class TransactionsView extends React.Component<TransactionsViewProps, IState> {
         months.push('October');
         months.push('November');
         months.push('December');
-
-
         return months;
     }
+
     render() {
-        if (this.state.transactions) {
+        if (this.state.transactions && this.state.categories) {
+            let sum = 0.0;
             return (<Box>
                 <h2>Transactions</h2>
                 <Stack direction='row' spacing={2}>
-                <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Age</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={this.state.year}
-                        label="year"
-                        onChange={this.handleYearChange}
-                    >
-                        {this.getYears().map((year) => {
-                            
-                            return (<MenuItem value={year}>{year}</MenuItem>)
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">Age</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={this.state.year}
+                            label="year"
+                            onChange={this.handleYearChange}
+                        >
+                            {this.getYears().map((year) => {
+                                return (<MenuItem value={year}>{year}</MenuItem>)
+                            })}
+                        </Select>
+                    </FormControl>
 
-                        })}
-                    </Select>
-                </FormControl>
-             
-                <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Month</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={this.state.month}
-                        label="month"
-                        onChange={this.handleMonthChange}
-                    >
-                        {this.getMonths().map((month, i) => {
-                            
-                            return (<MenuItem value={i}>{month}</MenuItem>)
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">Month</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={this.state.month}
+                            label="month"
+                            onChange={this.handleMonthChange}
+                        >
+                            {this.getMonths().map((month, i) => {
+                                return (<MenuItem value={i}>{month}</MenuItem>)
+                            })}
+                        </Select>
+                    </FormControl>
 
-                        })}
-                    </Select>
-                </FormControl>
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">Category</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={this.state.category}
+                            label="category"
+                            onChange={this.handleCategoryChange}
+                        >
+                            {this.state.categories.map((category) => {
+                                return (<MenuItem value={category}>{category}</MenuItem>)
+                            })}
+                        </Select>
+                    </FormControl>
+
                 </Stack>
+                <br />
                 <TableContainer component={Paper}>
                     <Table aria-label="simple table">
                         <TableHead>
@@ -162,7 +181,8 @@ class TransactionsView extends React.Component<TransactionsViewProps, IState> {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {this.state.transactions.map((transaction: Transaction) => {
+                            {this.state.transactions.map((transaction: Transaction, idx: number) => {
+                                sum += transaction.amount;
                                 return (
                                     <TableRow
                                         key={transaction.id}
@@ -185,6 +205,20 @@ class TransactionsView extends React.Component<TransactionsViewProps, IState> {
                                     </TableRow>
                                 )
                             })}
+
+                            <TableRow
+                                key={0}
+                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                            >
+                                <TableCell component="th" scope="row">
+                                    {``}
+                                </TableCell>
+                                <TableCell align="center">SUM</TableCell>
+                                <TableCell align="center">${sum.toFixed(2)}</TableCell>
+                                <TableCell align="center"></TableCell>
+                                <TableCell align="center"></TableCell>
+                                <TableCell align="center"></TableCell>
+                            </TableRow>
                         </TableBody>
                     </Table>
                 </TableContainer>
