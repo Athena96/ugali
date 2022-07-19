@@ -58,8 +58,10 @@ class TransactionsView extends React.Component<TransactionsViewProps, Transactio
         }
         if (year && month && category) {
             await this.fetchTransactions(parseInt(year), realMonth, category)
+            this.setState({  year, month, category })
         } else if (year && month && category === undefined) {
             await this.fetchTransactions(parseInt(year), realMonth, this.state.category)
+            this.setState({  year, month, category: ALL })
         } else {
             await this.fetchTransactions(parseInt(this.state.year), parseInt(this.state.month), this.state.category)
         }

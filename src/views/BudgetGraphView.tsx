@@ -12,7 +12,7 @@ import { Tick } from 'chart.js';
 
 interface BudgetGraphViewProps {
   user: string
-
+  dateDirectoryProps: DateDirectory[] | undefined
 }
 
 interface IState {
@@ -33,26 +33,26 @@ class BudgetGraphView extends React.Component<BudgetGraphViewProps, IState> {
   }
 
   async componentDidMount() {
-    const today = new Date();
-    const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-    const dates = dateRange(oneYearAgo, today);
-    const allTxns: Transaction[] = []
-    for (const date of dates) {
-
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1;
-      const yearMonthTransactions = await fetchTransactionsForYearMonth(this.props.user, year, month)
-
-      for (const t of yearMonthTransactions) {
-
-        allTxns.push(t);
+    let dateDirectory: DateDirectory[] = []
+    if (this.props.dateDirectoryProps) {
+      dateDirectory = this.props.dateDirectoryProps;
+    } else {
+      const today = new Date();
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      const dates = dateRange(oneYearAgo, today);
+      const allTxns: Transaction[] = []
+      for (const date of dates) {
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const yearMonthTransactions = await fetchTransactionsForYearMonth(this.props.user, year, month)
+        for (const t of yearMonthTransactions) {
+          allTxns.push(t);
+        }
       }
-
+      dateDirectory = groupByMonth(allTxns);
     }
 
-
-    const dateDirectory: DateDirectory[] = groupByMonth(allTxns);
     this.setState({ dateDirectory });
   }
 

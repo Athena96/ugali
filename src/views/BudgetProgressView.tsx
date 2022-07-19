@@ -3,15 +3,12 @@ import * as React from 'react';
 import '../App.css';
 import Box from '@mui/material/Box';
 import { fetchTransactionsForYearMonth } from '../dataAccess/TransactionDataAccess';
-import LinearProgress from '@mui/material/LinearProgress';
-
-import Typography from '@mui/material/Typography';
-
 import { CategoryDirectory, groupTransactionsByCategory } from '../utilities/transactionUtils';
 import { getBudgetForUserDB } from '../dataAccess/BudgetDataAccess';
 import { Category } from '../model/Category';
 import { Budget } from '../model/Budget';
 import { Link } from 'react-router-dom';
+import BudgetComponent from '../components/BudgetComponent';
 
 interface BudgetProgressViewProps {
   user: string;
@@ -97,43 +94,27 @@ class BudgetProgressView extends React.Component<BudgetProgressViewProps, IState
       const totalOfTotalSpent = this.getTotalSpent();
       const percentSpent = (totalOfTotalSpent / totalCanSpend) * 100.0
       const isOverTotalBudget = percentSpent > 100.0
-      const leftOfTotalToSpend = totalCanSpend - totalOfTotalSpent;
-      const leftOrOverMsgTotal = isOverTotalBudget ? "over budget" : "left to spend";
       const today = new Date();
       const year = today.getFullYear()
       const month = today.getMonth() + 1;
       return (
         <Box >
           <h2><Link style={{ color: 'black', textDecoration: 'none' }} to={`/transactions/${year}/${month}`}>Budget</Link></h2>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Box sx={{ width: '100%', mr: 1 }}>
-              <LinearProgress variant="determinate" value={percentSpent} />
-            </Box>
-            <Box sx={{ minWidth: 35 }}>
-              <Typography variant="body2" color={isOverTotalBudget ? "red" : "text.secondary"}>{`$${leftOfTotalToSpend.toFixed(2)} ${leftOrOverMsgTotal}`}</Typography>
-            </Box>
-          </Box>
+          <BudgetComponent year={year} month={month} category={{
+            name: 'Total',
+            transactions: [],
+            sum: totalOfTotalSpent,
+            budgetCategory: new Category('1',
+              '',
+              totalCanSpend)
+          }} percentSpent={percentSpent} isOverBudget={isOverTotalBudget} isMaster={true} />
           <hr />
           {this.state.categoryMap.map((category) => {
             const rawSpentCalc = (category.sum / (category.budgetCategory?.value || 0.0)) * 100.0
             const isOverBudget = rawSpentCalc > 100.0
             const percentSpent = (isOverBudget) ? 100.0 : rawSpentCalc;
-            const leftToSpend = (category.budgetCategory!.value - category.sum)
-            const leftOrOverMsg = isOverBudget ? "over budget" : "left to spend";
             return (
-              <>
-                <h3><Link style={{ color: 'black', textDecoration: 'none' }} to={`/transactions/${year}/${month}/${category.name}`}>{category.name}</Link></h3>
-                <p>${category.sum.toFixed(2)}</p>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Box sx={{ width: '100%', mr: 1 }}>
-                    <LinearProgress variant="determinate" value={percentSpent} />
-                  </Box>
-                  <Box sx={{ minWidth: 35 }}>
-                    <Typography variant="body2" color={isOverBudget ? "red" : "text.secondary"}>{`$${leftToSpend.toFixed(2)} ${leftOrOverMsg}`}</Typography>
-                  </Box>
-                </Box>
-
-              </>
+              <BudgetComponent year={year} month={month} category={category} percentSpent={percentSpent} isOverBudget={isOverBudget} />
             )
           })}
         </Box >

@@ -3,6 +3,7 @@ import * as React from 'react';
 
 
 import { Switch, Route } from 'react-router-dom';
+import { DateDirectory } from '../utilities/transactionUtils';
 import AddEditTransactionView from './AddEditTransactionView';
 import BudgetView from './BudgetView';
 import DashboardView from './DashboardView';
@@ -11,6 +12,8 @@ import TransactionsView from './TransactionsView';
 
 interface InputsViewProps {
   user: string
+  categories: string[]
+  dateDirectoryProps: DateDirectory[] | undefined
 
 }
 
@@ -33,9 +36,9 @@ class Main extends React.Component<InputsViewProps, IState> {
   render() {
     return (
       <Switch>
-        <Route exact path="/" render={(props) =>  <DashboardView  user={this.props.user}/>}/>
+        <Route exact path="/" render={(props) =>  <DashboardView  user={this.props.user} dateDirectoryProps={this.props.dateDirectoryProps}/>}/>
         <Route path="/transactions" render={(props) =>  <TransactionsView  user={this.props.user}/>}/>
-        <Route path="/transaction" render={(props) =>  <AddEditTransactionView  user={this.props.user} closeDialog={ undefined }/>} />
+        <Route path="/transaction" render={(props) =>  <AddEditTransactionView  user={this.props.user} categories={this.props.categories} closeDialog={ undefined }/>} />
         <Route path="/budget" render={(props) =>  <BudgetView  user={this.props.user} />} />
       </Switch>
     );

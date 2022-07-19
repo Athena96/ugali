@@ -8,14 +8,16 @@ import Stack from '@mui/material/Stack';
 import { Transaction } from '../model/Transaction';
 import { dateRange } from '../utilities/helpers';
 import { fetchTransactionsForYearMonth } from '../dataAccess/TransactionDataAccess';
+import { DateDirectory } from '../utilities/transactionUtils';
 
 
 interface DashboardViewProps {
   user: string
+  dateDirectoryProps: DateDirectory[] | undefined
 }
 
 interface IState {
-transactions: Transaction[]
+  transactions: Transaction[]
 }
 
 
@@ -31,29 +33,43 @@ class DashboardView extends React.Component<DashboardViewProps, IState> {
 
   }
 
- async componentDidMount() {
+  async componentDidMount() {
     const today = new Date();
     const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear()-1);
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
     const dates = dateRange(oneYearAgo, today);
     const allTxns: Transaction[] = []
     for (const date of dates) {
-        
-        const year = date.getFullYear();
-        const month = date.getMonth()+1;
-        const yearMonthTransactions = await fetchTransactionsForYearMonth(this.props.user, year, month)
 
-        for (const t of yearMonthTransactions) {
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const yearMonthTransactions = await fetchTransactionsForYearMonth(this.props.user, year, month)
 
-            allTxns.push(t);
-        }
+      for (const t of yearMonthTransactions) {
+
+        allTxns.push(t);
+      }
 
     }
 
-    this.setState({transactions: allTxns})
+    this.setState({ transactions: allTxns })
   }
 
 
+  getBudgetProgressView(isMobile: boolean, user: string) {
+    return (
+      <Stack direction='column' spacing={2} sx={{ width: isMobile ? '100%' : '30%' }}>
+        <BudgetProgressView user={user} />
+      </Stack>
+    )
+  }
+  getBudgetGraphView(isMobile: boolean, user: string, dateDirectoryProps: DateDirectory[] | undefined) {
+    return (
+      <Stack direction='column' spacing={2} sx={{ width: isMobile ? '100%' : '70%' }}>
+        <BudgetGraphView user={user} dateDirectoryProps={dateDirectoryProps}/>
+      </Stack>
+    )
+  }
   render() {
     const isMobile = window.innerWidth <= 390;
 
@@ -61,12 +77,8 @@ class DashboardView extends React.Component<DashboardViewProps, IState> {
       return (
         <Box >
           <Stack direction={isMobile ? 'column' : 'row'} spacing={8}>
-            <Stack direction='column' spacing={2} sx={{width: isMobile ? '100%' : '25%'}}>
-              <BudgetProgressView user={this.props.user}/>
-            </Stack>
-            <Stack direction='column' spacing={2} sx={{width: isMobile ? '100%' : '75%'}}>
-              <BudgetGraphView user={this.props.user}/>
-            </Stack>
+            {isMobile ? this.getBudgetGraphView(isMobile, this.props.user, this.props.dateDirectoryProps) : this.getBudgetProgressView(isMobile, this.props.user)}
+            {isMobile ? this.getBudgetProgressView(isMobile, this.props.user) : this.getBudgetGraphView(isMobile, this.props.user, this.props.dateDirectoryProps)}
           </Stack>
         </Box >
       )

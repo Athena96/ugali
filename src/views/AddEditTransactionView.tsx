@@ -12,13 +12,17 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import { LocalizationProvider, DatePicker }from '@mui/lab';
+
+import { FormControl, SelectChangeEvent, InputLabel, Select, MenuItem } from '@mui/material';
+
+import { LocalizationProvider, DatePicker } from '@mui/lab';
 
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 
 
 interface AddTransactionViewProps {
     user: string
+    categories: string[]
     closeDialog: (() => void) | undefined;
 }
 
@@ -42,16 +46,21 @@ class AddTransactionView extends React.Component<AddTransactionViewProps, AddTra
                 0.0,
                 "random",
                 new Date(),
-               "",
-               PaymentMethod.Credit,
-                 TransactionType.Expense,
-                 new Date(),
-                 new Date(),
-                 this.props.user
+                "",
+                PaymentMethod.Credit,
+                TransactionType.Expense,
+                new Date(),
+                new Date(),
+                this.props.user
             )
         }
         this.componentDidMount = this.componentDidMount.bind(this);
         this.render = this.render.bind(this);
+        this.handleCategoryChange = this.handleCategoryChange.bind(this);
+        this.handleAmountChange = this.handleAmountChange.bind(this);
+        this.handleDateChange = this.handleDateChange.bind(this);
+        this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
+        this.handleTitleChange = this.handleTitleChange.bind(this);
     }
 
     async componentDidMount() {
@@ -59,7 +68,7 @@ class AddTransactionView extends React.Component<AddTransactionViewProps, AddTra
             const transactionId = window.location.pathname.split('/')[2]
             const transaction = await getTransactionDB(transactionId, this.props.user)
             if (transaction) {
-                this.setState({transaction, amountString: transaction.amount.toFixed(2)});
+                this.setState({ transaction, amountString: transaction.amount.toFixed(2) });
             }
         }
 
@@ -76,7 +85,7 @@ class AddTransactionView extends React.Component<AddTransactionViewProps, AddTra
         } catch (err) {
             console.error('error creating todo:', err)
         }
-        
+
         if (this.props.closeDialog) {
             this.props.closeDialog();
         }
@@ -96,12 +105,26 @@ class AddTransactionView extends React.Component<AddTransactionViewProps, AddTra
 
         this.setState({ amountString: newAmountString })
     }
- 
-    handleCategoryChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-        const newCategory = event.target.value;
+
+    // handleCategoryChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    //     const newCategory = event.target.value;
+    //     if (this.state.transaction) {
+    //         const transaction = this.state.transaction;
+    //         transaction.category = newCategory;
+    //         this.setState({ transaction })
+    //     }
+    // }
+
+    handleCategoryChange(event: SelectChangeEvent) {
+        // const selectedSimulationName = event.target.value as string;
+        // this.setState({ category: selectedSimulationName })
+        // this.fetchTransactions(parseInt(this.state.year), parseInt(this.state.month), selectedSimulationName)
+
+        const selectedSimulationName = event.target.value as string;
+        console.log('selectedSimulationName ' + selectedSimulationName)
         if (this.state.transaction) {
             const transaction = this.state.transaction;
-            transaction.category = newCategory;
+            transaction.category = selectedSimulationName;
             this.setState({ transaction })
         }
     }
@@ -126,47 +149,60 @@ class AddTransactionView extends React.Component<AddTransactionViewProps, AddTra
 
     render() {
 
-        if (this.state.transaction) {
+        if (this.state.transaction && this.props.categories) {
+            const title = this.state.isNewTransaction ? "Add Transaction" : "Edit Transaction";
             return (
                 <>
-                    <DialogTitle>Add Transaction</DialogTitle>
+                    <DialogTitle>{title}</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
                         </DialogContentText>
-    
+
                         <Stack direction='column' spacing={2}>
                             <br />
                             <TextField label={'title'} id="outlined-basic" variant="outlined" onChange={(event) => this.handleTitleChange(event)} value={this.state.transaction.title} />
                             <TextField label={'amount'} id="outlined-basic" variant="outlined" onChange={(event) => this.handleAmountChange(event)} value={this.state.amountString} />
-                            <TextField label={'category'} id="outlined-basic" variant="outlined" onChange={(event) => this.handleCategoryChange(event)} value={this.state.transaction.category} />
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Category</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    value={this.state.transaction.category}
+                                    label="category"
+                                    onChange={this.handleCategoryChange}
+                                >
+                                    {this.props.categories.map((category) => {
+                                        return (<MenuItem value={category}>{category}</MenuItem>)
+                                    })}
+                                </Select>
+                            </FormControl>
+
                             <LocalizationProvider dateAdapter={AdapterDateFns}>
                                 <DatePicker
-                                label="date"
-                                value={this.state.transaction.date}
-                                onChange={(newDate) => this.handleDateChange(newDate)}
-                                renderInput={(params) => <TextField {...params} />}
+                                    label="date"
+                                    value={this.state.transaction.date}
+                                    onChange={(newDate) => this.handleDateChange(newDate)}
+                                    renderInput={(params) => <TextField {...params} />}
                                 />
                             </LocalizationProvider>
-                            <TextField label='description' id="outlined-multiline-static" multiline rows={4}  onChange={(event) => this.handleDescriptionChange(event)} defaultValue={this.state.transaction.description} />
-    
-                        
+                            <TextField label='description' id="outlined-multiline-static" multiline rows={4} onChange={(event) => this.handleDescriptionChange(event)} value={this.state.transaction.description} />
                         </Stack>
-    
-    
-    
+
+
+
                     </DialogContent>
-    
+
                     <DialogActions>
                         {this.props.closeDialog && <Button onClick={this.props.closeDialog}>Cancel</Button>}
                         <Button onClick={(e) => this.saveTransaction(e, this.state.transaction)}>Save</Button>
                     </DialogActions>
                 </>
-    
+
             )
         } else {
             return (<></>)
         }
-     
+
     }
 }
 

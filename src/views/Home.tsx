@@ -4,13 +4,17 @@ import { Auth } from 'aws-amplify';
 import { Link } from "react-router-dom";
 
 import Main from './Main';
-import AddTransactionView from './AddEditTransactionView';
+import AddEditTransactionView from './AddEditTransactionView';
 
 import {
   AppBar, MenuItem, Menu, Dialog, Typography, IconButton, Toolbar, Box
 } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import AddIcon from '@mui/icons-material/Add';
+import { dateRange } from '../utilities/helpers';
+import { fetchTransactionsForYearMonth } from '../dataAccess/TransactionDataAccess';
+import { Transaction } from '../model/Transaction';
+import { DateDirectory, groupByMonth } from '../utilities/transactionUtils';
 
 interface IProps {
   hideSignIn: () => void;
@@ -18,6 +22,9 @@ interface IProps {
 }
 
 interface IState {
+
+  dateDirectory: DateDirectory[] | undefined;
+  categories: string[] | undefined;
   user: string | undefined;
   profileOpen: boolean;
   addTransactionDialog: boolean;
@@ -49,7 +56,9 @@ class Home extends React.Component<IProps, IState> {
       txns: [],
       user: undefined,
       profileOpen: false,
-      addTransactionDialog: false
+      addTransactionDialog: false,
+      categories: undefined,
+      dateDirectory: undefined
 
     }
     this.componentDidMount = this.componentDidMount.bind(this);
@@ -78,6 +87,34 @@ class Home extends React.Component<IProps, IState> {
     const user = await Auth.currentAuthenticatedUser();
     const email: string = user.attributes.email;
     this.setState({ user: email });
+
+
+    /// fetch txns to pass to other views.
+    const today = new Date();
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const dates = dateRange(oneYearAgo, today);
+    const allTxns: Transaction[] = []
+    let categories: string[] = []
+    const categoryMap: any = {}
+
+    for (const date of dates) {
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const yearMonthTransactions = await fetchTransactionsForYearMonth(email, year, month)
+      for (const t of yearMonthTransactions) {
+        allTxns.push(t);
+        if (!Object.keys(categoryMap).includes(t.category)) {
+          categoryMap[t.category] = 0
+        }
+        categoryMap[t.category] += 1
+      }
+    }
+
+    const keysSorted = Object.keys(categoryMap).sort(function(a,b){return categoryMap[b]-categoryMap[a]}).slice(0,15)
+    categories = keysSorted
+    const dateDirectory: DateDirectory[] = groupByMonth(allTxns);
+    this.setState({categories, dateDirectory})
   }
 
 
@@ -108,7 +145,7 @@ class Home extends React.Component<IProps, IState> {
 
   render() {
 
-    if (this.state.user) {
+    if (this.state.user && this.state.categories && this.state.dateDirectory) {
 
       return (
         <Box sx={{ flexGrow: 1 }}>
@@ -161,9 +198,9 @@ class Home extends React.Component<IProps, IState> {
           </AppBar>
           <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <Dialog open={this.state.addTransactionDialog} onClose={this.closeDialog}>
-              {this.state.addTransactionDialog && <AddTransactionView user={this.state.user} closeDialog={this.closeDialog} />}
+              {this.state.addTransactionDialog && <AddEditTransactionView user={this.state.user} categories={this.state.categories} closeDialog={this.closeDialog} />}
             </Dialog>
-            <Main user={this.state.user} />
+            <Main user={this.state.user} categories={this.state.categories} dateDirectoryProps={this.state.dateDirectory}/>
           </Box>
         </Box>
       )
