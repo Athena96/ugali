@@ -38,7 +38,7 @@ class AddTransactionView extends React.Component<AddTransactionViewProps, AddTra
         const next: string | undefined = window.location.pathname.split('/')[3];
         this.state = {
             newCategory: false,
-            isNewTransaction: transactionId.length > 4 && next === undefined ? false : true,
+            isNewTransaction: transactionId && transactionId.length > 4 && next === undefined ? false : true,
             amountString: "0.0",
             transaction: new Transaction(
                 (new Date().getTime()).toString(),
