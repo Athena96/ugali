@@ -10,6 +10,7 @@ import {
   AppBar, MenuItem, Menu, Dialog, Typography, IconButton, Toolbar, Box
 } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import CircularProgress from '@mui/material/CircularProgress';
 import AddIcon from '@mui/icons-material/Add';
 import { dateRange } from '../utilities/helpers';
 import { fetchTransactionsForYearMonth } from '../dataAccess/TransactionDataAccess';
@@ -145,7 +146,7 @@ class Home extends React.Component<IProps, IState> {
 
   render() {
 
-    if (this.state.user && this.state.categories && this.state.dateDirectory) {
+
 
       return (
         <Box sx={{ flexGrow: 1 }}>
@@ -198,15 +199,18 @@ class Home extends React.Component<IProps, IState> {
           </AppBar>
           <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <Dialog open={this.state.addTransactionDialog} onClose={this.closeDialog}>
-              {this.state.addTransactionDialog && <AddEditTransactionView user={this.state.user} categories={this.state.categories} closeDialog={this.closeDialog} />}
+              {this.state.addTransactionDialog && this.state.user && this.state.categories && 
+                <AddEditTransactionView user={this.state.user} categories={this.state.categories} closeDialog={this.closeDialog} />}
             </Dialog>
-            <Main user={this.state.user} categories={this.state.categories} dateDirectoryProps={this.state.dateDirectory}/>
+            {this.state.user && this.state.categories && this.state.dateDirectory ? 
+              <Main user={this.state.user} categories={this.state.categories} dateDirectoryProps={this.state.dateDirectory}/> : 
+              <Box sx={{ position: 'absolute', top: '50%', left: '50%' }}>
+                <CircularProgress />
+              </Box>}
           </Box>
         </Box>
       )
-    } else {
-      return (<></>)
-    }
+
   }
 }
 

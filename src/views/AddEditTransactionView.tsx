@@ -106,22 +106,8 @@ class AddTransactionView extends React.Component<AddTransactionViewProps, AddTra
         this.setState({ amountString: newAmountString })
     }
 
-    // handleCategoryChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-    //     const newCategory = event.target.value;
-    //     if (this.state.transaction) {
-    //         const transaction = this.state.transaction;
-    //         transaction.category = newCategory;
-    //         this.setState({ transaction })
-    //     }
-    // }
-
     handleCategoryChange(event: SelectChangeEvent) {
-        // const selectedSimulationName = event.target.value as string;
-        // this.setState({ category: selectedSimulationName })
-        // this.fetchTransactions(parseInt(this.state.year), parseInt(this.state.month), selectedSimulationName)
-
         const selectedSimulationName = event.target.value as string;
-        console.log('selectedSimulationName ' + selectedSimulationName)
         if (this.state.transaction) {
             const transaction = this.state.transaction;
             transaction.category = selectedSimulationName;
@@ -160,8 +146,8 @@ class AddTransactionView extends React.Component<AddTransactionViewProps, AddTra
 
                         <Stack direction='column' spacing={2}>
                             <br />
-                            <TextField label={'title'} id="outlined-basic" variant="outlined" onChange={(event) => this.handleTitleChange(event)} value={this.state.transaction.title} />
-                            <TextField label={'amount'} id="outlined-basic" variant="outlined" onChange={(event) => this.handleAmountChange(event)} value={this.state.amountString} />
+                            <TextField label={'Title'} id="outlined-basic" variant="outlined" onChange={(event) => this.handleTitleChange(event)} value={this.state.transaction.title} />
+                            <TextField label={'Amount'} id="outlined-basic" variant="outlined" onChange={(event) => this.handleAmountChange(event)} value={this.state.amountString} />
                             <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-label">Category</InputLabel>
                                 <Select
@@ -179,13 +165,13 @@ class AddTransactionView extends React.Component<AddTransactionViewProps, AddTra
 
                             <LocalizationProvider dateAdapter={AdapterDateFns}>
                                 <DatePicker
-                                    label="date"
+                                    label="Date"
                                     value={this.state.transaction.date}
                                     onChange={(newDate) => this.handleDateChange(newDate)}
                                     renderInput={(params) => <TextField {...params} />}
                                 />
                             </LocalizationProvider>
-                            <TextField label='description' id="outlined-multiline-static" multiline rows={4} onChange={(event) => this.handleDescriptionChange(event)} value={this.state.transaction.description} />
+                            <TextField label='Description' id="outlined-multiline-static" multiline rows={4} onChange={(event) => this.handleDescriptionChange(event)} value={this.state.transaction.description} />
                         </Stack>
 
 
