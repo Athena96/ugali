@@ -11,6 +11,7 @@ import {
     TableContainer, TableCell, TableBody, Table, Stack, Select, SelectChangeEvent
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { ALL } from '../utilities/helpers';
 
 interface TransactionsViewProps {
     user: string
@@ -24,7 +25,6 @@ interface TransactionsViewState {
     categories: string[]
 }
 
-const ALL = 'all';
 class TransactionsView extends React.Component<TransactionsViewProps, TransactionsViewState> {
 
     constructor(props: TransactionsViewProps) {

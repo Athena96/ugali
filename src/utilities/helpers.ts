@@ -1,3 +1,6 @@
+
+export const ALL = 'all';
+
 export function dateRange(startDate: Date, endDate: Date, steps = 31): Date[] {
     const dateArray: Date[] = [];
     let currentDate = new Date(startDate);

@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 import { CategoryDirectory } from '../utilities/transactionUtils';
 import Typography from '@mui/material/Typography';
+import { ALL } from '../utilities/helpers';
 
 interface BudgetComponentProps {
     year: number;
@@ -23,7 +24,7 @@ const BudgetComponent: FC<BudgetComponentProps> = ({ year,
     const leftOrOverMsg = isOverBudget ? "over" : "left";
     const title = isMaster ? <b>{category.name}</b> : <>{category.name}</>
     return (
-        <Link style={{ color: 'black', textDecoration: 'none' }} to={`/transactions/${year}/${month}/${category.name}`}>
+        <Link style={{ color: 'black', textDecoration: 'none' }} to={`/transactions/${year}/${month}/${isMaster ? ALL : category.name}`}>
         <Box sx={{marginTop: '30px', '&:hover': {
             backgroundColor: 'lightgray',
             opacity: [0.9, 0.8, 0.7],
