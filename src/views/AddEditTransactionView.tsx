@@ -12,11 +12,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-
 import { FormControl, SelectChangeEvent, InputLabel, Select, MenuItem } from '@mui/material';
-
 import { LocalizationProvider, DatePicker } from '@mui/lab';
-
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 
 
@@ -30,6 +27,7 @@ interface AddTransactionViewState {
     transaction: Transaction;
     amountString: string;
     isNewTransaction: boolean;
+    newCategory: boolean
 }
 
 class AddTransactionView extends React.Component<AddTransactionViewProps, AddTransactionViewState> {
@@ -37,8 +35,10 @@ class AddTransactionView extends React.Component<AddTransactionViewProps, AddTra
     constructor(props: AddTransactionViewProps) {
         super(props);
         const transactionId: string | undefined = window.location.pathname.split('/')[2];
+        const next: string | undefined = window.location.pathname.split('/')[3];
         this.state = {
-            isNewTransaction: transactionId ? false : true,
+            newCategory: false,
+            isNewTransaction: transactionId.length > 4 && next === undefined ? false : true,
             amountString: "0.0",
             transaction: new Transaction(
                 (new Date().getTime()).toString(),
@@ -108,6 +108,10 @@ class AddTransactionView extends React.Component<AddTransactionViewProps, AddTra
 
     handleCategoryChange(event: SelectChangeEvent) {
         const selectedSimulationName = event.target.value as string;
+        if (selectedSimulationName === 'new') {
+            this.setState({ newCategory: true })
+            return;
+        }
         if (this.state.transaction) {
             const transaction = this.state.transaction;
             transaction.category = selectedSimulationName;
@@ -133,6 +137,17 @@ class AddTransactionView extends React.Component<AddTransactionViewProps, AddTra
         }
     }
 
+
+    handleNewCategoryChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+        const newCat = event.target.value;
+        if (this.state.transaction) {
+            const transaction = this.state.transaction;
+            transaction.category = newCat;
+            this.setState({ transaction })
+        }
+    }
+   
+
     render() {
 
         if (this.state.transaction && this.props.categories) {
@@ -148,7 +163,9 @@ class AddTransactionView extends React.Component<AddTransactionViewProps, AddTra
                             <br />
                             <TextField label={'Title'} id="outlined-basic" variant="outlined" onChange={(event) => this.handleTitleChange(event)} value={this.state.transaction.title} />
                             <TextField label={'Amount'} id="outlined-basic" variant="outlined" onChange={(event) => this.handleAmountChange(event)} value={this.state.amountString} />
-                            <FormControl fullWidth>
+                            {this.state.newCategory ? 
+                            <TextField label={'Category'} id="outlined-basic" variant="outlined" onChange={(event) => this.handleNewCategoryChange(event)} value={this.state.transaction.category} />
+                                : <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-label">Category</InputLabel>
                                 <Select
                                     labelId="demo-simple-select-label"
@@ -160,8 +177,9 @@ class AddTransactionView extends React.Component<AddTransactionViewProps, AddTra
                                     {this.props.categories.map((category) => {
                                         return (<MenuItem value={category}>{category}</MenuItem>)
                                     })}
+                                    <MenuItem value={'new'}>+</MenuItem>
                                 </Select>
-                            </FormControl>
+                            </FormControl>}
 
                             <LocalizationProvider dateAdapter={AdapterDateFns}>
                                 <DatePicker

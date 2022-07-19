@@ -152,7 +152,7 @@ class TransactionsView extends React.Component<TransactionsViewProps, Transactio
                             onChange={this.handleYearChange}
                         >
                             {this.getYears().map((year) => {
-                                return (<MenuItem value={year}>{year}</MenuItem>)
+                                return (<MenuItem key={year} value={year}>{year}</MenuItem>)
                             })}
                         </Select>
                     </FormControl>
@@ -167,7 +167,7 @@ class TransactionsView extends React.Component<TransactionsViewProps, Transactio
                             onChange={this.handleMonthChange}
                         >
                             {this.getMonths().map((month, i) => {
-                                return (<MenuItem value={i}>{month}</MenuItem>)
+                                return (<MenuItem key={i} value={i}>{month}</MenuItem>)
                             })}
                         </Select>
                     </FormControl>
@@ -182,7 +182,7 @@ class TransactionsView extends React.Component<TransactionsViewProps, Transactio
                             onChange={this.handleCategoryChange}
                         >
                             {this.state.categories.map((category) => {
-                                return (<MenuItem value={category}>{category}</MenuItem>)
+                                return (<MenuItem key={category} value={category}>{category}</MenuItem>)
                             })}
                         </Select>
                     </FormControl>
