@@ -114,7 +114,7 @@ class BudgetProgressView extends React.Component<BudgetProgressViewProps, IState
             const isOverBudget = rawSpentCalc > 100.0
             const percentSpent = (isOverBudget) ? 100.0 : rawSpentCalc;
             return (
-              <BudgetComponent year={year} month={month} category={category} percentSpent={percentSpent} isOverBudget={isOverBudget} />
+              <BudgetComponent key={category.name} year={year} month={month} category={category} percentSpent={percentSpent} isOverBudget={isOverBudget} />
             )
           })}
         </Box >

@@ -12,10 +12,9 @@ import {
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import CircularProgress from '@mui/material/CircularProgress';
 import AddIcon from '@mui/icons-material/Add';
-import { dateRange } from '../utilities/helpers';
+import { ALL, dateRange } from '../utilities/helpers';
 import { fetchTransactionsForYearMonth } from '../dataAccess/TransactionDataAccess';
 import { Transaction } from '../model/Transaction';
-import { DateDirectory, groupByMonth } from '../utilities/transactionUtils';
 
 interface IProps {
   hideSignIn: () => void;
@@ -24,7 +23,7 @@ interface IProps {
 
 interface IState {
 
-  dateDirectory: DateDirectory[] | undefined;
+  transactions: Transaction[] | undefined;
   categories: string[] | undefined;
   user: string | undefined;
   profileOpen: boolean;
@@ -59,7 +58,7 @@ class Home extends React.Component<IProps, IState> {
       profileOpen: false,
       addTransactionDialog: false,
       categories: undefined,
-      dateDirectory: undefined
+      transactions: undefined
 
     }
     this.componentDidMount = this.componentDidMount.bind(this);
@@ -114,8 +113,8 @@ class Home extends React.Component<IProps, IState> {
 
     const keysSorted = Object.keys(categoryMap).sort(function(a,b){return categoryMap[b]-categoryMap[a]}).slice(0,15)
     categories = keysSorted
-    const dateDirectory: DateDirectory[] = groupByMonth(allTxns);
-    this.setState({categories, dateDirectory})
+    categories.push(ALL)
+    this.setState({categories, transactions: allTxns})
   }
 
 
@@ -202,8 +201,8 @@ class Home extends React.Component<IProps, IState> {
               {this.state.addTransactionDialog && this.state.user && this.state.categories && 
                 <AddEditTransactionView user={this.state.user} categories={this.state.categories} closeDialog={this.closeDialog} />}
             </Dialog>
-            {this.state.user && this.state.categories && this.state.dateDirectory ? 
-              <Main user={this.state.user} categories={this.state.categories} dateDirectoryProps={this.state.dateDirectory}/> : 
+            {this.state.user && this.state.categories && this.state.transactions ? 
+              <Main user={this.state.user} categories={this.state.categories} transactions={this.state.transactions}/> : 
               <Box sx={{ position: 'absolute', top: '50%', left: '50%' }}>
                 <CircularProgress />
               </Box>}
