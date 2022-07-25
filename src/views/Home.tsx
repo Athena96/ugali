@@ -145,14 +145,16 @@ class Home extends React.Component<IProps, IState> {
 
   render() {
 
+    const isMobile = window.innerWidth <= 390;
 
 
       return (
+
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static">
             <Toolbar>
               <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                <Link style={{ color: 'white', textDecoration: 'none' }} to="/">Zen Spending</Link>
+                {!isMobile && <Link style={{ color: 'white', textDecoration: 'none' }} to="/">Zen Spending</Link>}
                 <Link style={{ color: 'white', textDecoration: 'none' }} to="/transactions"><small style={{ marginLeft: '20px' }}>Transactions</small></Link>
                 <Link style={{ color: 'white', textDecoration: 'none' }} to="/budget"><small style={{ marginLeft: '20px' }}>Budget</small></Link>
 
