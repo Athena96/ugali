@@ -50,9 +50,19 @@ class BudgetView extends React.Component<BudgetViewProps, IState> {
   }
 
 
-  handleDeleteCategory(category: Category) {
+  async handleDeleteCategory(category: Category) {
+
+    if (this.state.budget) {
+      const catIdToDelete = category.id;
+      const budget = this.state.budget;
+      const newCategories = budget.categories.filter((category) => category.id !== catIdToDelete);
+      budget.categories = newCategories;
+      this.setState({ budget });
+      await this.saveBudget();
+    }
 
   }
+
   handleCategoryNameUpdate(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, i: number) {
     const newVal = event.target.value;
     if (this.state.budget) {
