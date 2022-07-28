@@ -1,21 +1,16 @@
 import * as React from 'react';
 
 import '../App.css';
-import Box from '@mui/material/Box';
 
+import {
+  Box, Paper, Button, Stack, TextField, InputAdornment
+} from '@mui/material';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-
-
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
-
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { createBudgetDB, getBudgetForUserDB, updateBudgetDB } from '../dataAccess/BudgetDataAccess';
 import { Budget } from '../model/Budget';
 import { Category } from '../model/Category';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { cleanNumberDataInput } from '../utilities/helpers';
 
 
@@ -57,8 +52,8 @@ class BudgetView extends React.Component<BudgetViewProps, IState> {
       const budget = this.state.budget;
       const newCategories = budget.categories.filter((category) => category.id !== catIdToDelete);
       budget.categories = newCategories;
-      this.setState({ budget });
       await this.saveBudget();
+      this.setState({ budget });
     }
 
   }
@@ -115,7 +110,9 @@ class BudgetView extends React.Component<BudgetViewProps, IState> {
 
     if (this.state.budget) {
       return (
-        <Box >
+        <Paper elevation={3}>
+
+        <Box sx={{margin: '10px'}}>
           <h2>Budget <small> - <i>${this.getBudgetTotal().toFixed(2)}</i></small></h2>
           <hr />
           <br />
@@ -149,9 +146,12 @@ class BudgetView extends React.Component<BudgetViewProps, IState> {
           <br />
           <br />
           <Button sx={{ width: '100%' }} onClick={(event) => this.saveBudget()} variant="outlined">save</Button>
+          <br />
+          <br />
 
 
-        </Box >
+          </Box >
+          </Paper >
       )
     } else {
       return (<></>)

@@ -3,7 +3,7 @@ import * as React from 'react';
 import '../App.css';
 
 import {
-  FormControl, Box, MenuItem, InputLabel, Select, SelectChangeEvent
+  FormControl, Box, Paper, MenuItem, InputLabel, Select, SelectChangeEvent
 } from '@mui/material';
 import { Transaction } from '../model/Transaction';
 import { ALL, dateRange } from '../utilities/helpers';
@@ -126,7 +126,7 @@ class BudgetGraphView extends React.Component<BudgetGraphViewProps, IState> {
     }
 
     // if max is 766 if returns 800
-    let next100 = Math.round((max + 100)/100)*100;
+    let next100 = Math.round((max + 100) / 100) * 100;
     return next100;
   }
 
@@ -166,26 +166,30 @@ class BudgetGraphView extends React.Component<BudgetGraphViewProps, IState> {
     };
 
     return (
-      <Box >
-        <h2>Monthly Spending</h2>
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Category</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={this.state.category}
-            label="category"
-            onChange={this.handleCategoryChange}
-          >
-            {this.props.categories.map((category) => {
-              return (<MenuItem key={category} value={category}>{category}</MenuItem>)
-            })}
-          </Select>
-        </FormControl>
-        <br/>
-        <br/>
-        {this.state.dateDirectory && <Line style={{ width: '100%' }} data={this.getChartData()} options={options} />}
-      </Box >
+      <Paper elevation={3}>
+
+        <Box sx={{ margin: '10px' }}>
+          <h2>Monthly Spending</h2>
+          <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-label">Category</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={this.state.category}
+              label="category"
+              onChange={this.handleCategoryChange}
+            >
+              {this.props.categories.map((category) => {
+                return (<MenuItem key={category} value={category}>{category}</MenuItem>)
+              })}
+            </Select>
+          </FormControl>
+          <br />
+          <br />
+          {this.state.dateDirectory && <Line style={{ width: '100%' }} data={this.getChartData()} options={options} />}
+        </Box >
+      </Paper>
+
     )
   }
 }

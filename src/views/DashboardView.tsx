@@ -1,10 +1,11 @@
 import * as React from 'react';
 
 import '../App.css';
-import Box from '@mui/material/Box';
+import {
+  Box, Stack
+} from '@mui/material';
 import BudgetProgressView from './BudgetProgressView';
 import BudgetGraphView from './BudgetGraphView';
-import Stack from '@mui/material/Stack';
 import { Transaction } from '../model/Transaction';
 
 interface DashboardViewProps {
@@ -52,7 +53,7 @@ class DashboardView extends React.Component<DashboardViewProps, IState> {
     if (this.props.transactions) {
       return (
         <Box >
-          <Stack direction={isMobile ? 'column' : 'row'} spacing={8}>
+          <Stack direction={isMobile ? 'column' : 'row'} spacing={4}>
             {isMobile ? this.getBudgetGraphView(isMobile, this.props.categories, this.props.user, this.props.transactions) : this.getBudgetProgressView(isMobile, this.props.user)}
             {isMobile ? this.getBudgetProgressView(isMobile, this.props.user) : this.getBudgetGraphView(isMobile,this.props.categories, this.props.user, this.props.transactions)}
           </Stack>

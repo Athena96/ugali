@@ -1,7 +1,9 @@
 import * as React from 'react';
 
 import '../App.css';
-import Box from '@mui/material/Box';
+import {
+   Box, Paper
+} from '@mui/material';
 import { fetchTransactionsForYearMonth } from '../dataAccess/TransactionDataAccess';
 import { CategoryDirectory, groupTransactionsByCategory } from '../utilities/transactionUtils';
 import { getBudgetForUserDB } from '../dataAccess/BudgetDataAccess';
@@ -59,6 +61,13 @@ class BudgetProgressView extends React.Component<BudgetProgressViewProps, IState
         const matchingTransactions: CategoryDirectory | undefined = this.getMatchingTransactions(cat, categoryMap)
         if (matchingTransactions) {
           finalCategoryMap.push(matchingTransactions)
+        } else {
+          finalCategoryMap.push({
+            name: cat.name,
+            transactions: [],
+            sum: 0.0,
+            budgetCategory: cat
+          })
         }
       }
     } else {
@@ -98,26 +107,28 @@ class BudgetProgressView extends React.Component<BudgetProgressViewProps, IState
       const year = today.getFullYear()
       const month = today.getMonth() + 1;
       return (
-        <Box >
-          <h2><Link style={{ color: 'black', textDecoration: 'none' }} to={`/transactions/${year}/${month}`}>Budget</Link></h2>
-          <BudgetComponent year={year} month={month} category={{
-            name: 'Total',
-            transactions: [],
-            sum: totalOfTotalSpent,
-            budgetCategory: new Category('1',
-              '',
-              totalCanSpend)
-          }} percentSpent={percentSpent} isOverBudget={isOverTotalBudget} isMaster={true} />
-          <hr />
-          {this.state.categoryMap.map((category) => {
-            const rawSpentCalc = (category.sum / (category.budgetCategory?.value || 0.0)) * 100.0
-            const isOverBudget = rawSpentCalc > 100.0
-            const percentSpent = (isOverBudget) ? 100.0 : rawSpentCalc;
-            return (
-              <BudgetComponent key={category.name} year={year} month={month} category={category} percentSpent={percentSpent} isOverBudget={isOverBudget} />
-            )
-          })}
-        </Box >
+        <Paper elevation={3}>
+          <Box sx={{ margin: '10px' }}>
+            <h2><Link style={{ color: 'black', textDecoration: 'none' }} to={`/transactions/${year}/${month}`}>Budget</Link></h2>
+            <BudgetComponent year={year} month={month} category={{
+              name: 'Total',
+              transactions: [],
+              sum: totalOfTotalSpent,
+              budgetCategory: new Category('1',
+                '',
+                totalCanSpend)
+            }} percentSpent={percentSpent} isOverBudget={isOverTotalBudget} isMaster={true} />
+            <hr />
+            {this.state.categoryMap.map((category) => {
+              const rawSpentCalc = (category.sum / (category.budgetCategory?.value || 0.0)) * 100.0
+              const isOverBudget = rawSpentCalc > 100.0
+              const percentSpent = (isOverBudget) ? 100.0 : rawSpentCalc;
+              return (
+                <BudgetComponent key={category.name} year={year} month={month} category={category} percentSpent={percentSpent} isOverBudget={isOverBudget} />
+              )
+            })}
+          </Box>
+        </Paper >
       )
     } else {
       return (<></>)

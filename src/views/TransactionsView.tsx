@@ -2,10 +2,8 @@ import * as React from 'react';
 
 import '../App.css';
 import { Link } from "react-router-dom";
-
 import { Transaction } from '../model/Transaction';
 import { deleteTransactionDB, fetchTransactionsForYearMonth } from '../dataAccess/TransactionDataAccess';
-
 import {
     FormControl, MenuItem, InputLabel, Button, Box, Paper, TableRow, TableHead,
     TableContainer, TableCell, TableBody, Table, Stack, Select, SelectChangeEvent
@@ -58,10 +56,10 @@ class TransactionsView extends React.Component<TransactionsViewProps, Transactio
         }
         if (year && month && category) {
             await this.fetchTransactions(parseInt(year), realMonth, category)
-            this.setState({  year, month, category })
+            this.setState({ year, month, category })
         } else if (year && month && category === undefined) {
             await this.fetchTransactions(parseInt(year), realMonth, this.state.category)
-            this.setState({  year, month, category: ALL })
+            this.setState({ year, month, category: ALL })
         } else {
             await this.fetchTransactions(parseInt(this.state.year), parseInt(this.state.month), this.state.category)
         }
@@ -139,110 +137,114 @@ class TransactionsView extends React.Component<TransactionsViewProps, Transactio
     render() {
         if (this.state.transactions && this.state.categories) {
             let sum = 0.0;
-            return (<Box>
-                <h2>Transactions</h2>
-                <Stack direction='row' spacing={2}>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Age</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={this.state.year}
-                            label="year"
-                            onChange={this.handleYearChange}
-                        >
-                            {this.getYears().map((year) => {
-                                return (<MenuItem key={year} value={year}>{year}</MenuItem>)
-                            })}
-                        </Select>
-                    </FormControl>
+            return (
+                <Paper elevation={3}>
 
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Month</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={this.state.month}
-                            label="month"
-                            onChange={this.handleMonthChange}
-                        >
-                            {this.getMonths().map((month, i) => {
-                                return (<MenuItem key={i} value={i}>{month}</MenuItem>)
-                            })}
-                        </Select>
-                    </FormControl>
+                    <Box sx={{ margin: '10px' }}>
+                        <h2>Transactions</h2>
+                        <Stack direction='row' spacing={2}>
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Age</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    value={this.state.year}
+                                    label="year"
+                                    onChange={this.handleYearChange}
+                                >
+                                    {this.getYears().map((year) => {
+                                        return (<MenuItem key={year} value={year}>{year}</MenuItem>)
+                                    })}
+                                </Select>
+                            </FormControl>
 
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Category</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={this.state.category}
-                            label="category"
-                            onChange={this.handleCategoryChange}
-                        >
-                            {this.state.categories.map((category) => {
-                                return (<MenuItem key={category} value={category}>{category}</MenuItem>)
-                            })}
-                        </Select>
-                    </FormControl>
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Month</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    value={this.state.month}
+                                    label="month"
+                                    onChange={this.handleMonthChange}
+                                >
+                                    {this.getMonths().map((month, i) => {
+                                        return (<MenuItem key={i} value={i}>{month}</MenuItem>)
+                                    })}
+                                </Select>
+                            </FormControl>
 
-                </Stack>
-                <br />
-                <TableContainer component={Paper}>
-                    <Table aria-label="simple table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Date</TableCell>
-                                <TableCell align="center">Title</TableCell>
-                                <TableCell align="center">Amount</TableCell>
-                                <TableCell align="center">Category</TableCell>
-                                <TableCell align="center">Updated At</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {this.state.transactions.map((transaction: Transaction, idx: number) => {
-                                sum += transaction.amount;
-                                return (
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Category</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    value={this.state.category}
+                                    label="category"
+                                    onChange={this.handleCategoryChange}
+                                >
+                                    {this.state.categories.map((category) => {
+                                        return (<MenuItem key={category} value={category}>{category}</MenuItem>)
+                                    })}
+                                </Select>
+                            </FormControl>
+
+                        </Stack>
+                        <br />
+                        <TableContainer component={Paper}>
+                            <Table aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Date</TableCell>
+                                        <TableCell align="center">Title</TableCell>
+                                        <TableCell align="center">Amount</TableCell>
+                                        <TableCell align="center">Category</TableCell>
+                                        <TableCell align="center">Updated At</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {this.state.transactions.map((transaction: Transaction, idx: number) => {
+                                        sum += transaction.amount;
+                                        return (
+                                            <TableRow
+                                                key={transaction.id}
+
+                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                            >
+                                                <TableCell component="th" scope="row">
+                                                    {`${transaction.date.getMonth() + 1}/${transaction.date.getDate()}/${transaction.date.getFullYear()}`}
+                                                </TableCell>
+                                                <TableCell align="center"><Link to={`/transaction/${transaction.id}`}>{transaction.title} </Link></TableCell>
+                                                <TableCell align="center">${Number(transaction.amount).toFixed(2)}</TableCell>
+                                                <TableCell align="center">{transaction.category}</TableCell>
+                                                <TableCell component="th" scope="row">
+                                                    {`${transaction.updatedAt.getMonth() + 1}/${transaction.updatedAt.getDate()}/${transaction.updatedAt.getFullYear()}`}
+                                                </TableCell>
+                                                <TableCell component="th" scope="row">
+                                                    <Button onClick={(e) => this.deleteTransaction(transaction)}><DeleteIcon /></Button>
+                                                </TableCell>
+
+                                            </TableRow>
+                                        )
+                                    })}
+
                                     <TableRow
-                                        key={transaction.id}
-
+                                        key={0}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
                                         <TableCell component="th" scope="row">
-                                            {`${transaction.date.getMonth() + 1}/${transaction.date.getDate()}/${transaction.date.getFullYear()}`}
+                                            {``}
                                         </TableCell>
-                                        <TableCell align="center"><Link to={`/transaction/${transaction.id}`}>{transaction.title} </Link></TableCell>
-                                        <TableCell align="center">${Number(transaction.amount).toFixed(2)}</TableCell>
-                                        <TableCell align="center">{transaction.category}</TableCell>
-                                        <TableCell component="th" scope="row">
-                                            {`${transaction.updatedAt.getMonth() + 1}/${transaction.updatedAt.getDate()}/${transaction.updatedAt.getFullYear()}`}
-                                        </TableCell>
-                                        <TableCell component="th" scope="row">
-                                            <Button onClick={(e) => this.deleteTransaction(transaction)}><DeleteIcon /></Button>
-                                        </TableCell>
-
+                                        <TableCell align="center">SUM</TableCell>
+                                        <TableCell align="center">${sum.toFixed(2)}</TableCell>
+                                        <TableCell align="center"></TableCell>
+                                        <TableCell align="center"></TableCell>
+                                        <TableCell align="center"></TableCell>
                                     </TableRow>
-                                )
-                            })}
-
-                            <TableRow
-                                key={0}
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                            >
-                                <TableCell component="th" scope="row">
-                                    {``}
-                                </TableCell>
-                                <TableCell align="center">SUM</TableCell>
-                                <TableCell align="center">${sum.toFixed(2)}</TableCell>
-                                <TableCell align="center"></TableCell>
-                                <TableCell align="center"></TableCell>
-                                <TableCell align="center"></TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Box>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Box>
+                </Paper>
             )
         } else {
             return (
