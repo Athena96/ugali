@@ -44,43 +44,54 @@ class TransactionsView extends React.Component<TransactionsViewProps, Transactio
     }
 
     async componentDidMount() {
-        const year = window.location.pathname.split('/')[2]
-        const month = window.location.pathname.split('/')[3]
-        const category = window.location.pathname.split('/')[4]
-        // options
-        // 1: year/month/category
-        // 2: year/month
-        let realMonth = 0;
-        if (month) {
-            realMonth = parseInt(month) - 1
+        let year = window.location.pathname.split('/')[2]
+        let month = window.location.pathname.split('/')[3]
+        let category = window.location.pathname.split('/')[4]
+        if (!year) {
+            year = this.state.year
         }
+        if (!category) {
+            category = this.state.category
+        }
+
+        if (month) {
+            const realMonth = parseInt(month) - 1
+            month = String(realMonth);
+        } else {
+            month = this.state.month
+        }
+
         if (year && month && category) {
-            await this.fetchTransactions(parseInt(year), realMonth, category)
             this.setState({ year, month, category })
         } else if (year && month && category === undefined) {
-            await this.fetchTransactions(parseInt(year), realMonth, this.state.category)
             this.setState({ year, month, category: ALL })
-        } else {
-            await this.fetchTransactions(parseInt(this.state.year), parseInt(this.state.month), this.state.category)
         }
+        await this.loadPageData(parseInt(year), parseInt(month), category);
     }
 
-    async fetchTransactions(year: number, month: number, category: string) {
-        let transactions = await fetchTransactionsForYearMonth(this.props.user, year, month + 1)
-        const categories: string[] = [ALL]
-        for (const transaction of transactions) {
-            if (!categories.includes(transaction.category)) {
-                categories.push(transaction.category)
-            }
-        }
-        this.setState({ categories })
+    async loadPageData(year: number, month: number, category: string) {
+        let transactions: Transaction[] = await this.fetchTransactions(year, month);
+        let categories = this.getCategoriesFromTransactions(transactions);
+        transactions = this.filterTransactionsByCategory(transactions, category).sort((a, b) => (a.date > b.date) ? -1 : 1);
+        this.setState({ categories, transactions });
+    }
 
-        transactions = transactions
-            .filter((transaction) =>
-                category === ALL ? true :
-                    transaction.category === category)
-            .sort((a, b) => (a.date > b.date) ? -1 : 1)
-        this.setState({ transactions })
+    getCategoriesFromTransactions(transactions: Transaction[]): string[] {
+        const categories: Set<string> = new Set([ALL])
+        transactions.forEach((transaction) => {
+            categories.add(transaction.category);
+        })
+        return Array.from(categories);
+    }
+
+    filterTransactionsByCategory(transactions: Transaction[], category: string): Transaction[] {
+        return transactions.filter((transaction) =>
+            category === ALL ? true :
+                transaction.category === category);
+    }
+
+    async fetchTransactions(year: number, month: number) {
+        return await fetchTransactionsForYearMonth(this.props.user, year, month + 1)
     }
 
     async deleteTransaction(transaction: Transaction) {
@@ -91,21 +102,21 @@ class TransactionsView extends React.Component<TransactionsViewProps, Transactio
     }
 
     handleYearChange(event: SelectChangeEvent) {
-        const selectedSimulationName = event.target.value as string;
-        this.setState({ year: selectedSimulationName });
-        this.fetchTransactions(parseInt(selectedSimulationName), parseInt(this.state.month), this.state.category)
+        const newYear = event.target.value as string;
+        this.setState({ year: newYear });
+        this.loadPageData(parseInt(newYear), parseInt(this.state.month), this.state.category)
     }
 
     handleMonthChange(event: SelectChangeEvent) {
-        const selectedSimulationName = event.target.value as string;
-        this.setState({ month: selectedSimulationName })
-        this.fetchTransactions(parseInt(this.state.year), parseInt(selectedSimulationName), this.state.category)
+        const newMonth = event.target.value as string;
+        this.setState({ month: newMonth })
+        this.loadPageData(parseInt(this.state.year), parseInt(newMonth), this.state.category)
     }
 
     handleCategoryChange(event: SelectChangeEvent) {
-        const selectedSimulationName = event.target.value as string;
-        this.setState({ category: selectedSimulationName })
-        this.fetchTransactions(parseInt(this.state.year), parseInt(this.state.month), selectedSimulationName)
+        const newCategory = event.target.value as string;
+        this.setState({ category: newCategory })
+        this.loadPageData(parseInt(this.state.year), parseInt(this.state.month), newCategory)
     }
 
     getYears() {
@@ -139,7 +150,6 @@ class TransactionsView extends React.Component<TransactionsViewProps, Transactio
             let sum = 0.0;
             return (
                 <Paper elevation={3}>
-
                     <Box sx={{ margin: '10px' }}>
                         <h2>Transactions</h2>
                         <Stack direction='row' spacing={2}>

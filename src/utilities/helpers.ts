@@ -1,5 +1,5 @@
 
-export const ALL = 'all';
+export const ALL: string = 'all';
 
 export function dateRange(startDate: Date, endDate: Date, steps = 31): Date[] {
     const dateArray: Date[] = [];
