@@ -223,7 +223,7 @@ class TransactionsView extends React.Component<TransactionsViewProps, Transactio
                                                 <TableCell component="th" scope="row">
                                                     {`${transaction.date.getMonth() + 1}/${transaction.date.getDate()}/${transaction.date.getFullYear()}`}
                                                 </TableCell>
-                                                <TableCell align="center"><Link to={`/transaction/${transaction.id}`}>{transaction.title} </Link></TableCell>
+                                                <TableCell align="center"><Link to={`/transaction/${transaction.id}`}>{transaction.title}</Link><br/><small>{transaction.description}</small></TableCell>
                                                 <TableCell align="center">${Number(transaction.amount).toFixed(2)}</TableCell>
                                                 <TableCell align="center">{transaction.category}</TableCell>
                                                 <TableCell component="th" scope="row">
